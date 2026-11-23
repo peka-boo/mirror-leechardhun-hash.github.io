@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="후니 TV">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="후니가 보고 싶은 tv 방송 — 바로 켜지는 실시간 TV">
+<title>후니가 보고 싶은 tv 방송</title>
+<style>
+  :root{
+    --bg:#070b12;
+    --bg2:#0b1220;
+    --card:#111a29;
+    --card2:#16233a;
+    --line:#22304a;
+    --ink:#eef3ff;
+    --ink2:#a8b8d0;
+    --ink3:#6b7c96;
+    --accent:#ff3b5c;
+    --accent2:#59a7ff;
+    --ok:#3ddc97;
+    --warn:#ffb057;
+    --r:16px;
+    --safe-t:env(safe-area-inset-top,0px);
+    --safe-b:env(safe-area-inset-bottom,0px);
+    --safe-l:env(safe-area-inset-left,0px);
+    --safe-r:env(safe-area-inset-right,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;width:100%;max-width:100%;overflow-x:hidden;overflow-x:clip}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{
+    background:
+      radial-gradient(900px 480px at 88% -12%, rgba(255,59,92,.16), transparent 62%),
+      radial-gradient(800px 460px at 4% 0%, rgba(89,167,255,.13), transparent 58%),
+      var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+    font-size:15px;line-height:1.42;
+    min-height:100vh;min-height:100dvh;
+    padding-bottom:calc(28px + var(--safe-b));
+  }
+  button,input{font:inherit;color:inherit}
+  button{cursor:pointer;border:0;background:none;touch-action:manipulation}
+  .wrap{padding-left:calc(16px + var(--safe-l));padding-right:calc(16px + var(--safe-r))}
+
+  /* ---------- header ---------- */
+  .top{padding-top:calc(10px + var(--safe-t));padding-bottom:6px}
+  .brand{display:flex;align-items:center;gap:9px;min-width:0}
+  .brand .ico{font-size:21px;line-height:1;filter:drop-shadow(0 0 9px rgba(255,59,92,.5))}
+  .brand h1{margin:0;font-size:17.5px;font-weight:800;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .meta{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:11.5px;color:var(--ink3);min-width:0}
+  .meta b{color:var(--ink2);font-weight:700}
+  .dotlive{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(255,59,92,.18);flex:none}
+  .topRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  /* 전체 앱 목록(런처)으로 이동 */
+  .home-pill{flex:none;display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 13px;border-radius:999px;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;
+    font-size:12.5px;font-weight:700;line-height:1;text-decoration:none;white-space:nowrap;
+    -webkit-tap-highlight-color:transparent}
+  .home-pill:active{background:rgba(255,255,255,.24)}
+
+  /* ---------- stage (sticky) ---------- */
+  .stage{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,rgba(7,11,18,.98) 70%,rgba(7,11,18,.92));
+    border-bottom:1px solid rgba(34,48,74,.55);margin-bottom:8px;
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .stage.stuck{box-shadow:0 10px 26px rgba(0,0,0,.45);padding-top:var(--safe-t)}
+
+  .videoBox{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden}
+  @media (min-width:700px){ .videoBox{box-shadow:0 18px 50px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.07)} }
+  .videoBox video{position:absolute;inset:0;width:100%;height:100%;background:#000;display:block;object-fit:contain}
+  .videoBox.idle video{opacity:0}
+
+  .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+    text-align:center;padding:14px;pointer-events:none;
+    background:radial-gradient(circle at 50% 42%,rgba(22,35,58,.92),rgba(5,8,13,.97))}
+  .overlay[hidden]{display:none}
+  .overlay.act{pointer-events:auto}
+  .bigplay{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-size:22px;color:#fff;
+    background:linear-gradient(160deg,#ff4d6b,#d81b45);box-shadow:0 10px 26px rgba(255,59,92,.35);padding-left:4px}
+  .bigplay:active{transform:scale(.96)}
+  .ovT{font-size:14px;font-weight:800;letter-spacing:-.01em}
+  .ovS{font-size:11.5px;color:var(--ink3);max-width:280px;line-height:1.45}
+  .spinner{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.16);border-top-color:var(--accent);
+    animation:sp .8s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .ovBtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+  .ovBtn{padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid var(--line);
+    font-size:12px;font-weight:700;color:var(--ink)}
+  .ovBtn.pri{background:linear-gradient(160deg,#ff4d6b,#d81b45);border-color:transparent;color:#fff}
+
+  .nowbar{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:8px;
+    padding:8px 11px 20px;pointer-events:none;
+    background:linear-gradient(180deg,rgba(0,0,0,.72),transparent);
+    font-size:11.5px;font-weight:700;color:#fff}
+  .nowbar .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+  .nowbar .live{display:none;align-items:center;gap:4px;font-size:9.5px;font-weight:800;letter-spacing:.06em;
+    background:var(--accent);color:#fff;padding:2px 6px;border-radius:5px;flex:none}
+  .videoBox.playing .nowbar .live{display:inline-flex}
+  .nowbar .st{font-weight:600;color:#cfe0f7;font-size:10.5px;flex:none;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nowbar .fs{pointer-events:auto;width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.14);
+    display:grid;place-items:center;font-size:13px;color:#fff;flex:none;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  .nowbar[hidden]{display:none}
+
+  /* compact mini player */
+  .mini{display:none;align-items:center;gap:9px;padding:6px 12px;height:50px}
+  .mini .mp{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.1);display:grid;place-items:center;font-size:13px;flex:none}
+  .mini .mn{flex:1;min-width:0;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mini .ms{font-size:10px;color:var(--ink3);font-weight:700;flex:none}
+  .stage.compact .videoBox{position:absolute;left:0;top:0;width:2px;height:2px;opacity:0;overflow:hidden;pointer-events:none}
+  .stage.compact .mini{display:flex}
+
+  /* tabs */
+  .tabs{display:flex;gap:5px;padding:7px calc(12px + var(--safe-l)) 8px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;
+    font-size:13px;font-weight:800;color:var(--ink2);background:rgba(255,255,255,.055);border:1px solid transparent;white-space:nowrap}
+  .tab.on{background:linear-gradient(160deg,#ff4d6b,#d81b45);color:#fff;box-shadow:0 6px 16px rgba(255,59,92,.28)}
+  .tab .cnt{font-size:10px;font-weight:800;opacity:.72}
+
+  /* ---------- search + chips ---------- */
+  .searchbar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:9px 13px;margin:10px 0 0}
+  .searchbar .si{font-size:13px;opacity:.7;flex:none}
+  .searchbar input{flex:1;min-width:0;background:none;border:0;outline:none;font-size:14px;color:var(--ink);padding:0}
+  .searchbar input::placeholder{color:var(--ink3)}
+  .searchbar input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+  .searchbar .clr{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.09);color:var(--ink2);
+    font-size:11px;display:none;place-items:center;flex:none}
+  .searchbar.has .clr{display:grid}
+
+  .chips{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;color:var(--ink2);
+    background:rgba(255,255,255,.05);border:1px solid var(--line);white-space:nowrap}
+  .chip.on{background:rgba(89,167,255,.16);border-color:rgba(89,167,255,.55);color:#cfe4ff}
+
+  /* ---------- grid ---------- */
+  main{padding-top:8px;min-width:0}
+  .seched{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:6px 0 10px}
+  .seched h2{margin:0;font-size:13.5px;font-weight:800;letter-spacing:-.01em;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .seched .side{font-size:11px;color:var(--ink3);font-weight:700;flex:none}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px}
+  .card{position:relative;display:flex;flex-direction:column;gap:6px;align-items:stretch;text-align:left;
+    background:none;border:0;padding:0;min-width:0}
+  .card .logo{position:relative;aspect-ratio:1/1;border-radius:15px;overflow:hidden;display:grid;place-items:center;
+    background:linear-gradient(158deg,var(--c,#1b2942),rgba(0,0,0,.55));
+    border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 16px rgba(0,0,0,.32);
+    transition:transform .12s ease, box-shadow .12s ease}
+  .card .logo:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 12%,rgba(255,255,255,.28),transparent 62%);opacity:.7}
+  .card .bd{position:relative;z-index:1;font-weight:900;letter-spacing:-.02em;color:#fff;
+    font-size:clamp(11px,3.6vw,16px);text-shadow:0 2px 6px rgba(0,0,0,.45);padding:0 4px;text-align:center;line-height:1.1;
+    word-break:keep-all}
+  .card .fl{position:absolute;right:5px;bottom:4px;font-size:11px;opacity:.85;z-index:2;line-height:1}
+  .card .domTag{position:absolute;left:4px;bottom:4px;z-index:2;display:inline-flex;align-items:center;gap:2px;
+    font-size:8px;font-weight:800;letter-spacing:-.02em;line-height:1;
+    padding:3px 4px;border-radius:5px;color:#1b1204;background:rgba(255,190,92,.94);
+    box-shadow:0 1px 4px rgba(0,0,0,.45);white-space:nowrap}
+  .card .domTag .up{font-size:8px;opacity:.85}
+  .card .nm{font-size:11.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+  .card .ct{font-size:10px;color:var(--ink3);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:-3px}
+  .card:active .logo{transform:scale(.965)}
+  .card.on .logo{border-color:rgba(255,59,92,.85);box-shadow:0 0 0 2px rgba(255,59,92,.5),0 8px 20px rgba(255,59,92,.28)}
+  .card.on .nm{color:#fff}
+  .card .livePip{position:absolute;left:5px;top:5px;z-index:2;display:none;align-items:center;gap:3px;
+    background:rgba(255,59,92,.94);color:#fff;font-size:8px;font-weight:900;letter-spacing:.05em;padding:2px 5px;border-radius:5px}
+  .card.on .livePip{display:inline-flex}
+  a.card{text-decoration:none;color:inherit}
+  .card.extOnly.on .livePip,.card.extOnly .livePip{display:none}
+  .card .fav{position:absolute;right:3px;top:3px;z-index:3;width:24px;height:24px;border-radius:8px;
+    display:grid;place-items:center;font-size:12px;color:rgba(255,255,255,.5);
+    background:rgba(0,0,0,.28);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .card .fav.on{color:#ffcf5c;background:rgba(0,0,0,.42)}
+  .card .fav:active{transform:scale(.9)}
+
+  .empty{padding:34px 14px;text-align:center;color:var(--ink3);font-size:13px;line-height:1.7}
+  .empty b{color:var(--ink2)}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:calc(20px + var(--safe-b));transform:translate(-50%,14px);
+    display:flex;align-items:center;gap:10px;max-width:calc(100vw - 28px);
+    background:rgba(23,34,54,.98);border:1px solid var(--line);border-radius:14px;padding:10px 12px;
+    font-size:12px;color:var(--ink);box-shadow:0 14px 34px rgba(0,0,0,.5);
+    opacity:0;pointer-events:none;transition:.22s;z-index:100}
+  .toast.show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+  .toast button{flex:none;font-size:12px;font-weight:800;color:var(--accent2);padding:2px 4px}
+
+  footer{margin-top:22px;padding-top:14px;border-top:1px solid rgba(34,48,74,.6);font-size:11px;color:var(--ink3);line-height:1.65}
+  footer b{color:var(--ink2);font-weight:700}
+  footer .lnk{color:var(--accent2);font-weight:700}
+
+  /* ---------- 수동 숨김 / 채널 편집 ---------- */
+  .seched .secRight{display:flex;align-items:center;gap:8px;flex:none}
+  .editBtn{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:var(--ink2);
+    padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);white-space:nowrap}
+  .editBtn.on{background:rgba(255,59,92,.16);border-color:rgba(255,59,92,.6);color:#ffd5dd}
+  .editBtn:active{transform:scale(.97)}
+
+  .editHint{display:flex;align-items:center;gap:9px;margin:2px 0 10px;padding:9px 11px;
+    border-radius:12px;background:rgba(255,59,92,.1);border:1px solid rgba(255,59,92,.3);
+    font-size:11.5px;line-height:1.45;color:#ffd9e0}
+  .editHint[hidden]{display:none}
+  .editHint span{flex:1;min-width:0}
+  .editHint b{color:#fff;font-weight:800}
+  .editHint button{flex:none;font-size:11.5px;font-weight:800;color:#fff;background:linear-gradient(160deg,#ff4d6b,#d81b45);
+    padding:6px 12px;border-radius:999px}
+
+  .grid.editing .card .logo{filter:saturate(.45) brightness(.72)}
+  .card.edit .logo{border-style:dashed;border-color:rgba(255,59,92,.55)}
+  .card.edit .nm{color:#ffd9e0}
+  .card .hidePill{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;
+    display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:900;letter-spacing:-.02em;
+    color:#fff;background:rgba(255,59,92,.95);padding:4px 8px;border-radius:999px;white-space:nowrap;
+    box-shadow:0 4px 12px rgba(0,0,0,.5)}
+
+  .manageBtn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin:16px 0 0;
+    padding:12px 14px;border-radius:14px;background:var(--card);border:1px solid var(--line);
+    font-size:12.5px;font-weight:800;color:var(--ink2)}
+  .manageBtn.has{background:rgba(255,59,92,.08);border-color:rgba(255,59,92,.45);color:#ffd9e0}
+  .manageBtn:active{transform:scale(.99)}
+  .manageBtn .n{display:inline-flex;min-width:21px;height:20px;align-items:center;justify-content:center;
+    padding:0 6px;border-radius:999px;background:rgba(255,59,92,.9);color:#fff;font-size:11px;font-weight:900}
+
+  /* 현재 재생 채널 바 (수동 숨기기) */
+  .curBar{display:flex;align-items:center;gap:8px;padding:6px 12px 7px;
+    border-top:1px solid rgba(34,48,74,.55);background:rgba(9,14,23,.94)}
+  .curBar[hidden]{display:none}
+  .curBar .cn{flex:1;min-width:0;font-size:11.5px;font-weight:700;color:var(--ink2);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .curBar .ch{flex:none;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;color:#ffd5dd;
+    background:rgba(255,59,92,.14);border:1px solid rgba(255,59,92,.45);padding:6px 10px;border-radius:999px}
+  .curBar .ch:active{transform:scale(.96)}
+  .stage.compact .curBar{display:none}
+
+  /* 숨긴 채널 관리 모달 */
+  .modal{position:fixed;inset:0;z-index:95;display:flex;align-items:flex-end;justify-content:center}
+  .modal[hidden]{display:none}
+  .modal .mbg{position:absolute;inset:0;background:rgba(0,0,0,.62);
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .modal .mcard{position:relative;width:100%;max-width:520px;max-height:84vh;display:flex;flex-direction:column;
+    background:#0e1725;border:1px solid var(--line);border-radius:20px 20px 0 0;
+    padding-bottom:calc(10px + var(--safe-b));box-shadow:0 -18px 50px rgba(0,0,0,.6);animation:mUp .18s ease}
+  @keyframes mUp{from{transform:translateY(20px);opacity:.5}to{transform:none;opacity:1}}
+  .mhead{display:flex;align-items:center;gap:10px;padding:13px 15px 10px;border-bottom:1px solid rgba(34,48,74,.7)}
+  .mhead h3{margin:0;font-size:14.5px;font-weight:800;letter-spacing:-.02em;flex:1;min-width:0}
+  .mhead .x{width:30px;height:30px;flex:none;border-radius:9px;background:rgba(255,255,255,.08);
+    color:var(--ink2);display:grid;place-items:center;font-size:13px}
+  .mbody{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 12px 2px}
+  .hrow{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid rgba(34,48,74,.45)}
+  .hrow:last-child{border-bottom:0}
+  .hrow .hl{width:38px;height:38px;flex:none;border-radius:11px;display:grid;place-items:center;
+    font-size:9.5px;font-weight:900;line-height:1.05;color:#fff;text-align:center;overflow:hidden;
+    border:1px solid rgba(255,255,255,.1)}
+  .hrow .hi{flex:1;min-width:0}
+  .hrow .hi b{display:block;font-size:12.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hrow .hi span{display:block;font-size:10.5px;color:var(--ink3);font-weight:600;margin-top:1px}
+  .hrow .rb{flex:none;font-size:11.5px;font-weight:800;color:#cfe4ff;background:rgba(89,167,255,.16);
+    border:1px solid rgba(89,167,255,.5);padding:7px 11px;border-radius:999px}
+  .hrow .rb:active{transform:scale(.96)}
+  .mfoot{display:flex;gap:8px;padding:10px 15px 2px}
+  .mfoot button{flex:1;padding:11px;border-radius:12px;font-size:12.5px;font-weight:800}
+  .mfoot .all{background:rgba(255,59,92,.14);border:1px solid rgba(255,59,92,.5);color:#ffd5dd}
+  .mfoot .close{background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--ink2)}
+  .mempty{padding:26px 12px 30px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.65}
+  .mempty b{color:var(--ink2)}
+
+  /* ---------- 전 세계 국가 ---------- */
+  .ctryWrap{margin:10px 0 0}
+  .ctryToggle{display:flex;align-items:center;gap:8px;width:100%;padding:11px 14px;border-radius:14px;
+    background:var(--card);border:1px solid var(--line);font-size:12.5px;font-weight:800;color:var(--ink2)}
+  .ctryToggle .t{flex:1;min-width:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ctryToggle .t b{color:var(--ink);font-weight:800}
+  .ctryToggle .cv{flex:none;font-size:11px;color:var(--ink3);transition:transform .16s}
+  .ctryToggle.open .cv{transform:rotate(180deg)}
+  .ctryToggle:active{transform:scale(.995)}
+  .ctryPanel[hidden]{display:none}
+  .ctryPanel{margin-top:8px;padding:10px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+  .ctrySearch{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:8px 12px}
+  .ctrySearch span{font-size:12px;opacity:.7;flex:none}
+  .ctrySearch input{flex:1;min-width:0;background:none;border:0;outline:none;font-size:13px;color:var(--ink);padding:0}
+  .ctrySearch input::placeholder{color:var(--ink3)}
+  .ctrySearch input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+  .ctryGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px;
+    max-height:47vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .ctile{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:8px 9px;border-radius:12px;
+    background:var(--card);border:1px solid rgba(34,48,74,.9);text-align:left;min-width:0}
+  .ctile .cf{font-size:15px;line-height:1.15}
+  .ctile .cn{display:block;width:100%;font-size:11.5px;font-weight:800;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ctile .cc{display:block;font-size:9.5px;color:var(--ink3);font-weight:700}
+  .ctile.on{background:rgba(89,167,255,.14);border-color:rgba(89,167,255,.6)}
+  .ctile:active{transform:scale(.97)}
+
+  .ctryBar{display:flex;align-items:center;gap:8px;margin:10px 0 0;padding:9px 12px;border-radius:14px;
+    background:rgba(89,167,255,.1);border:1px solid rgba(89,167,255,.4);font-size:12px;color:#cfe4ff}
+  .ctryBar[hidden]{display:none}
+  .ctryBar .cb{flex:1;min-width:0;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ctryBar .cb b{color:#fff}
+  .ctryBar button{flex:none;font-size:11.5px;font-weight:800;color:#cfe4ff;background:rgba(255,255,255,.08);
+    border:1px solid rgba(89,167,255,.4);padding:6px 10px;border-radius:999px}
+  .moreBtn{display:block;width:100%;margin:14px 0 0;padding:12px;border-radius:13px;background:var(--card);
+    border:1px solid var(--line);font-size:12.5px;font-weight:800;color:var(--ink2)}
+  .moreBtn[hidden]{display:none}
+  .loadBox{display:flex;flex-direction:column;align-items:center;gap:11px;padding:30px 12px;
+    text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.65}
+  .loadBox b{color:var(--ink2)}
+
+  /* ---------- desktop ---------- */
+  @media (min-width:700px){
+    .ctryGrid{grid-template-columns:repeat(5,1fr)}
+    .wrap{max-width:1180px;margin-left:auto;margin-right:auto}
+    .stage{max-width:1180px;margin-left:auto;margin-right:auto}
+    .videoBox{max-width:calc(54vh * 16 / 9);margin:8px auto 0;border-radius:14px}
+    .tabs{justify-content:center}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:12px}
+    .brand h1{font-size:20px}
+    .card .bd{font-size:15px}
+    .card .nm{font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+<div class="top wrap">
+  <div class="topRow">
+    <div class="brand">
+      <span class="ico">📺</span>
+      <h1>후니가 보고 싶은 tv 방송</h1>
+    </div>
+    <a class="home-pill" href="/" aria-label="전체 앱 목록으로 이동">🏠 앱 목록</a>
+  </div>
+  <div class="meta">
+    <span class="dotlive"></span>
+    <span>실시간 <b id="totalCnt">0</b>개 채널</span>
+    <span style="opacity:.5">·</span>
+    <span>설치 없이 바로 재생</span>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="videoBox idle" id="videoBox">
+    <video id="tv" playsinline webkit-playsinline controls preload="none" x-webkit-airplay="allow" disablepictureinpicture="false"></video>
+
+    <div class="overlay" id="overlay">
+      <button class="bigplay" id="bigplay" aria-label="재생">▶</button>
+      <div class="ovT" id="ovT">채널을 골라 주세요</div>
+      <div class="ovS" id="ovS">아래에서 방송사를 누르면 이 화면에서 바로 켜집니다.</div>
+    </div>
+
+    <div class="nowbar" id="nowbar" hidden>
+      <span class="live">● LIVE</span>
+      <span class="nm" id="nowName"></span>
+      <span class="st" id="nowState"></span>
+      <button class="fs" id="fsBtn" aria-label="전체화면">⛶</button>
+    </div>
+  </div>
+
+  <div class="curBar" id="curBar" hidden>
+    <span class="cn" id="curNm"></span>
+    <button class="ch" id="hideCurBtn">이 채널 숨기기</button>
+  </div>
+
+  <div class="mini" id="mini">
+    <button class="mp" id="miniPlay" aria-label="재생/일시정지">▶</button>
+    <span class="mn" id="miniName">채널을 골라 주세요</span>
+    <span class="ms" id="miniState"></span>
+    <button class="fs" id="miniExpand" aria-label="플레이어 펼치기" style="width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:13px">⤢</button>
+  </div>
+
+  <nav class="tabs" id="tabs" aria-label="탭"></nav>
+</div>
+
+<div class="wrap">
+  <div class="searchbar" id="searchbar">
+    <span class="si">🔎</span>
+    <input type="search" id="q" placeholder="채널 이름으로 찾기 (예: EBS, 뉴스, 일본)" autocomplete="off" enterkeyhint="search">
+    <button class="clr" id="qClear" aria-label="지우기">✕</button>
+  </div>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="ctryWrap" id="ctryWrap" hidden>
+    <button class="ctryToggle" id="ctryToggle" aria-expanded="false">
+      <span class="t">🌐 <b>전 세계 TV</b> · <span id="ctryTotal">0</span>개국에서 골라 보기</span>
+      <span class="cv">▾</span>
+    </button>
+    <div class="ctryPanel" id="ctryPanel" hidden>
+      <div class="ctrySearch"><span>🔎</span><input id="ctryQ" type="search" placeholder="나라 이름으로 찾기 (예: 미국, Japan)" autocomplete="off"></div>
+      <div class="ctryGrid" id="ctryGrid"></div>
+    </div>
+  </div>
+
+  <div class="ctryBar" id="ctryBar" hidden>
+    <span class="cb" id="ctryBarTxt"></span>
+    <button id="ctryBack">국가 목록</button>
+  </div>
+
+  <main>
+    <div class="seched">
+      <h2 id="secTitle">한국 실시간 TV</h2>
+      <div class="secRight">
+        <span class="side" id="secCount"></span>
+        <button class="editBtn" id="editBtn" aria-pressed="false">채널 편집</button>
+      </div>
+    </div>
+    <div class="editHint" id="editHint" hidden>
+      <span>숨기고 싶은 채널을 <b>탭</b>하세요. 숨긴 채널은 아래 <b>숨긴 채널 관리</b>에서 언제든 다시 꺼낼 수 있어요.</span>
+      <button id="editDone">완료</button>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden></div>
+    <button class="moreBtn" id="moreBtn" hidden>더 보기</button>
+    <button class="manageBtn" id="manageBtn">🗂 숨긴 채널 관리 <span class="n" id="hiddenCnt">0</span></button>
+  </main>
+
+  <footer>
+    <div><b>후니가 보고 싶은 tv 방송</b> · 실시간 채널 <b id="totalCnt2">0</b>개 내장 (2026-11-23 기준 실제 재생 확인)</div>
+    <div style="margin-top:5px">방송은 각 방송사가 인터넷에 공개한 스트림을 그대로 연결합니다. 방송사 사정으로 끊겨도 채널은 <b>목록에서 사라지지 않고</b>, 플레이어에 안내와 <b>다시 시도</b> 버튼만 뜹니다.</div>
+    <div style="margin-top:5px">채널을 정리하고 싶을 때만 직접 숨기세요 — 목록 위 <b>채널 편집</b>을 켜고 원하는 채널을 탭하거나, 재생 중 <b>이 채널 숨기기</b>를 누르면 됩니다. 숨긴 채널은 아래 <b>숨긴 채널 관리</b>에서 하나씩 또는 한꺼번에 되살릴 수 있어요.</div>
+    <div style="margin-top:5px"><b>🌐 전 세계</b> 해외 TV 탭의 <b>전 세계 TV</b>를 펼치면 <b>186개국</b>에서 나라를 골라 볼 수 있어요. 국가를 누를 때 그 나라 목록을 iptv-org 공개 DB에서 불러오므로 인터넷 연결이 필요하고, 방송사 사정으로 안 열리는 채널이 있을 수 있어요.</div>
+    <div style="margin-top:5px"><b>🇰🇷 국내전용</b> 배지는 한국 네트워크에서만 열리는 채널입니다. KBS·MBC·SBS·JTBC·YTN 등은 방송사가 공개 스트림을 제공하지 않아 <b>공식 온에어 페이지(↗)</b>로 연결됩니다.</div>
+  </footer>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="mbg" id="modalBg"></div>
+  <div class="mcard" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="mhead">
+      <h3 id="modalTitle">숨긴 채널 관리</h3>
+      <button class="x" id="modalClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="mbody" id="modalBody"></div>
+    <div class="mfoot">
+      <button class="all" id="modalAll">전체 복구</button>
+      <button class="close" id="modalDone">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastTxt"></span><button id="toastAct" hidden></button></div>
+
+<script>
+/* =========================================================================
+   후니가 보고 싶은 tv 방송 — 단일 HTML 실시간 TV 앱
+   · 첫 화면은 내장 데이터로 네트워크 대기 없이 즉시 표시
+   · iPhone Safari: 네이티브 HLS 재생 / 그 외(Chrome 등): hls.js 를 필요할 때만 로드
+   · 재생 실패해도 채널은 목록에서 절대 사라지지 않음 (자동 숨김 없음)
+   · 숨김은 오직 사용자가 직접 (채널 편집 / 이 채널 숨기기) 할 때만
+   ========================================================================= */
+var DATA = {
+  updated: "2026-11-23",
+  channels: [
+    /* ---------------- 🇰🇷 국내 전용 (한국 네트워크에서만) ---------------- */
+    {id:"kr-kbs1", n:"KBS 1TV", b:"KBS 1", c:"#0b3d91", k:"terr", dom:1, ext:"https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=11&ch_type=global"},
+    {id:"kr-kbs2", n:"KBS 2TV", b:"KBS 2", c:"#1565c0", k:"terr", dom:1, ext:"https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=12&ch_type=global"},
+    {id:"kr-mbc",  n:"MBC TV", b:"MBC", c:"#e53935", k:"terr", dom:1, ext:"https://onair.imbc.com/"},
+    {id:"kr-sbs",  n:"SBS TV", b:"SBS", c:"#1e4fa3", k:"terr", dom:1, ext:"https://www.sbs.co.kr/live/S01"},
+    {id:"kr-jtbc", n:"JTBC", b:"JTBC", c:"#1f6feb", k:"news", dom:1, ext:"https://monair.jtbc.co.kr/"},
+    {id:"kr-chosun",n:"TV조선", b:"TV조선", c:"#b71c1c", k:"news", url:"http://onair.cdn.tvchosun.com/origin1/_definst_/tvchosun_s1/playlist.m3u8", ext:"https://broadcast.tvchosun.com/home.cstv"},
+    {id:"kr-mbn",  n:"MBN", b:"MBN", c:"#d32f2f", k:"news", dom:1, ext:"https://www.mbn.co.kr/vod/onair"},
+    {id:"kr-ytn",  n:"YTN", b:"YTN", c:"#0b57d0", k:"news", dom:1, ext:"https://www.youtube.com/@YTN/live"},
+    {id:"kr-yonhap",n:"연합뉴스TV", b:"연합\nTV", c:"#1b3fa0", k:"news", dom:1, ext:"https://www.yonhapnewstv.co.kr/live"},
+    {id:"kr-chana",n:"채널A", b:"A", c:"#0d47a1", k:"news", dom:1, url:"http://channelalive.ktcdn.co.kr/chalivepc/_definst_/atv2/playlist.m3u8", ext:"https://ichannela.com/com/cmm/onair.do"},
+    {id:"kr-natv", n:"국회방송", b:"국회", c:"#3949ab", k:"news", dom:1, ext:"https://www.natv.go.kr/natv/main.do"},
+    {id:"kr-obs",  n:"OBS 경인TV", b:"OBS", c:"#00897b", k:"terr", dom:1, url:"https://vod3.obs.co.kr:444/live/obsstream1/tv.stream/playlist.m3u8"},
+    {id:"kr-knn",  n:"KNN 부산경남", b:"KNN", c:"#0277bd", k:"terr", dom:1, url:"https://stream1.knn.co.kr/hls/9ly4534y7dm2xfa123r2_tv/index.m3u8"},
+    {id:"kr-gjmbc",n:"광주MBC", b:"광주\nMBC", c:"#c62828", k:"terr", dom:1, url:"https://media.kjmbc.co.kr/hls/live/stream/playlist.m3u8"},
+    {id:"kr-tbc",  n:"TBC 대구", b:"TBC", c:"#ef6c00", k:"terr", dom:1, url:"http://203.251.91.122:1935/on-air-Backup/tv/playlist.m3u8"},
+    {id:"kr-chosun2",n:"TV조선2", b:"조선2", c:"#8e0000", k:"ent", url:"http://onair2.cdn.tvchosun.com/origin2/_definst_/tvchosun_s3/playlist.m3u8"},
+    {id:"kr-jibs", n:"JIBS 제주", b:"JIBS", c:"#00838f", k:"terr", url:"http://123.140.197.22/stream/1/play.m3u8"},
+    {id:"kr-gcn",  n:"GCN 기독교TV", b:"GCN", c:"#455a64", k:"etc", url:"http://liveko24-manminglobal3.ktcdn.co.kr/liveko24/gcnko_1300k.stream/playlist.m3u8"},
+    {id:"kr-rutc", n:"RUTC TV", b:"RUTC", c:"#546e7a", k:"etc", url:"https://d26sxnc75smwvh.cloudfront.net/livehttporigin/rutclive_720p2.stream/playlist.m3u8"},
+
+    /* ---------------- 🇰🇷 한국: 뉴스·보도 ---------------- */
+    {id:"kr-ktv",  n:"KTV 국정방송", b:"KTV", c:"#1f6feb", k:"news", url:"https://hlive.ktv.go.kr/live/klive_h.stream/playlist.m3u8"},
+    {id:"kr-tbs",  n:"TBS 서울", b:"TBS", c:"#00a86b", k:"news", url:"https://cdntv.tbs.seoul.kr/tbs/tbs_tv_web.smil/playlist.m3u8"},
+    {id:"kr-ari",  n:"아리랑 TV", b:"ARI", c:"#0b4f9c", k:"news", url:"https://amdlive-ch01-ctnd-com.akamaized.net/arirang_1ch/smil:arirang_1ch.smil/playlist.m3u8"},
+    {id:"kr-ariun",n:"아리랑 UN", b:"AUN", c:"#2f6fb8", k:"news", url:"https://amdlive-ch02-ctnd-com.akamaized.net/arirang_2ch/smil:arirang_2ch.smil/playlist.m3u8"},
+
+    /* ---------------- 🇰🇷 한국: 지상파·교양 ---------------- */
+    {id:"kr-ebs1", n:"EBS 1TV", b:"EBS 1", c:"#0b3d91", k:"terr", url:"https://ebsonair.ebs.co.kr/ebs1familypc/familypc1m/playlist.m3u8"},
+    {id:"kr-tjmbc",n:"대전MBC", b:"대전\nMBC", c:"#e53935", k:"terr", url:"https://ns1.tjmbc.co.kr/live/myStream.sdp/playlist.m3u8"},
+    {id:"kr-dgmbc",n:"대구MBC", b:"대구\nMBC", c:"#d32f2f", k:"terr", url:"https://5ee1ec6f32118.streamlock.net/live/livetv/playlist.m3u8"},
+    {id:"kr-jejumbc",n:"제주MBC", b:"제주\nMBC", c:"#c62828", k:"terr", url:"https://wowza.jejumbc.com/live/tv_jejumbc/playlist.m3u8"},
+    {id:"kr-ccmbc",n:"춘천MBC", b:"춘천\nMBC", c:"#b71c1c", k:"terr", url:"https://stream.chmbc.co.kr/TV/myStream/playlist.m3u8"},
+    {id:"kr-ysmbc",n:"여수MBC", b:"여수\nMBC", c:"#e64a19", k:"terr", url:"https://5c3639aa99149.streamlock.net/live_TV/tv/playlist.m3u8"},
+    {id:"kr-ubc",  n:"울산 UBC", b:"UBC", c:"#f4511e", k:"terr", url:"https://stream.ubc.co.kr/hls/ubctvstream/index.m3u8"},
+    {id:"kr-kbc",  n:"대구 KBC", b:"KBC", c:"#ef6c00", k:"terr", url:"https://vod.ikbc.co.kr/KBCTV/tv/playlist.m3u8"},
+    {id:"kr-jtv",  n:"전주 JTV", b:"JTV", c:"#fb8c00", k:"terr", url:"https://61ff3340258d2.streamlock.net/jtv_live/myStream/playlist.m3u8"},
+    {id:"kr-abn",  n:"ABN 경북", b:"ABN", c:"#ff7043", k:"terr", url:"https://vod2.abn.co.kr/IPHONE/abn.m3u8"},
+
+    /* ---------------- 🇰🇷 한국: 어린이·교육 ---------------- */
+    {id:"kr-ebs2",  n:"EBS 2TV", b:"EBS 2", c:"#1565c0", k:"kids", url:"https://ebsonair.ebs.co.kr/ebs2familypc/familypc1m/playlist.m3u8"},
+    {id:"kr-ebsp1", n:"EBS Plus 1", b:"EBS+1", c:"#1e88e5", k:"kids", url:"https://ebsonair.ebs.co.kr/plus1familypc/familypc1m/playlist.m3u8"},
+    {id:"kr-ebsp2", n:"EBS Plus 2", b:"EBS+2", c:"#42a5f5", k:"kids", url:"https://ebsonair.ebs.co.kr/plus2familypc/familypc1m/playlist.m3u8"},
+    {id:"kr-ebsen", n:"EBS English", b:"EBS\nENG", c:"#0277bd", k:"kids", url:"https://ebsonair.ebs.co.kr/plus3familypc/familypc1m/playlist.m3u8"},
+    {id:"kr-ebskids",n:"EBS Kids", b:"EBS\nKIDS", c:"#f9a825", k:"kids", url:"https://ebsonair.ebs.co.kr/ebsufamilypc/familypc1m/playlist.m3u8"},
+    {id:"kr-knou",  n:"방송대 OUN", b:"OUN", c:"#6a1b9a", k:"kids", url:"https://live.knou.ac.kr/knou1/live1/playlist.m3u8"},
+
+    /* ---------------- 🇰🇷 한국: 홈쇼핑 ---------------- */
+    {id:"kr-cjon",  n:"CJ OnStyle", b:"CJ", c:"#e91e63", k:"shop", url:"https://live-ch1.cjonstyle.net/cjmalllive/stream2/playlist.m3u8"},
+    {id:"kr-cjonp", n:"CJ OnStyle+", b:"CJ+", c:"#f06292", k:"shop", url:"https://live-ch2.cjonstyle.net/cjosplus/live2/playlist.m3u8"},
+    {id:"kr-gs",    n:"GS Shop", b:"GS", c:"#ff5722", k:"shop", url:"https://gstv-gsshop.gsshop.com/gsshop_hd/gsshop_hd.stream/playlist.m3u8"},
+    {id:"kr-gsmy",  n:"GS My Shop", b:"GS\nMY", c:"#ff8a65", k:"shop", url:"https://gstv-myshop.gsshop.com/myshop_hd/myshop_hd.stream/playlist.m3u8"},
+    {id:"kr-hyun",  n:"현대홈쇼핑", b:"현대", c:"#0d47a1", k:"shop", url:"https://dtvstreaming.hyundaihmall.com/newcjp3/_definst_/newcjpstream.smil/playlist.m3u8"},
+    {id:"kr-lotte", n:"롯데홈쇼핑", b:"롯데", c:"#d81b60", k:"shop", url:"https://pchlslivesw.lotteimall.com/live/livestream/lotteimalllive_mp4.m3u8"},
+    {id:"kr-lotte1",n:"롯데 OneTV", b:"L.ONE", c:"#ad1457", k:"shop", url:"https://onetvhlslive.lotteimall.com/lotteonetvlive/lotteonetvlive.mp4.m3u8"},
+    {id:"kr-ssg",   n:"신세계TV쇼핑", b:"신세계", c:"#8e24aa", k:"shop", url:"https://liveout.catenoid.net/live-02-shinsegaetvshopping/shinsegaetvshopping_720p/playlist.m3u8"},
+    {id:"kr-wshop", n:"W쇼핑", b:"W", c:"#6a1b9a", k:"shop", url:"https://liveout.catenoid.net/live-05-wshopping/wshopping_1500k/playlist.m3u8"},
+    {id:"kr-hns",   n:"홈&쇼핑", b:"홈&", c:"#c2185b", k:"shop", url:"https://s28.qtcdn.co.kr/media/liveM3U8/idx/518045142/enc/1860408350/playlist.m3u8"},
+    {id:"kr-gongy", n:"공영홈쇼핑", b:"공영", c:"#f57c00", k:"shop", url:"https://etv.publichs.com/live5.stream/playlist.m3u8"},
+    {id:"kr-snt",   n:"쇼핑NT", b:"NT", c:"#7e57c2", k:"shop", url:"https://live.shoppingntmall.com/live/10011.m3u8"},
+
+    /* ---------------- 🇰🇷 한국: 기타 ---------------- */
+    {id:"kr-gugak", n:"국악방송 Gugak TV", b:"국악", c:"#00897b", k:"etc", url:"https://mgugaklive.nowcdn.co.kr/gugakvideo/gugakvideo.stream/playlist.m3u8"},
+    {id:"kr-btn",   n:"BTN 불교TV", b:"BTN", c:"#546e7a", k:"etc", url:"https://btn.nowcdn.co.kr/btn/btnlive2m/playlist.m3u8"},
+    {id:"kr-fgtv",  n:"FGTV 기독교TV", b:"FGT", c:"#455a64", k:"etc", url:"https://fgtvlive.fgtv.com/smil:fgtv.smil/playlist.m3u8"},
+
+    /* ---------------- 🇺🇸 미국 ---------------- */
+    {id:"us-scripps",n:"Scripps News", b:"SCR", c:"#0b57d0", k:"US", url:"https://aka-live1050.delivery.roku.com/a48b72c9-5755-4ede-9dac-9e51e4ca5cc8/t2-origin/out/v1/live.m3u8", fl:"🇺🇸"},
+    {id:"us-livenow",n:"LiveNOW from FOX", b:"LIVE\nNOW", c:"#c62828", k:"US", url:"https://aka-live1050.delivery.roku.com/eaf7d889-16e0-4c14-a299-a2932df9f467/t2-origin/out/v1/live.m3u8", fl:"🇺🇸"},
+    {id:"us-foxwx",  n:"Fox Weather", b:"FOX\nWX", c:"#0277bd", k:"US", url:"https://aka-live1050.delivery.roku.com/2ff50939-341e-4fa8-becf-718769322f14/t2-origin/out/v1/live.m3u8", fl:"🇺🇸"},
+    {id:"us-wnation",n:"WeatherNation", b:"WX\nNATION", c:"#00838f", k:"US", url:"https://aka-live1050.delivery.roku.com/90ba101a-eef0-4c48-b464-b5ef935b5dcb/t2-origin/out/v1/live.m3u8", fl:"🇺🇸"},
+    {id:"us-voa",    n:"VOA TV", b:"VOA", c:"#1565c0", k:"US", url:"https://voa-ingest.akamaized.net/hls/live/2033874/tvmc06/playlist.m3u8", fl:"🇺🇸"},
+    {id:"us-ntd",    n:"NTD TV", b:"NTD", c:"#4527a0", k:"US", url:"https://ntd02.akamaized.net/HD-NY/index.m3u8", fl:"🇺🇸"},
+    {id:"us-newsmax",n:"Newsmax TV", b:"NMX", c:"#b71c1c", k:"US", url:"https://nmx1ota.akamaized.net/hls/live/2107010/Live_1/index.m3u8", fl:"🇺🇸"},
+    {id:"us-bloom",  n:"Bloomberg TV", b:"BFM", c:"#1b1b1b", k:"US", url:"https://mumbai-edge.smartplaytv.in/Bloomberg/index.m3u8", fl:"🇺🇸"},
+    {id:"us-bloomo", n:"Bloomberg Originals", b:"BFM\nORIG", c:"#263238", k:"US", url:"https://dai.google.com/linear/hls/event/jKwfd4apQcuxQtyRI9Q6-Q/master.m3u8", fl:"🇺🇸"},
+    {id:"us-cnno",   n:"CNN Originals", b:"CNN\nORIG", c:"#cc0000", k:"US", url:"https://amg01918-cnnus-amg01918c2-vizio-us-9192.playouts.now.amagi.tv/playlist/amg01918-cnnus-cnnoriginals-vizious/playlist.m3u8", fl:"🇺🇸"},
+    {id:"us-mbca",   n:"MBC America", b:"MBC\nUS", c:"#e53935", k:"US", url:"https://cdn-us-east-prod-ingest-infra-dacast-com.akamaized.net/624ff8f9-db18-da92-4d42-896fa2ff3eb3/source/index.m3u8", fl:"🇺🇸"},
+    {id:"us-mrbean", n:"Mr Bean Animated", b:"BEAN", c:"#f9a825", k:"US", url:"https://amg00627-amg00627c23-samsung-au-4110.playouts.now.amagi.tv/playlist.m3u8", fl:"🇺🇸"},
+    {id:"us-retro",  n:"RetroCrush", b:"RETRO", c:"#6a1b9a", k:"US", url:"https://linear-899.frequency.stream/dist/cineverse/899/hls/master/playlist.m3u8", fl:"🇺🇸"},
+    {id:"us-freemv", n:"24 Hour Free Movies", b:"FREE\nMOV", c:"#37474f", k:"US", url:"https://d1j2u714xk898n.cloudfront.net/scheduler/scheduleMaster/145.m3u8", fl:"🇺🇸"},
+    {id:"us-sports", n:"SportsGrid", b:"SPORT\nS", c:"#2e7d32", k:"US", url:"https://sportsgrid-tribal.amagi.tv/playlist.m3u8", fl:"🇺🇸"},
+
+    /* ---------------- 🇯🇵 일본 ---------------- */
+    {id:"jp-nhk",   n:"NHK World-Japan", b:"NHK", c:"#0d47a1", k:"JP", url:"https://fta.ektv.in/live/417/master.m3u8", fl:"🇯🇵"},
+    {id:"jp-wn",    n:"웨더뉴스 Weathernews", b:"WX\nNEWS", c:"#00838f", k:"JP", url:"https://rch01e-alive-hls.akamaized.net/38fb45b25cdb05a1/out/v1/4e907bfabc684a1dae10df8431a84d21/index.m3u8", fl:"🇯🇵"},
+    {id:"jp-sakura",n:"사쿠란보 TV (야마가타)", b:"桜", c:"#d81b60", k:"JP", url:"https://tv-stream-test.daydreamer-json.cc/stream/bd2dd29080c36c9b01338d329156febe/master.m3u8", fl:"🇯🇵"},
+    {id:"jp-yts",   n:"YTS 야마가타 TV", b:"YTS", c:"#ef6c00", k:"JP", url:"https://tv-stream-test.daydreamer-json.cc/stream/407fd00ebd2a059c9cd1ea3fa7156097/master.m3u8", fl:"🇯🇵"},
+    {id:"jp-shop",  n:"Shop Channel", b:"SHOP", c:"#ad1457", k:"JP", url:"https://stream3.shopch.jp/HLS/master.m3u8", fl:"🇯🇵"},
+    {id:"jp-qvc",   n:"QVC 재팬", b:"QVC", c:"#6a1b9a", k:"JP", url:"https://d1flvb4iqlercm.cloudfront.net/live/live_1080p_2nd.m3u8", fl:"🇯🇵"},
+    {id:"jp-gstv",  n:"GSTV 골프", b:"GSTV", c:"#2e7d32", k:"JP", url:"https://japaneast.av.mk.io/mediakindcdn-mediakind/ca01a143-f823-4432-b670-c22ff9643ce4/index.qfm/manifest(format=m3u8-cmaf)", fl:"🇯🇵"},
+    {id:"jp-cgn",   n:"CGNTV 재팬", b:"CGN", c:"#455a64", k:"JP", url:"https://d2p4mrcwl6ly4.cloudfront.net/out/v1/8d50f69fdbbf411a8d302743e4263716/CGNWebLiveJP.m3u8", fl:"🇯🇵"},
+
+    /* ---------------- 🇬🇧 영국·유럽 ---------------- */
+    {id:"uk-bbc",   n:"BBC News", b:"BBC", c:"#b80000", k:"EU", url:"https://vs-hls-push-ww-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_news_channel_hd/mobile_wifi_main_hd_abr_v2.m3u8", fl:"🇬🇧"},
+    {id:"uk-sky",   n:"Sky News", b:"SKY", c:"#0b4f9c", k:"EU", url:"https://dash4.antik.sk/live/test_skynews/playlist.m3u8", fl:"🇬🇧"},
+    {id:"uk-skywx", n:"Sky News Weather", b:"SKY\nWX", c:"#00796b", k:"EU", url:"https://distro001-gb-hls1-prd.delivery.skycdp.com/easel_cdn/ngrp:weather_loop.stream_all/playlist.m3u8", fl:"🇬🇧"},
+    {id:"fr-f24",   n:"France 24 English", b:"F24", c:"#0b5394", k:"EU", url:"https://live.france24.com/hls/live/2037218-b/F24_EN_HI_HLS/master_5000.m3u8", fl:"🇫🇷"},
+    {id:"fr-euro",  n:"Euronews English", b:"EURO", c:"#1565c0", k:"EU", url:"https://streams.sofast.tv/euronewsen/live/eds/euronews-en/25017/euronews-en.m3u8", fl:"🇪🇺"},
+    {id:"de-dw",    n:"DW English", b:"DW", c:"#0d47a1", k:"EU", url:"https://mumbai-edge.smartplaytv.in/DW/index.m3u8", fl:"🇩🇪"},
+    {id:"de-ard",   n:"Das Erste (ARD)", b:"ARD", c:"#1a237e", k:"EU", url:"https://daserste-live.ard-mcdn.de/daserste/live/hls/int/master.m3u8", fl:"🇩🇪"},
+    {id:"de-zdf",   n:"ZDF", b:"ZDF", c:"#e65100", k:"EU", url:"https://dash4.antik.sk/live/test_zdf_avc_25p/playlist.m3u8", fl:"🇩🇪"},
+    {id:"de-3sat",  n:"3sat", b:"3sat", c:"#c62828", k:"EU", url:"https://dash4.antik.sk/live/test_drei_sat_tizen/playlist.m3u8", fl:"🇩🇪"},
+    {id:"de-arte",  n:"arte", b:"arte", c:"#ef6c00", k:"EU", url:"https://dash4.antik.sk/live/test_arte_avc_25p/playlist.m3u8", fl:"🇩🇪"},
+    {id:"de-ntv",   n:"n-tv", b:"n-tv", c:"#b71c1c", k:"EU", url:"https://dash4.antik.sk/live/test_ntv_tizen/playlist.m3u8", fl:"🇩🇪"},
+    {id:"de-welt",  n:"WELT", b:"WELT", c:"#263238", k:"EU", url:"https://dash4.antik.sk/live/test_welt_tizen/playlist.m3u8", fl:"🇩🇪"},
+    {id:"de-pro7",  n:"ProSieben", b:"P7", c:"#37474f", k:"EU", url:"https://dash4.antik.sk/live/test_pro_sieben_tizen/playlist.m3u8", fl:"🇩🇪"},
+    {id:"de-rtl",   n:"RTL", b:"RTL", c:"#d32f2f", k:"EU", url:"https://dash4.antik.sk/live/test_rtl_ger_tizen/playlist.m3u8", fl:"🇩🇪"},
+    {id:"de-kika",  n:"KiKA", b:"KiKA", c:"#f9a825", k:"EU", url:"https://kikahls.akamaized.net/hls/live/2022690/livetvkika_ww/master.m3u8", fl:"🇩🇪"},
+    {id:"de-br",    n:"BR Fernsehen", b:"BR", c:"#0277bd", k:"EU", url:"https://mcdn.br.de/br/fs/bfs_nord/hls/de/master.m3u8", fl:"🇩🇪"},
+    {id:"de-ndr",   n:"NDR Fernsehen", b:"NDR", c:"#00838f", k:"EU", url:"https://mcdn.ndr.de/ndr/hls/ndr_fs/ndr_hh/master.m3u8", fl:"🇩🇪"},
+    {id:"de-doku",  n:"Dokusat", b:"DOKU", c:"#455a64", k:"EU", url:"https://muc3.iptv-playoutcenter.de/dokusat/dokusat1/playlist.m3u8", fl:"🇩🇪"},
+
+    /* ---------------- 🌐 글로벌 ---------------- */
+    {id:"gl-aje",   n:"Al Jazeera English", b:"AJE", c:"#c9a227", k:"GL", url:"https://live-hls-web-aje-fa.thehlive.com/AJE/index.m3u8", fl:"🌐"},
+    {id:"gl-trt",   n:"TRT World", b:"TRT", c:"#0d47a1", k:"GL", url:"https://mumbai-edge.smartplaytv.in/TRTWorld/index.m3u8", fl:"🇹🇷"},
+    {id:"gl-cgtn",  n:"CGTN", b:"CGTN", c:"#b71c1c", k:"GL", url:"https://hlspackager.akamaized.net/live/DB/CGTN_ENGLISH/HLS/CGTN_ENGLISH.m3u8", fl:"🇨🇳"},
+    {id:"gl-cgtnd", n:"CGTN Documentary", b:"CGTN\nDOC", c:"#7f0000", k:"GL", url:"https://hlspackager.akamaized.net/live/DB/CGTN_DOCUMENTARY/HLS/CGTN_DOCUMENTARY.m3u8", fl:"🇨🇳"},
+    {id:"gl-cna",   n:"CNA Originals", b:"CNA", c:"#b71c1c", k:"GL", url:"https://amg01082-cna-amg01082c1-rlaxx-us-11304.playouts.now.amagi.tv/playlist.m3u8", fl:"🇸🇬"},
+    {id:"gl-africa",n:"Africanews", b:"AFR", c:"#00897b", k:"GL", url:"https://mumbai-edge.smartplaytv.in/AfricaNews/index.m3u8", fl:"🌍"},
+    {id:"gl-cnbc",  n:"CNBC Arabiya", b:"CNBC", c:"#0b5394", k:"GL", url:"https://cnbc-live.akamaized.net/cnbc/master.m3u8", fl:"🇦🇪"},
+    {id:"gl-cnnes", n:"CNN en Español", b:"CNN\nES", c:"#cc0000", k:"GL", url:"https://streaming.onnethn.com/CNN_ESPANOL/playlist.m3u8", fl:"🇺🇸"},
+    {id:"gl-redbull",n:"Red Bull TV", b:"RB", c:"#1b1b1b", k:"GL", url:"https://freqsyndlin.redbull.com/644/vizio/hls/master/playlist.m3u8", fl:"🌐"},
+    {id:"gl-cbc",   n:"CBC News Network", b:"CBC", c:"#c62828", k:"GL", url:"https://aka-live1050.delivery.roku.com/0c24a9ef-e9c3-485c-bf68-3f1ae5ef3e85/t2-origin/out/v1/live.m3u8", fl:"🇨🇦"},
+    {id:"gl-ticker",n:"ticker News", b:"TICK", c:"#2e7d32", k:"GL", url:"https://live-hls-7agy.livepush.io/live_abr_cdn/nsitWAl1pTZtwca/emnmZbKZcO8RfwJR/index.m3u8", fl:"🇦🇺"},
+    {id:"gl-planet",n:"Love The Planet", b:"PLNT", c:"#2e7d32", k:"GL", url:"https://amg01821-lovetvchannels-lovetheplanetuksamsung-samsunguk-apopw.amagi.tv/playlist/amg01821-lovetvchannels-lovetheplanetuksamsung-samsunguk/playlist.m3u8", fl:"🌐"},
+    {id:"gl-terra", n:"Terra Mater WILD", b:"WILD", c:"#455a64", k:"GL", url:"https://53ff3982.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmxheHhUVi1ldV9UZXJyYU1hdGVyV2lsZF9ITFM/playlist.m3u8", fl:"🌐"}
+  ]
+};
+
+(function(){
+  "use strict";
+
+  var LS_FAV = "huni_tv_fav_v1";
+  var LS_HIDDEN = "huni_tv_manual_hidden_v1";  // 수동 숨김 전용 키 (예전 자동 숨김 기록과 분리)
+  var LS_LAST = "huni_tv_last_v1";
+  var HLS_CDNS = [
+    "https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js",
+    "https://fastly.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js",
+    "https://unpkg.com/hls.js@1.5.17/dist/hls.min.js"
+  ];
+
+  var KR_CATS = [
+    {id:"all", label:"전체"},
+    {id:"dom", label:"🇰🇷 국내전용"},
+    {id:"news", label:"뉴스·보도"},
+    {id:"terr", label:"지상파·교양"},
+    {id:"ent", label:"예능·드라마"},
+    {id:"kids", label:"어린이·교육"},
+    {id:"shop", label:"홈쇼핑"},
+    {id:"etc", label:"기타"}
+  ];
+  var CAT_LABEL = {news:"뉴스·보도", terr:"지상파·교양", ent:"예능·드라마", kids:"어린이·교육", shop:"홈쇼핑", etc:"기타"};
+  var REGIONS = [
+    {id:"all", label:"전체"},
+    {id:"US", label:"🇺🇸 미국"},
+    {id:"JP", label:"🇯🇵 일본"},
+    {id:"EU", label:"🇬🇧 영국·유럽"},
+    {id:"GL", label:"🌐 글로벌"}
+  ];
+  var REGION_LABEL = {US:"미국", JP:"일본", EU:"영국·유럽", GL:"글로벌"};
+
+  var state = {tab:"kr", krCat:"all", region:"all", q:"", cur:null,
+    country:null, ctryOpen:false, ctryQ:"", worldShown:240};
+  var favs = load(LS_FAV, {});
+  var hidden = load(LS_HIDDEN, {});   // {channelId: timestamp} — 사용자가 직접 숨긴 채널만
+  var editing = false;
+  var extra = [];            // iptv-org에서 불러온 전 세계 국가 채널
+  var worldCache = {};       // {countryCode: [channels]}
+  var loadingCC = {}, errCC = {};
+
+  /* 전 세계 국가 (iptv-org 공개 DB 기준, https .m3u8 채널이 있는 나라만) */
+  var CTRY_RAW = [["US","United States","🇺🇸",1412],["IN","India","🇮🇳",775],["BR","Brazil","🇧🇷",301],["IT","Italy","🇮🇹",289],["ES","Spain","🇪🇸",261],["RU","Russia","🇷🇺",260],["DE","Germany","🇩🇪",259],["DO","Dominican Republic","🇩🇴",245],["CA","Canada","🇨🇦",236],["UK","United Kingdom","🇬🇧",214],["FR","France","🇫🇷",200],["CL","Chile","🇨🇱",184],["IR","Iran","🇮🇷",181],["RO","Romania","🇷🇴",166],["TR","Turkiye","🇹🇷",158],["NL","Netherlands","🇳🇱",155],["PE","Peru","🇵🇪",155],["AR","Argentina","🇦🇷",152],["MX","Mexico","🇲🇽",142],["ID","Indonesia","🇮🇩",135],["CH","Switzerland","🇨🇭",121],["DK","Denmark","🇩🇰",110],["SE","Sweden","🇸🇪",101],["AT","Austria","🇦🇹",98],["CO","Colombia","🇨🇴",89],["VN","Vietnam","🇻🇳",84],["NO","Norway","🇳🇴",82],["AU","Australia","🇦🇺",75],["PL","Poland","🇵🇱",73],["EC","Ecuador","🇪🇨",72],["HN","Honduras","🇭🇳",67],["UA","Ukraine","🇺🇦",66],["PY","Paraguay","🇵🇾",65],["VE","Venezuela","🇻🇪",65],["TH","Thailand","🇹🇭",61],["HU","Hungary","🇭🇺",57],["BO","Bolivia","🇧🇴",55],["GT","Guatemala","🇬🇹",55],["PK","Pakistan","🇵🇰",55],["GR","Greece","🇬🇷",54],["CR","Costa Rica","🇨🇷",52],["NG","Nigeria","🇳🇬",52],["SA","Saudi Arabia","🇸🇦",50],["IQ","Iraq","🇮🇶",49],["IE","Ireland","🇮🇪",49],["BE","Belgium","🇧🇪",48],["PT","Portugal","🇵🇹",46],["KR","South Korea","🇰🇷",46],["CN","China","🇨🇳",41],["KZ","Kazakhstan","🇰🇿",40],["KE","Kenya","🇰🇪",38],["IL","Israel","🇮🇱",35],["UZ","Uzbekistan","🇺🇿",33],["CZ","Czech Republic","🇨🇿",28],["SV","El Salvador","🇸🇻",28],["RS","Serbia","🇷🇸",27],["BD","Bangladesh","🇧🇩",26],["BG","Bulgaria","🇧🇬",26],["NZ","New Zealand","🇳🇿",26],["PR","Puerto Rico","🇵🇷",26],["LB","Lebanon","🇱🇧",25],["SK","Slovakia","🇸🇰",25],["AF","Afghanistan","🇦🇫",24],["FI","Finland","🇫🇮",24],["HT","Haiti","🇭🇹",23],["ZA","South Africa","🇿🇦",23],["UG","Uganda","🇺🇬",23],["UY","Uruguay","🇺🇾",22],["MK","North Macedonia","🇲🇰",20],["AE","United Arab Emirates","🇦🇪",20],["KH","Cambodia","🇰🇭",19],["CI","Ivory Coast","🇨🇮",19],["MD","Moldova","🇲🇩",19],["PA","Panama","🇵🇦",18],["SI","Slovenia","🇸🇮",18],["BY","Belarus","🇧🇾",17],["EG","Egypt","🇪🇬",17],["HR","Croatia","🇭🇷",16],["LK","Sri Lanka","🇱🇰",16],["AL","Albania","🇦🇱",15],["BA","Bosnia and Herzegovina","🇧🇦",15],["CM","Cameroon","🇨🇲",15],["NP","Nepal","🇳🇵",15],["PS","Palestine","🇵🇸",15],["PH","Philippines","🇵🇭",15],["SN","Senegal","🇸🇳",15],["CY","Cyprus","🇨🇾",14],["EE","Estonia","🇪🇪",14],["JO","Jordan","🇯🇴",14],["LU","Luxembourg","🇱🇺",14],["NI","Nicaragua","🇳🇮",13],["AW","Aruba","🇦🇼",12],["JP","Japan","🇯🇵",12],["KW","Kuwait","🇰🇼",12],["MM","Myanmar","🇲🇲",12],["BJ","Benin","🇧🇯",11],["TW","Taiwan","🇹🇼",11],["TJ","Tajikistan","🇹🇯",11],["CD","Democratic Republic of the Congo","🇨🇩",10],["GE","Georgia","🇬🇪",10],["GH","Ghana","🇬🇭",10],["LA","Laos","🇱🇦",10],["LV","Latvia","🇱🇻",10],["MV","Maldives","🇲🇻",10],["QA","Qatar","🇶🇦",10],["TG","Togo","🇹🇬",10],["HK","Hong Kong","🇭🇰",9],["XK","Kosovo","🇽🇰",9],["LT","Lithuania","🇱🇹",9],["MA","Morocco","🇲🇦",9],["SY","Syria","🇸🇾",9],["JM","Jamaica","🇯🇲",8],["TT","Trinidad and Tobago","🇹🇹",8],["TM","Turkmenistan","🇹🇲",8],["GY","Guyana","🇬🇾",7],["DZ","Algeria","🇩🇿",6],["AD","Andorra","🇦🇩",6],["BF","Burkina Faso","🇧🇫",6],["LY","Libya","🇱🇾",6],["MO","Macao","🇲🇴",6],["MQ","Martinique","🇲🇶",6],["ME","Montenegro","🇲🇪",6],["OM","Oman","🇴🇲",6],["SX","Sint Maarten","🇸🇽",6],["TZ","Tanzania","🇹🇿",6],["AZ","Azerbaijan","🇦🇿",5],["BH","Bahrain","🇧🇭",5],["BQ","Bonaire","🇧🇶",5],["CW","Curacao","🇨🇼",5],["GN","Guinea","🇬🇳",5],["MN","Mongolia","🇲🇳",5],["NE","Niger","🇳🇪",5],["RW","Rwanda","🇷🇼",5],["BS","Bahamas","🇧🇸",4],["CU","Cuba","🇨🇺",4],["ET","Ethiopia","🇪🇹",4],["GP","Guadeloupe","🇬🇵",4],["IS","Iceland","🇮🇸",4],["MY","Malaysia","🇲🇾",4],["MC","Monaco","🇲🇨",4],["MZ","Mozambique","🇲🇿",4],["KP","North Korea","🇰🇵",4],["CG","Republic of the Congo","🇨🇬",4],["SG","Singapore","🇸🇬",4],["SO","Somalia","🇸🇴",4],["TN","Tunisia","🇹🇳",4],["YE","Yemen","🇾🇪",4],["AO","Angola","🇦🇴",3],["AM","Armenia","🇦🇲",3],["ML","Mali","🇲🇱",3],["MT","Malta","🇲🇹",3],["KN","Saint Kitts and Nevis","🇰🇳",3],["SM","San Marino","🇸🇲",3],["VA","Vatican City","🇻🇦",3],["BZ","Belize","🇧🇿",2],["VG","British Virgin Islands","🇻🇬",2],["BN","Brunei","🇧🇳",2],["BI","Burundi","🇧🇮",2],["PF","French Polynesia","🇵🇫",2],["LI","Liechtenstein","🇱🇮",2],["MR","Mauritania","🇲🇷",2],["MU","Mauritius","🇲🇺",2],["NA","Namibia","🇳🇦",2],["LC","Saint Lucia","🇱🇨",2],["SD","Sudan","🇸🇩",2],["SR","Suriname","🇸🇷",2],["AG","Antigua and Barbuda","🇦🇬",1],["BB","Barbados","🇧🇧",1],["CV","Cape Verde","🇨🇻",1],["TD","Chad","🇹🇩",1],["KM","Comoros","🇰🇲",1],["GQ","Equatorial Guinea","🇬🇶",1],["ER","Eritrea","🇪🇷",1],["FJ","Fiji","🇫🇯",1],["GF","French Guiana","🇬🇫",1],["GM","Gambia","🇬🇲",1],["GU","Guam","🇬🇺",1],["MG","Madagascar","🇲🇬",1],["NC","New Caledonia","🇳🇨",1],["PG","Papua New Guinea","🇵🇬",1],["RE","Reunion","🇷🇪",1],["VC","Saint Vincent and the Grenadines","🇻🇨",1],["WS","Samoa","🇼🇸",1],["SL","Sierra Leone","🇸🇱",1],["EH","Western Sahara","🇪🇭",1],["ZW","Zimbabwe","🇿🇼",1]];
+  var CTRY = {};
+  CTRY_RAW.forEach(function(r){ CTRY[r[0]] = {name:r[1], flag:r[2], n:r[3]}; });
+  var KO_FIX = {UK:"영국", US:"미국", JP:"일본", CN:"중국", KP:"북한", KR:"한국", TW:"대만", HK:"홍콩", MO:"마카오",
+    CD:"콩고민주공화국", CG:"콩고", VC:"세인트빈센트", KN:"세인트키츠", BQ:"보네르", CW:"쿠라소", SX:"신트마르턴",
+    AE:"아랍에미리트", SA:"사우디아라비아", DO:"도미니카공화국", RE:"레위니옹", XK:"코소보", PS:"팔레스타인"};
+  var hlsLib = null, hlsLoading = false, hlsInst = null;
+  var playToken = 0, watchdog = null, retried = false;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var DBG = /(^|[#&])dbg/.test(location.hash);
+  function dbg(m){ if(DBG){ (window.__hlsLog = window.__hlsLog || []).push(m); } }
+  var video = $("tv"), overlay = $("overlay"), stage = $("stage");
+  var ovT = $("ovT"), ovS = $("ovS"), bigplay = $("bigplay");
+  var nowbar = $("nowbar"), nowName = $("nowName"), nowState = $("nowState");
+  var miniName = $("miniName"), miniState = $("miniState"), miniPlay = $("miniPlay");
+  var grid = $("grid"), emptyEl = $("empty"), chipsEl = $("chips"), tabsEl = $("tabs");
+  var secTitle = $("secTitle"), secCount = $("secCount"), qInput = $("q"), searchbar = $("searchbar");
+  var editBtn = $("editBtn"), editHint = $("editHint"), manageBtn = $("manageBtn"), hiddenCnt = $("hiddenCnt");
+  var curBar = $("curBar"), curNm = $("curNm"), modal = $("modal"), modalBody = $("modalBody");
+  var ctryWrap = $("ctryWrap"), ctryToggle = $("ctryToggle"), ctryPanel = $("ctryPanel"), ctryGrid = $("ctryGrid");
+  var ctryQ = $("ctryQ"), ctryTotal = $("ctryTotal"), ctryBar = $("ctryBar"), ctryBarTxt = $("ctryBarTxt"), moreBtn = $("moreBtn");
+
+  function load(k, dflt){
+    try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : dflt; }catch(e){ return dflt; }
+  }
+  function save(k, v){
+    try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){}
+  }
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  /* ---------------- rendering ---------------- */
+  var byId = {};
+  DATA.channels.forEach(function(c){ byId[c.id] = c; $("totalCnt").textContent = DATA.channels.length; $("totalCnt2").textContent = DATA.channels.length; });
+
+  function isHidden(c){ return !!(c && hidden[c.id]); }
+  function allChannels(){ return DATA.channels.concat(extra); }
+  function hiddenList(){
+    return allChannels().filter(function(c){ return !!hidden[c.id]; })
+      .sort(function(a,b){ return String(a.n).localeCompare(String(b.n), "ko"); });
+  }
+  // 자동 숨김 없음 — 재생이 실패해도 모든 채널이 목록에 그대로 남습니다.
+  function visibleBase(){
+    return allChannels().filter(function(c){ return !hidden[c.id]; });
+  }
+
+  function curList(){
+    var q = state.q.trim().toLowerCase();
+    if(q){
+      return visibleBase().filter(function(c){
+        return (c.n.toLowerCase().indexOf(q) >= 0) || (c.b || "").toLowerCase().indexOf(q) >= 0 ||
+               (CAT_LABEL[c.k] || "").indexOf(q) >= 0 || (REGION_LABEL[c.k] || "").toLowerCase().indexOf(q) >= 0;
+      });
+    }
+    if(state.tab === "fav"){
+      return visibleBase().filter(function(c){ return favs[c.id]; });
+    }
+    if(state.tab === "kr"){
+      return visibleBase().filter(function(c){
+        if(!(c.k in CAT_LABEL)) return false;
+        if(state.krCat === "all") return true;
+        if(state.krCat === "dom") return !!c.dom;
+        return c.k === state.krCat;
+      });
+    }
+    if(state.tab === "world" && state.country){
+      return (worldCache[state.country] || []).filter(function(c){ return !hidden[c.id]; });
+    }
+    return visibleBase().filter(function(c){
+      if(!(c.k in REGION_LABEL)) return false;
+      return state.region === "all" || c.k === state.region;
+    });
+  }
+
+  function renderTabs(){
+    var krN = visibleBase().filter(function(c){ return c.k in CAT_LABEL; }).length;
+    var wN = visibleBase().filter(function(c){ return c.k in REGION_LABEL; }).length;
+    var fN = visibleBase().filter(function(c){ return favs[c.id]; }).length;
+    var t = [
+      {id:"kr", label:"🇰🇷 한국 실시간 TV", n:krN},
+      {id:"world", label:"🌍 해외 TV", n:wN},
+      {id:"fav", label:"⭐ 즐겨찾기", n:fN}
+    ];
+    tabsEl.innerHTML = t.map(function(x){
+      return '<button class="tab' + (state.tab === x.id && !state.q ? ' on' : '') + '" data-tab="' + x.id + '">' +
+        x.label + '<span class="cnt">' + x.n + '</span></button>';
+    }).join("");
+  }
+
+  function renderChips(){
+    var list = [];
+    if(state.tab === "world" && state.country){ chipsEl.innerHTML = ""; chipsEl.style.display = "none"; return; }
+    if(state.q.trim()){ chipsEl.innerHTML = ""; chipsEl.style.display = "none"; return; }
+    chipsEl.style.display = "";
+    if(state.tab === "kr"){
+      list = KR_CATS.map(function(c){
+        var n = visibleBase().filter(function(x){
+          if(!(x.k in CAT_LABEL)) return false;
+          if(c.id === "all") return true;
+          if(c.id === "dom") return !!x.dom;
+          return x.k === c.id;
+        }).length;
+        return {id:c.id, label:c.label + " " + n, on:state.krCat === c.id};
+      });
+      chipsEl.innerHTML = list.map(function(c){
+        return '<button class="chip' + (c.on ? ' on' : '') + '" data-cat="' + c.id + '">' + c.label + '</button>';
+      }).join("");
+    } else if(state.tab === "world"){
+      list = REGIONS.map(function(r){
+        var n = visibleBase().filter(function(x){ return (x.k in REGION_LABEL) && (r.id === "all" || x.k === r.id); }).length;
+        return {id:r.id, label:r.label + " " + n, on:state.region === r.id};
+      });
+      chipsEl.innerHTML = list.map(function(c){
+        return '<button class="chip' + (c.on ? ' on' : '') + '" data-reg="' + c.id + '">' + c.label + '</button>';
+      }).join("");
+    } else {
+      chipsEl.innerHTML = "";
+    }
+  }
+
+  function cardHTML(c){
+    var isOn = state.cur && state.cur.id === c.id;
+    var isFav = !!favs[c.id];
+    var extOnly = !!(c.ext && !c.url);
+    var tag = extOnly ? "a" : "div";
+    var badge = String(c.b || c.n.slice(0, 3)).split("\n").map(esc).join("<br>");
+    var sub = (c.k in CAT_LABEL) ? CAT_LABEL[c.k] : (REGION_LABEL[c.k] || "");
+    if(c.ext) sub += " · 공식";
+    return '<' + tag + ' class="card' + (isOn ? ' on' : '') + (extOnly ? ' extOnly' : '') + (editing ? ' edit' : '') + '" data-id="' + c.id +
+      '" role="button" tabindex="0" aria-label="' + esc(c.n) + (c.dom ? ' 국내전용' : '') + (editing ? ' 숨기기' : '') + '"' +
+      (extOnly && !editing ? ' href="' + esc(c.ext) + '" target="_blank" rel="noopener"' : '') + '>' +
+      '<div class="logo" style="--c:' + (c.c || "#1b2942") + '">' +
+        '<span class="livePip">● LIVE</span>' +
+        '<span class="bd">' + badge + '</span>' +
+        (c.dom ? '<span class="domTag">국내전용' + (c.ext ? '<span class="up">↗</span>' : '') + '</span>' : '') +
+        (c.fl ? '<span class="fl">' + c.fl + '</span>' : '') +
+        (editing ? '<span class="hidePill">숨기기 −</span>' : '') +
+      '</div>' +
+      (editing ? '' : '<button class="fav' + (isFav ? ' on' : '') + '" data-fav="' + c.id + '" aria-label="즐겨찾기">' + (isFav ? "★" : "☆") + '</button>') +
+      '<div class="nm">' + esc(c.n) + '</div>' +
+      '<div class="ct">' + esc(sub) + '</div>' +
+    '</' + tag + '>';
+  }
+
+  function render(){
+    renderTabs();
+    renderChips();
+
+    var list = curList();
+    var isWorld = state.tab === "world";
+    var cMeta = (state.country && CTRY[state.country]) ? CTRY[state.country] : null;
+    var cName = cMeta ? koName(state.country, cMeta.name) : "";
+    var wLoading = !!(cMeta && loadingCC[state.country]);
+    var wErr = cMeta ? (errCC[state.country] || null) : null;
+
+    var title = "한국 실시간 TV";
+    if(state.q.trim()) title = "'" + state.q.trim() + "' 검색 결과";
+    else if(isWorld && cMeta) title = cMeta.flag + " " + cName + " TV";
+    else if(isWorld) title = "해외 TV" + (state.region === "all" ? "" : " · " + REGION_LABEL[state.region]);
+    else if(state.tab === "fav") title = "즐겨찾기";
+    else if(state.krCat === "dom") title = "🇰🇷 국내 전용 채널";
+    else if(state.krCat !== "all") title = "한국 · " + CAT_LABEL[state.krCat];
+    secTitle.textContent = title;
+    secCount.textContent = (isWorld && cMeta && wLoading && !state.q.trim()) ? "불러오는 중…" : list.length + "개";
+
+    /* 전 세계 국가 선택 */
+    ctryWrap.hidden = !isWorld || !!cMeta;
+    ctryBar.hidden = !isWorld || !cMeta;
+    ctryToggle.classList.toggle("open", !!state.ctryOpen);
+    ctryToggle.setAttribute("aria-expanded", state.ctryOpen ? "true" : "false");
+    ctryPanel.hidden = !state.ctryOpen;
+    if(!ctryWrap.hidden) renderCountries();
+    if(!ctryBar.hidden && cMeta) ctryBarTxt.innerHTML = cMeta.flag + " <b>" + esc(cName) + "</b>";
+
+    var shown = list;
+    if(isWorld && cMeta && list.length > state.worldShown) shown = list.slice(0, state.worldShown);
+    grid.innerHTML = shown.map(cardHTML).join("");
+    grid.classList.toggle("editing", editing);
+    moreBtn.hidden = !(isWorld && cMeta && shown.length < list.length);
+
+    if(isWorld && cMeta && wLoading && !list.length){
+      emptyEl.hidden = false;
+      emptyEl.innerHTML = '<div class="loadBox"><div class="spinner"></div><div><b>' + esc(cName) + '</b> 채널을 불러오는 중이에요…<br>잠깐만 기다려 주세요.</div></div>';
+    } else if(isWorld && cMeta && wErr && !list.length){
+      emptyEl.hidden = false;
+      emptyEl.innerHTML = '<div class="loadBox">채널 목록을 불러오지 못했어요.<br>' + esc(wErr) +
+        '<br><button class="ovBtn pri" data-retry="' + esc(state.country) + '">다시 시도</button></div>';
+    } else if(!list.length){
+      emptyEl.hidden = false;
+      if(state.tab === "fav" && !state.q.trim()){
+        emptyEl.innerHTML = "아직 즐겨찾기한 채널이 없어요.<br>채널 카드 오른쪽 위 <b>☆</b> 를 누르면 여기에 모입니다.";
+      } else if(state.q.trim()){
+        emptyEl.innerHTML = "'" + esc(state.q.trim()) + "' 에 맞는 채널이 없어요.<br>다른 이름으로 찾아보세요.";
+      } else {
+        emptyEl.innerHTML = "이 분류에 보이는 채널이 없어요.<br>숨긴 채널이 있다면 아래 <b>숨긴 채널 관리</b>에서 다시 꺼낼 수 있어요.";
+      }
+    } else {
+      emptyEl.hidden = true;
+    }
+
+    $("totalCnt").textContent = visibleBase().length;
+    editBtn.classList.toggle("on", editing);
+    editBtn.textContent = editing ? "편집 완료" : "채널 편집";
+    editBtn.setAttribute("aria-pressed", editing ? "true" : "false");
+    editHint.hidden = !editing;
+    var hN = hiddenList().length;
+    hiddenCnt.textContent = hN;
+    manageBtn.classList.toggle("has", hN > 0);
+    syncCurBar();
+  }
+
+  /* ---------------- 전 세계 국가별 TV ---------------- */
+  function koName(code, en){
+    if(KO_FIX[code]) return KO_FIX[code];
+    try{
+      var dn = new Intl.DisplayNames(["ko"], {type:"region"});
+      var v = dn.of(code);
+      if(v && v !== code) return v;
+    }catch(e){}
+    return en || code;
+  }
+  function nameHash(s){ var h = 5381, i = s.length; while(i) h = (h * 33 ^ s.charCodeAt(--i)) >>> 0; return h.toString(36); }
+  function badgeOf(nm){
+    var s = String(nm).replace(/\([^)]*\)/g, " ").replace(/\b(HD|FHD|UHD|SD|4K|8K)\b/gi, " ").replace(/\s+/g, " ").trim();
+    var p = s.split(" ");
+    if(p.length >= 3) return p.slice(0, 3).map(function(w){ return w.charAt(0); }).join("").toUpperCase();
+    if(p.length === 2) return (p[0].slice(0, 2) + p[1].charAt(0)).toUpperCase();
+    return s.slice(0, 3).toUpperCase();
+  }
+  function colorOf(s){
+    var h = 0; for(var i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) % 360; }
+    return "hsl(" + h + ",46%,33%)";
+  }
+  function parseM3U(txt, cc){
+    var lines = txt.split(/\r?\n/), out = [], seen = {}, meta = null;
+    var flag = (CTRY[cc] || {}).flag || "";
+    for(var i = 0; i < lines.length; i++){
+      var l = lines[i].trim();
+      if(!l) continue;
+      if(l.indexOf("#EXTINF:") === 0){
+        var inQ = false, cut = -1;
+        for(var k = 0; k < l.length; k++){
+          var ch = l.charAt(k);
+          if(ch === '"') inQ = !inQ;
+          else if(ch === "," && !inQ){ cut = k; break; }
+        }
+        var nm = cut >= 0 ? l.slice(cut + 1).trim() : "";
+        var g = /group-title="([^"]*)"/.exec(l);
+        meta = { n: nm, g: g ? g[1] : "" };
+        continue;
+      }
+      if(l.charAt(0) === "#") continue;
+      if(!meta) continue;
+      if(l.indexOf("https://") === 0 && l.indexOf(".m3u8") > 0){
+        var clean = meta.n.replace(/\s*\((?:FHD|UHD|HD|SD|\d{3,4}p)\)\s*$/i, "").replace(/\s*\[[^\]]*\]\s*$/, "").trim();
+        var key = clean.toLowerCase();
+        if(clean && !seen[key]){
+          seen[key] = 1;
+          out.push({ id: "w-" + cc.toLowerCase() + "-" + nameHash(clean), n: clean, b: badgeOf(clean),
+                     c: colorOf(clean), k: "world", url: l, fl: flag, cc: cc });
+        }
+      }
+      meta = null;
+    }
+    return out;
+  }
+  function renderCountries(){
+    ctryTotal.textContent = CTRY_RAW.length;
+    var q = state.ctryQ.trim().toLowerCase();
+    var rows = CTRY_RAW.filter(function(r){
+      if(!q) return true;
+      return koName(r[0], r[1]).toLowerCase().indexOf(q) >= 0 || r[1].toLowerCase().indexOf(q) >= 0 || r[0].toLowerCase() === q;
+    });
+    ctryGrid.innerHTML = rows.length ? rows.map(function(r){
+      return '<button class="ctile' + (state.country === r[0] ? " on" : "") + '" data-cc="' + r[0] + '">' +
+        '<span class="cf">' + r[2] + '</span>' +
+        '<span class="cn">' + esc(koName(r[0], r[1])) + '</span>' +
+        '<span class="cc">' + r[3].toLocaleString("ko-KR") + '개</span>' +
+      '</button>';
+    }).join("") : '<div class="mempty" style="grid-column:1/-1">해당하는 나라가 없어요.</div>';
+  }
+  function loadCountry(cc){
+    if(worldCache[cc] || loadingCC[cc]) return;
+    loadingCC[cc] = 1; delete errCC[cc]; render();
+    fetch("https://iptv-org.github.io/iptv/countries/" + cc.toLowerCase() + ".m3u", {cache:"force-cache"})
+      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+      .then(function(txt){
+        var list = parseM3U(txt, cc);
+        worldCache[cc] = list;
+        list.forEach(function(c){ if(!byId[c.id]){ byId[c.id] = c; extra.push(c); } });
+        delete loadingCC[cc]; delete errCC[cc];
+        render();
+        if(!list.length) toast("이 나라는 지금 바로 재생되는 HTTPS 채널이 없어요", null, null);
+      })
+      .catch(function(e){
+        delete loadingCC[cc];
+        errCC[cc] = (e && e.message) ? e.message : "불러오지 못했어요";
+        render();
+      });
+  }
+  function selectCountry(cc){
+    state.country = cc; state.q = ""; qInput.value = ""; searchbar.classList.remove("has");
+    state.worldShown = 240; state.ctryOpen = false;
+    render();
+    if(!worldCache[cc]) loadCountry(cc);
+    var y = grid.getBoundingClientRect().top + window.scrollY - 96;
+    try{ window.scrollTo({top: y < 0 ? 0 : y, behavior:"smooth"}); }catch(e){}
+  }
+
+  function syncCurBar(){
+    if(state.cur){ curBar.hidden = false; curNm.textContent = state.cur.n; }
+    else { curBar.hidden = true; curNm.textContent = ""; }
+  }
+
+  /* ---------------- player ---------------- */
+  function setOverlay(kind, title, sub, withPlay){
+    overlay.hidden = false;
+    overlay.className = "overlay act";
+    overlay.innerHTML = "";
+    if(kind === "loading"){
+      var sp = document.createElement("div"); sp.className = "spinner"; overlay.appendChild(sp);
+    }
+    if(withPlay){
+      var b = document.createElement("button"); b.className = "bigplay"; b.textContent = "▶"; b.setAttribute("aria-label","재생");
+      b.addEventListener("click", function(){ resume(); });
+      overlay.appendChild(b);
+    }
+    var t = document.createElement("div"); t.className = "ovT"; t.textContent = title; overlay.appendChild(t);
+    if(sub){ var s = document.createElement("div"); s.className = "ovS"; s.textContent = sub; overlay.appendChild(s); }
+    if(kind === "error"){
+      var box = document.createElement("div"); box.className = "ovBtns";
+      var rb = document.createElement("button"); rb.className = "ovBtn pri"; rb.textContent = "다시 시도";
+      rb.addEventListener("click", function(){ if(state.cur) play(state.cur, true); });
+      box.appendChild(rb); overlay.appendChild(box);
+    }
+    $("videoBox").classList.remove("idle");
+    if(kind === "idle") $("videoBox").classList.add("idle");
+    nowbar.hidden = !state.cur;
+  }
+
+  function idleScreen(){
+    overlay.hidden = false;
+    overlay.className = "overlay";
+    overlay.innerHTML = '<button class="bigplay" aria-label="재생">▶</button>' +
+      '<div class="ovT">채널을 골라 주세요</div>' +
+      '<div class="ovS">아래에서 방송사를 누르면 이 화면에서 바로 켜집니다.</div>';
+    overlay.querySelector("button").addEventListener("click", function(){
+      var first = curList()[0] || DATA.channels[0];
+      play(first);
+    });
+    $("videoBox").classList.add("idle");
+    nowbar.hidden = true;
+    miniName.textContent = "채널을 골라 주세요";
+    miniState.textContent = "";
+    miniPlay.textContent = "▶";
+    syncCurBar();
+  }
+
+  function setState(txt){ nowState.textContent = txt || ""; miniState.textContent = txt || ""; }
+
+  function markOnCard(){
+    var cards = grid.querySelectorAll(".card");
+    for(var i=0;i<cards.length;i++){
+      var c = cards[i];
+      if(state.cur && c.getAttribute("data-id") === state.cur.id) c.classList.add("on");
+      else c.classList.remove("on");
+    }
+    syncCurBar();
+  }
+
+  function loadHlsScript(cb){
+    if(hlsLib) return cb(null, hlsLib);
+    if(window.Hls && window.Hls.isSupported()){ hlsLib = window.Hls; return cb(null, hlsLib); }
+    if(hlsLoading) { setTimeout(function(){ loadHlsScript(cb); }, 120); return; }
+    hlsLoading = true;
+    var i = 0;
+    function next(){
+      if(i >= HLS_CDNS.length){ hlsLoading = false; return cb(new Error("hls load failed")); }
+      var s = document.createElement("script");
+      s.src = HLS_CDNS[i++];
+      s.async = true;
+      s.onload = function(){ hlsLoading = false; hlsLib = window.Hls; cb(null, hlsLib); };
+      s.onerror = function(){ s.remove(); next(); };
+      document.head.appendChild(s);
+    }
+    next();
+  }
+
+  function isAppleWebkit(){
+    var ua = navigator.userAgent || "";
+    var iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    var safari = /Safari/.test(ua) && !/Chrome|Chromium|CriOS|Edg|EdgiOS|OPR|Android|Firefox|FxiOS/.test(ua);
+    return iOS || safari;
+  }
+  // Chrome reports "maybe" for mpegurl but cannot actually play it, so never
+  // trust canPlayType alone.
+  function nativeHls(){
+    if(isAppleWebkit()) return true;
+    var v = document.createElement("video");
+    return !!(v.canPlayType && v.canPlayType("application/vnd.apple.mpegurl") === "probably");
+  }
+
+  function destroyHls(){
+    if(hlsInst){ try{ hlsInst.destroy(); }catch(e){} hlsInst = null; }
+    clearTimeout(watchdog);
+  }
+
+  function openOfficial(ch){
+    state.cur = ch;
+    destroyHls(); playToken++; clearTimeout(watchdog);
+    save(LS_LAST, ch.id);
+    try{ video.pause(); video.removeAttribute("src"); video.load(); }catch(e){}
+    markOnCard();
+    stage.classList.remove("compact");
+    nowName.textContent = ch.n; miniName.textContent = ch.n;
+    miniPlay.textContent = "▶";
+    setState("공식 페이지");
+    $("videoBox").classList.add("idle");
+    nowbar.hidden = false;
+    overlay.hidden = false; overlay.className = "overlay act"; overlay.innerHTML = "";
+    var go = document.createElement("a");
+    go.className = "bigplay"; go.setAttribute("aria-label", "공식 페이지 열기"); go.textContent = "↗";
+    go.href = ch.ext; go.target = "_blank"; go.rel = "noopener";
+    go.style.textDecoration = "none";
+    overlay.appendChild(go);
+    var t = document.createElement("div"); t.className = "ovT"; t.textContent = ch.n; overlay.appendChild(t);
+    var s = document.createElement("div"); s.className = "ovS";
+    s.textContent = "방송사 공식 온에어 페이지에서 생방송으로 재생돼요. 국내(한국)에서만 열리는 채널이에요.";
+    overlay.appendChild(s);
+    var box = document.createElement("div"); box.className = "ovBtns";
+    var ob = document.createElement("a"); ob.className = "ovBtn pri"; ob.textContent = "공식 페이지 열기";
+    ob.href = ch.ext; ob.target = "_blank"; ob.rel = "noopener"; ob.style.textDecoration = "none";
+    box.appendChild(ob); overlay.appendChild(box);
+  }
+
+  function httpBlocked(ch){
+    state.cur = ch;
+    destroyHls(); playToken++; clearTimeout(watchdog);
+    try{ video.pause(); video.removeAttribute("src"); video.load(); }catch(e){}
+    markOnCard();
+    nowName.textContent = ch.n; miniName.textContent = ch.n;
+    setState("공식 페이지");
+    $("videoBox").classList.add("idle");
+    nowbar.hidden = false;
+    overlay.hidden = false; overlay.className = "overlay act"; overlay.innerHTML = "";
+    var t = document.createElement("div"); t.className = "ovT"; t.textContent = ch.n; overlay.appendChild(t);
+    var s = document.createElement("div"); s.className = "ovS";
+    s.textContent = "이 채널은 http 주소만 있어서 지금처럼 https 화면에서는 바로 재생되지 않아요. 앱 파일을 내려받아 열면 볼 수 있어요.";
+    overlay.appendChild(s);
+    if(ch.ext){
+      var box = document.createElement("div"); box.className = "ovBtns";
+      var ob = document.createElement("a"); ob.className = "ovBtn pri"; ob.textContent = "공식 페이지 열기";
+      ob.href = ch.ext; ob.target = "_blank"; ob.rel = "noopener"; ob.style.textDecoration = "none";
+      box.appendChild(ob); overlay.appendChild(box);
+    }
+  }
+
+  function play(ch, isRetry, forceHls){
+    if(!ch) return;
+    if(ch.ext && !ch.url){ openOfficial(ch); return; }
+    if(location.protocol === "https:" && /^http:/i.test(ch.url || "")){ httpBlocked(ch); return; }
+    state.cur = ch;
+    retried = !!isRetry;
+    var token = ++playToken;
+    destroyHls();
+    save(LS_LAST, ch.id);
+
+    if(stage.classList.contains("compact")){ /* keep compact */ }
+    $("videoBox").classList.remove("idle");
+    $("videoBox").classList.remove("playing");
+    nowbar.hidden = false;
+    nowName.textContent = ch.n;
+    miniName.textContent = ch.n;
+    setState("연결 중…");
+    markOnCard();
+    // tapping a channel always brings the screen back into view
+    stage.classList.remove("compact");
+    if(window.scrollY > 60){ try{ window.scrollTo({top:0, behavior:"smooth"}); }catch(e){ window.scrollTo(0,0); } }
+    setOverlay("loading", ch.n, "실시간 신호를 받아오는 중이에요");
+
+    // watchdog: no media in 14s -> treat as failed
+    clearTimeout(watchdog);
+    watchdog = setTimeout(function(){
+      if(token !== playToken) return;
+      if(video.readyState < 2) failChannel(ch, token);
+    }, 14000);
+
+    if(!forceHls && nativeHls()){
+      // iPhone / iPad / Safari: native HLS, no library needed
+      state.mode = "native";
+      video.src = ch.url;
+      video.load();
+      tryPlay(token);
+      return;
+    }
+
+    state.mode = "hls";
+    setState("플레이어 준비…");
+    dbg("play " + ch.id + " mode=hls");
+    loadHlsScript(function(err, Hls){
+      if(token !== playToken) return;
+      dbg("hls script: " + (err ? "err " + err.message : "ok " + (Hls && Hls.version)));
+      if(err || !Hls || !Hls.isSupported()){
+        // last resort: let the browser try the URL itself
+        state.mode = "native";
+        video.src = ch.url;
+        video.load();
+        tryPlay(token);
+        return;
+      }
+      try{
+        hlsInst = new Hls({
+          enableWorker: true,
+          lowLatencyMode: false,
+          liveSyncDurationCount: 3,
+          maxBufferLength: 30,
+          backBufferLength: 30
+        });
+        // handlers must be registered before attachMedia: hls.js can emit
+        // MEDIA_ATTACHED synchronously during the call
+        hlsInst.on(Hls.Events.MANIFEST_PARSED, function(){ dbg("MANIFEST_PARSED"); if(token === playToken) tryPlay(token); });
+        hlsInst.on(Hls.Events.LEVEL_LOADED, function(){ dbg("LEVEL_LOADED"); });
+        hlsInst.on(Hls.Events.FRAG_BUFFERED, function(){ dbg("FRAG_BUFFERED rs=" + video.readyState + " buf=" + (video.buffered.length ? video.buffered.end(0) : 0)); });
+        hlsInst.on(Hls.Events.ERROR, function(evt, data){
+          dbg("ERROR " + (data && data.details) + " fatal=" + (data && data.fatal) + " " + (data && data.reason || "") + " " + (data && data.response && data.response.code));
+          if(token !== playToken) return;
+          if(!data || !data.fatal) return;
+          if(data.type === Hls.ErrorTypes.NETWORK_ERROR && !retried){
+            retried = true;
+            setState("다시 연결 중…");
+            try{ hlsInst.startLoad(); return; }catch(e){}
+          }
+          if(data.type === Hls.ErrorTypes.MEDIA_ERROR && !retried){
+            retried = true;
+            try{ hlsInst.recoverMediaError(); return; }catch(e){}
+          }
+          failChannel(ch, token);
+        });
+        hlsInst.attachMedia(video);
+        hlsInst.loadSource(ch.url);
+      }catch(e){
+        video.src = ch.url;
+        tryPlay(token);
+      }
+    });
+  }
+
+  function tryPlay(token){
+    setState("재생 중…");
+    dbg("tryPlay rs=" + video.readyState + " src=" + (video.currentSrc || "").slice(0, 40));
+    var p = video.play();
+    if(p && p.catch){
+      p.catch(function(e){
+        dbg("play reject " + (e && e.name));
+        if(token !== playToken) return;
+        setState("일시정지");
+        setOverlay("paused", "누르면 재생돼요", state.cur ? state.cur.n : "", true);
+      });
+    }
+  }
+
+  function resume(){
+    if(!state.cur) return;
+    if(state.cur.ext && !state.cur.url){ openOfficial(state.cur); return; }
+    if(!video.src && !hlsInst){ play(state.cur); return; }
+    tryPlay(playToken);
+  }
+
+  function failChannel(ch, token){
+    if(token !== playToken) return;
+    setState("재생 실패");
+    setOverlay("error", "지금 이 채널이 안 열려요",
+      "'" + ch.n + "' 신호가 응답하지 않아요. " + (ch.dom ? "국내(한국) 네트워크에서만 열리는 채널이에요. " : "") +
+      "잠시 뒤 '다시 시도'를 누르면 다시 연결합니다. 채널은 목록에 그대로 남아 있어요.");
+  }
+
+  /* ---------------- 수동 숨김 / 복구 ---------------- */
+  function stopPlayback(){
+    destroyHls(); playToken++; clearTimeout(watchdog);
+    try{ video.pause(); video.removeAttribute("src"); video.load(); }catch(e){}
+    state.cur = null;
+    idleScreen();
+  }
+
+  function hideChannel(ch){
+    if(!ch || hidden[ch.id]) return;
+    hidden[ch.id] = Date.now();
+    save(LS_HIDDEN, hidden);
+    var wasCur = !!(state.cur && state.cur.id === ch.id);
+    render();
+    if(wasCur) stopPlayback();
+    toast("'" + ch.n + "' 채널을 숨겼어요", "되돌리기", function(){ restoreChannel(ch.id); });
+  }
+
+  function restoreChannel(id){
+    if(!hidden[id]) return;
+    delete hidden[id];
+    save(LS_HIDDEN, hidden);
+    render();
+  }
+
+  function restoreAllHidden(){
+    var list = hiddenList();
+    if(!list.length) return;
+    hidden = {};
+    save(LS_HIDDEN, hidden);
+    render();
+    toast("숨긴 채널 " + list.length + "개를 모두 다시 보이게 했어요", null, null);
+    closeModal();
+  }
+
+  function openModal(){
+    var list = hiddenList();
+    if(!list.length){
+      modalBody.innerHTML = '<div class="mempty">아직 숨긴 채널이 없어요.<br>목록 위 <b>채널 편집</b>을 켜고 원하는 채널을 탭하면<br>여기에 모입니다.</div>';
+      $("modalAll").disabled = true; $("modalAll").style.opacity = ".4";
+    } else {
+      $("modalAll").disabled = false; $("modalAll").style.opacity = "";
+      modalBody.innerHTML = list.map(function(c){
+        var badge = String(c.b || c.n.slice(0, 3)).split("\n").map(esc).join("<br>");
+        var sub = (c.k in CAT_LABEL) ? CAT_LABEL[c.k] : (REGION_LABEL[c.k] || "");
+        if(c.ext) sub += " · 공식";
+        return '<div class="hrow">' +
+          '<div class="hl" style="background:' + (c.c || "#1b2942") + '">' + badge + '</div>' +
+          '<div class="hi"><b>' + esc(c.n) + '</b><span>' + esc(sub) + '</span></div>' +
+          '<button class="rb" data-restore="' + c.id + '">다시 꺼내기</button>' +
+        '</div>';
+      }).join("");
+    }
+    modal.hidden = false;
+  }
+  function closeModal(){ modal.hidden = true; }
+
+  video.addEventListener("playing", function(){
+    setState("생방송");
+    $("videoBox").classList.add("playing");
+    setOverlay("playing");
+    overlay.hidden = true;
+    overlay.className = "overlay";
+    $("videoBox").classList.remove("idle");
+    miniPlay.textContent = "❚❚";
+    nowbar.hidden = false;
+  });
+  video.addEventListener("pause", function(){
+    if(video.ended) return;
+    setState("일시정지");
+    $("videoBox").classList.remove("playing");
+    miniPlay.textContent = "▶";
+  });
+  video.addEventListener("waiting", function(){ setState("버퍼링…"); });
+  video.addEventListener("error", function(){
+    dbg("video error " + (video.error && video.error.code) + " mode=" + state.mode);
+    if(!state.cur || !video.error) return;
+    // A native <video> that cannot handle the stream: retry once through hls.js
+    if(state.mode === "native" && !retried && !isAppleWebkit()){
+      var ch = state.cur;
+      retried = true;
+      setTimeout(function(){ if(state.cur && state.cur.id === ch.id) play(ch, true, true); }, 120);
+      return;
+    }
+    failChannel(state.cur, playToken);
+  });
+
+  function toast(msg, actionLabel, action){
+    var el = $("toast"), btn = $("toastAct");
+    $("toastTxt").textContent = msg;
+    if(actionLabel){
+      btn.hidden = false; btn.textContent = actionLabel;
+      btn.onclick = function(){ action && action(); el.classList.remove("show"); };
+    } else { btn.hidden = true; btn.onclick = null; }
+    el.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function(){ el.classList.remove("show"); }, 4200);
+  }
+
+  /* ---------------- interactions ---------------- */
+  tabsEl.addEventListener("click", function(e){
+    var b = e.target.closest("[data-tab]");
+    if(!b) return;
+    state.tab = b.getAttribute("data-tab");
+    state.q = ""; qInput.value = ""; searchbar.classList.remove("has");
+    render();
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+
+  chipsEl.addEventListener("click", function(e){
+    var b = e.target.closest("[data-cat],[data-reg]");
+    if(!b) return;
+    if(b.hasAttribute("data-cat")) state.krCat = b.getAttribute("data-cat");
+    else state.region = b.getAttribute("data-reg");
+    render();
+  });
+
+  grid.addEventListener("click", function(e){
+    var fav = e.target.closest("[data-fav]");
+    if(fav){
+      e.stopPropagation(); e.preventDefault();
+      var id = fav.getAttribute("data-fav");
+      if(favs[id]) delete favs[id]; else favs[id] = 1;
+      save(LS_FAV, favs);
+      render();
+      return;
+    }
+    var card = e.target.closest(".card");
+    if(card){
+      var ch = byId[card.getAttribute("data-id")];
+      if(!ch) return;
+      if(editing){ e.preventDefault(); e.stopPropagation(); hideChannel(ch); return; }
+      play(ch);
+    }
+  });
+  grid.addEventListener("keydown", function(e){
+    if(e.key !== "Enter" && e.key !== " ") return;
+    var card = e.target.closest(".card");
+    if(card){
+      e.preventDefault();
+      var ch = byId[card.getAttribute("data-id")];
+      if(!ch) return;
+      if(editing){ hideChannel(ch); return; }
+      play(ch);
+    }
+  });
+
+  qInput.addEventListener("input", function(){
+    state.q = qInput.value;
+    searchbar.classList.toggle("has", !!state.q.trim());
+    render();
+  });
+  $("qClear").addEventListener("click", function(){
+    state.q = ""; qInput.value = ""; searchbar.classList.remove("has"); render(); qInput.focus();
+  });
+
+  /* ---------------- 수동 숨김 UI ---------------- */
+  editBtn.addEventListener("click", function(){
+    editing = !editing;
+    render();
+    if(editing) toast("편집 모드 — 숨길 채널을 탭하세요", null, null);
+  });
+  $("editDone").addEventListener("click", function(){ editing = false; render(); });
+
+  manageBtn.addEventListener("click", openModal);
+  $("modalClose").addEventListener("click", closeModal);
+  $("modalDone").addEventListener("click", closeModal);
+  $("modalBg").addEventListener("click", closeModal);
+  $("modalAll").addEventListener("click", restoreAllHidden);
+  modalBody.addEventListener("click", function(e){
+    var b = e.target.closest("[data-restore]");
+    if(!b) return;
+    var id = b.getAttribute("data-restore");
+    var nm = byId[id] ? byId[id].n : "채널";
+    restoreChannel(id);
+    toast("'" + nm + "' 채널을 다시 보이게 했어요", null, null);
+    if(state.cur){ /* keep playing */ } else { syncCurBar(); }
+    openModal();
+  });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !modal.hidden) closeModal(); });
+
+  $("hideCurBtn").addEventListener("click", function(){ if(state.cur) hideChannel(state.cur); });
+
+  /* ---------------- 전 세계 국가 UI ---------------- */
+  ctryToggle.addEventListener("click", function(){ state.ctryOpen = !state.ctryOpen; render(); });
+  ctryQ.addEventListener("input", function(){ state.ctryQ = ctryQ.value; renderCountries(); });
+  ctryGrid.addEventListener("click", function(e){
+    var b = e.target.closest("[data-cc]");
+    if(b) selectCountry(b.getAttribute("data-cc"));
+  });
+  $("ctryBack").addEventListener("click", function(){
+    state.country = null;
+    render();
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+  moreBtn.addEventListener("click", function(){ state.worldShown += 240; render(); });
+  emptyEl.addEventListener("click", function(e){
+    var b = e.target.closest("[data-retry]");
+    if(!b) return;
+    loadCountry(b.getAttribute("data-retry"));
+  });
+
+  function fullscreen(){
+    if(video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+    else if(video.requestFullscreen) video.requestFullscreen().catch(function(){});
+    else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+  }
+  $("fsBtn").addEventListener("click", fullscreen);
+
+  $("miniPlay").addEventListener("click", function(){
+    if(!state.cur){ var f = curList()[0]; if(f) play(f); return; }
+    if(video.paused) resume(); else video.pause();
+  });
+  $("miniExpand").addEventListener("click", function(){
+    stage.classList.remove("compact");
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+
+  /* compact player on scroll */
+  var lastY = window.scrollY;
+  window.addEventListener("scroll", function(){
+    var y = window.scrollY;
+    stage.classList.toggle("stuck", y > 6);
+    if(y > 150 && state.cur) stage.classList.add("compact");
+    else if(y < 90) stage.classList.remove("compact");
+    lastY = y;
+  }, {passive:true});
+
+  /* ---------------- boot ---------------- */
+  (function boot(){
+    // 예전 자동 숨김 기록은 더 이상 쓰지 않으므로 비워 둡니다.
+    // (새 수동 숨김 키와 분리되어 있어 CNN Originals 등은 처음부터 그대로 보입니다)
+    try{ localStorage.removeItem("huni_tv_fail_v1"); }catch(e){}
+    render();
+    var last = load(LS_LAST, null);
+    if(last && byId[last] && !isHidden(byId[last])){
+      state.cur = byId[last];
+      nowName.textContent = state.cur.n;
+      miniName.textContent = state.cur.n;
+      nowbar.hidden = false;
+      $("videoBox").classList.remove("idle");
+      setOverlay("paused", "이어서 볼까요?", state.cur.n, true);
+      state.cur = null; state.cur = byId[last];
+      markOnCard();
+    } else {
+      idleScreen();
+    }
+    // warm up hls.js after first paint (never blocks initial render)
+    var warm = function(){ if(!nativeHls()) loadHlsScript(function(){}); };
+    if(window.requestIdleCallback) requestIdleCallback(warm, {timeout:2500});
+    else setTimeout(warm, 1800);
+  })();
+})();
+</script>
+
+<script>
+/* PWA: 홈 화면 앱 + 오프라인 캐시 */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FFF9F0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="숫자놀이">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<title>숫자랑 놀자 · 엄마랑 같이</title>
+<style>
+:root{
+  --ink:#4A4038;
+  --ink2:#8B7C6E;
+  --cream:#FFF9F0;
+  --peach:#FFE3D3;
+  --mint:#DDF3E4;
+  --sky:#DCEFFB;
+  --lilac:#EDE4FB;
+  --pink:#FFE1EC;
+  --card-shadow:0 6px 16px rgba(168,146,124,.16);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  overflow:hidden;
+  -webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;
+  touch-action:manipulation;
+  overscroll-behavior:none;
+  line-height:1.3;
+}
+#bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 10% 6%, #DCEFFB 0%, rgba(220,239,251,0) 52%),
+    radial-gradient(circle at 92% 12%, #DDF3E4 0%, rgba(221,243,228,0) 48%),
+    radial-gradient(circle at 50% 102%, #FFE9DC 0%, rgba(255,233,220,0) 58%),
+    #FFF9F0;
+}
+#app{
+  position:relative;z-index:1;
+  height:100vh;height:100dvh;
+  max-width:640px;margin:0 auto;
+  display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+}
+.hidden{display:none!important}
+.invisible{visibility:hidden;pointer-events:none}
+
+/* ── top bar ── */
+#topbar{
+  flex:0 0 auto;height:52px;display:flex;align-items:center;gap:8px;
+  padding:0 12px;
+}
+.spacer{flex:1}
+.icon-btn{
+  width:44px;height:44px;border-radius:15px;border:none;
+  background:rgba(255,255,255,.82);
+  box-shadow:0 3px 10px rgba(168,146,124,.16);
+  font-size:20px;display:grid;place-items:center;cursor:pointer;
+  transition:transform .14s;
+}
+.icon-btn:active{filter:brightness(.92)}
+.range-pill{
+  height:34px;padding:0 12px;border-radius:13px;
+  border:1.5px solid #EFE0CF;background:rgba(255,255,255,.82);
+  font-size:12.5px;font-weight:900;color:#9A8574;
+  cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:4px;
+  -webkit-touch-callout:none;
+}
+.range-pill:active{background:#FFF3E2;filter:brightness(.98)}
+.range-pill .lock{font-size:10px;opacity:.6}
+/* ── 전체 앱 목록(런처) 버튼 ── */
+.applist-pill{
+  flex:0 0 auto;height:34px;padding:0 11px;border-radius:13px;
+  border:1.5px solid #EFE0CF;background:rgba(0,0,0,.06);
+  font-size:12.5px;font-weight:900;color:#6B5747;text-decoration:none;
+  display:flex;align-items:center;gap:3px;white-space:nowrap;
+  -webkit-touch-callout:none;
+}
+.applist-pill:active{background:rgba(0,0,0,.12)}
+
+/* ── mom tip ── */
+.momtip{
+  flex:0 0 auto;display:flex;gap:7px;align-items:flex-start;
+  background:linear-gradient(180deg,#FFF6E9,#FFFBF4);
+  border:1.5px solid #FFE4C8;border-radius:15px;
+  padding:7px 10px;margin:0 14px 7px;
+  font-size:12.5px;line-height:1.35;font-weight:600;color:#8A6A4E;
+}
+.momtip b{color:#DE8A5C;font-weight:900;white-space:nowrap;font-size:12.5px}
+.momtip span{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+/* ── stage / screens ── */
+#stage{position:relative;flex:1 1 auto;min-height:0}
+.screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  padding:0 14px 8px;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .2s ease;
+  overflow-y:auto;overflow-x:hidden;
+}
+.screen.active{opacity:1;visibility:visible;pointer-events:auto}
+
+/* ── home ── */
+.home-top{display:flex;flex-direction:column;align-items:center;gap:0;padding:0 0 10px}
+.home-title{
+  font-size:clamp(26px,7.6vw,32px);font-weight:900;letter-spacing:-.03em;
+  color:#57483B;margin:2px 0 0;
+}
+.home-sub{font-size:13px;color:#A6957F;font-weight:800;margin:2px 0 0}
+.menu{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:11px;align-content:space-evenly;padding-bottom:4px}
+.menu-card{
+  border:none;border-radius:24px;padding:12px 8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  min-height:clamp(84px,21vw,104px);
+  background:#fff;box-shadow:var(--card-shadow);
+  cursor:pointer;transition:filter .12s;
+  font-family:inherit;
+}
+.menu-card:active{filter:brightness(.95)}
+.menu-card .ico{font-size:clamp(28px,8.4vw,36px);line-height:1.05}
+.menu-card .lb{font-size:clamp(14px,3.9vw,16px);font-weight:900;color:#57483B;letter-spacing:-.02em}
+.menu-card .sub{font-size:11px;color:#AC9C8A;font-weight:700}
+.menu-card.wide{grid-column:1 / -1;flex-direction:row;gap:10px;justify-content:center;min-height:clamp(84px,21vw,104px);padding:8px 12px}
+.menu-card.wide .ico{font-size:clamp(24px,7vw,30px)}
+.menu-card.wide .lb{font-size:clamp(14px,4vw,15.5px)}
+.c-mint{background:linear-gradient(170deg,#E7F8EC,#D6F1E0)}
+.c-sky{background:linear-gradient(170deg,#E6F4FD,#D7EBFA)}
+.c-lilac{background:linear-gradient(170deg,#F1EAFC,#E6DBFA)}
+.c-peach{background:linear-gradient(170deg,#FFEFE3,#FFE0CB)}
+.c-pink{background:linear-gradient(170deg,#FFEDF3,#FFDBE8)}
+.c-cream{background:linear-gradient(170deg,#FFF6E2,#FFEAC4)}
+
+/* ── play head ── */
+.play-head{flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:0 0 6px}
+.mascot-wrap{
+  width:clamp(58px,17vw,74px);flex:0 0 auto;
+  animation:bob 2.6s ease-in-out infinite;
+}
+.mascot-wrap svg{display:block;width:100%;height:auto;overflow:visible}
+.home-mascot{width:clamp(82px,25vw,104px);margin:0 auto 2px}
+.mascot-wrap.shake{animation:shake .5s ease}
+.mascot-wrap.happy{animation:happy .5s ease 2}
+.eye{animation:blink 5s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.1)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes happy{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-9px) scale(1.08)}70%{transform:translateY(1px) scale(.98)}100%{transform:translateY(0) scale(1)}}
+@keyframes shake{0%,100%{transform:rotate(0)}15%{transform:rotate(-6deg)}35%{transform:rotate(5deg)}55%{transform:rotate(-4deg)}75%{transform:rotate(3deg)}}
+
+.bubble{
+  position:relative;flex:1;min-width:0;
+  background:#fff;border-radius:17px;padding:9px 13px;
+  font-size:clamp(12.5px,3.6vw,14.5px);font-weight:800;color:#6B5B4C;
+  box-shadow:0 4px 12px rgba(168,146,124,.14);
+  line-height:1.32;
+}
+.bubble::before{
+  content:'';position:absolute;left:-5px;top:50%;
+  width:11px;height:11px;background:#fff;border-radius:3px;
+  transform:translateY(-50%) rotate(45deg);
+}
+
+/* ── count ── */
+.count-stage{
+  flex:1;min-height:0;display:flex;flex-direction:column;
+  justify-content:center;gap:clamp(4px,1.6vh,14px);padding-bottom:2px;
+}
+.counter{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0}
+.counter-num{
+  font-size:clamp(50px,15vw,76px);font-weight:900;line-height:1;
+  color:#E9A06B;transition:transform .16s ease;letter-spacing:-.03em;
+}
+.counter-word{font-size:clamp(12.5px,3.6vw,14px);font-weight:900;color:#B0A08C;margin-top:1px;height:18px}
+.item-grid{
+  flex:0 1 auto;min-height:0;display:flex;flex-wrap:wrap;
+  align-content:center;justify-content:center;
+  gap:clamp(6px,2vw,11px);padding:2px;
+}
+.item{
+  width:clamp(56px,18vw,82px);height:clamp(56px,18vw,82px);
+  border-radius:24px;border:3px solid transparent;
+  background:#fff;box-shadow:0 5px 13px rgba(168,146,124,.15);
+  display:grid;place-items:center;
+  font-size:clamp(26px,9.4vw,40px);line-height:1;
+  cursor:pointer;transition:filter .12s,background .18s,border-color .18s;
+  padding:0;font-family:inherit;
+}
+.item:active{filter:brightness(.95)}
+.item.tapped{background:#FFF5DE;border-color:#FFD79A}
+.item.pop{animation:pop .45s ease}
+@keyframes pop{0%{transform:scale(1)}38%{transform:scale(1.22)}68%{transform:scale(.94)}100%{transform:scale(1)}}
+
+/* ── quiz (match / shape / add / coop) ── */
+.quiz{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:9px}
+.quiz-card{
+  flex:0 1 auto;min-height:clamp(180px,38vh,280px);display:flex;flex-wrap:wrap;
+  align-content:center;justify-content:center;
+  gap:clamp(6px,2vw,12px);padding:14px;
+  background:rgba(255,255,255,.72);border-radius:26px;
+  box-shadow:inset 0 0 0 3px #fff, 0 5px 14px rgba(168,146,124,.1);
+  transition:box-shadow .3s;
+}
+.quiz-card.glow{box-shadow:inset 0 0 0 3px #FFF3D6, 0 0 0 4px #FFDCA8, 0 5px 14px rgba(168,146,124,.1)}
+.quiz-card .qi{font-size:var(--qi,clamp(24px,8.4vw,38px));line-height:1.05}
+.choices{flex:0 0 auto;display:flex;gap:9px;justify-content:center}
+.num-btn{
+  flex:1 1 0;max-width:110px;min-height:clamp(68px,18.5vw,86px);
+  border:none;border-radius:22px;background:#fff;
+  box-shadow:0 6px 15px rgba(168,146,124,.17);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:filter .12s,background .2s,box-shadow .2s;
+  padding:0;font-family:inherit;
+}
+.num-btn:active{filter:brightness(.95)}
+.num-btn b{font-size:clamp(28px,8.6vw,38px);font-weight:900;color:#57483B;line-height:1;letter-spacing:-.02em}
+.num-btn span{font-size:10.5px;font-weight:800;color:#B0A08C;margin-top:1px}
+.num-btn.correct{background:#E8F9EC;box-shadow:0 0 0 4px #B7E8C5, 0 6px 15px rgba(140,205,160,.3)}
+.num-btn.correct b{color:#3E7A55}
+.num-btn.wobble{animation:wobble .45s ease}
+@keyframes wobble{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-5px) rotate(-2deg)}50%{transform:translateX(5px) rotate(2deg)}80%{transform:translateX(-3px) rotate(-1deg)}}
+
+/* ── shapes ── */
+.target-wrap{flex:0 0 auto;display:flex;justify-content:center;padding:0 0 2px}
+.target-card{
+  width:clamp(84px,26vw,110px);height:clamp(84px,26vw,110px);
+  display:grid;place-items:center;
+  background:rgba(255,255,255,.72);border-radius:26px;
+  box-shadow:inset 0 0 0 3px #fff;padding:9px;
+  transition:box-shadow .3s;
+}
+.target-card.hint{animation:hintGlow 1.1s ease 2}
+.target-card svg{display:block;width:100%;height:100%}
+@keyframes hintGlow{0%,100%{box-shadow:inset 0 0 0 3px #fff,0 0 0 0 rgba(255,196,110,0)}50%{box-shadow:inset 0 0 0 3px #FFF3D6,0 0 0 9px rgba(255,196,110,.3)}}
+.shape-grid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 0 2px}
+.shape-card{
+  border:none;background:#fff;border-radius:24px;
+  box-shadow:0 5px 14px rgba(168,146,124,.15);
+  display:grid;place-items:center;padding:9px;
+  cursor:pointer;transition:filter .12s,box-shadow .2s;
+  min-height:0;
+}
+.shape-card:active{filter:brightness(.96)}
+.shape-card svg{display:block;width:100%;height:100%;max-height:100%}
+.shape-card.correct{box-shadow:0 0 0 4px #B7E8C5,0 5px 14px rgba(140,205,160,.3);background:#F2FCF5}
+.shape-card.wobble{animation:wobble .45s ease}
+
+/* ── add ── */
+.add-wrap{
+  flex:0 0 auto;margin:auto 0;
+  display:flex;align-items:center;justify-content:center;
+  gap:clamp(4px,1.6vw,10px);padding:clamp(12px,3.4vw,20px) 6px;
+  background:rgba(255,255,255,.62);border-radius:26px;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.95);
+}
+.add-group{
+  display:flex;flex-wrap:wrap;align-content:center;justify-content:center;
+  gap:2px;padding:8px;border-radius:20px;
+  background:rgba(255,255,255,.95);box-shadow:inset 0 0 0 2px #FFF2E2;
+  min-width:clamp(56px,17vw,86px);max-width:clamp(80px,25vw,122px);
+  min-height:clamp(56px,17vw,86px);
+}
+.add-group .i{font-size:clamp(22px,7vw,31px);line-height:1.12}
+.add-op{font-size:clamp(20px,6.6vw,28px);font-weight:900;color:#C9B7A6;line-height:1}
+.add-result{
+  width:clamp(54px,16vw,76px);height:clamp(54px,16vw,76px);
+  border-radius:20px;background:#fff;
+  display:grid;place-items:center;
+  font-size:clamp(24px,7.6vw,32px);font-weight:900;color:#E9A06B;
+  box-shadow:0 4px 12px rgba(168,146,124,.15),inset 0 0 0 3px #FFE3C8;
+  transition:background .25s;
+}
+.add-result.filled{background:#FFF5DE;animation:pop .5s ease}
+
+/* ── coop ── */
+.coop-stars{
+  flex:0 0 auto;display:flex;justify-content:center;gap:5px;
+  padding:0 0 5px;font-size:clamp(22px,7vw,29px);line-height:1;
+}
+.coop-stars span{opacity:.28;filter:grayscale(1) contrast(.85)}
+.coop-stars span.on{opacity:1;filter:none}
+.coop-stars span.fresh{animation:starpop .55s ease}
+@keyframes starpop{0%{transform:scale(.4) rotate(-25deg)}55%{transform:scale(1.4) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
+.coop-head{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:0 0 6px}
+.turn-badge{
+  flex:0 0 auto;border-radius:999px;padding:6px 11px;
+  font-size:12.5px;font-weight:900;white-space:nowrap;
+  background:#FFE3EC;color:#B4507A;
+}
+.turn-badge.baby{background:#DCF3E4;color:#3E7A55}
+.turn-badge.turnpop{animation:pop .45s ease}
+.coop-msg{
+  flex:1;min-width:0;font-size:12.5px;font-weight:800;color:#8B7C6E;
+  line-height:1.32;overflow:hidden;
+}
+
+/* ── mom praise bar ── */
+.mom-bar{
+  flex:0 0 auto;height:54px;margin:6px 14px 8px;
+  border:none;border-radius:20px;
+  background:linear-gradient(180deg,#FFE9F2,#FFD7E4);
+  color:#B4507A;font-weight:900;font-size:14.5px;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 5px 14px rgba(230,150,185,.26);
+  cursor:pointer;transition:filter .12s;
+}
+.mom-bar:active{filter:brightness(.97)}
+.mom-bar .cnt{
+  font-size:12px;background:rgba(255,255,255,.8);
+  border-radius:999px;padding:2px 9px;color:#B4507A;font-weight:900;
+}
+.mom-bar.heartpop{animation:heartpop .6s ease}
+@keyframes heartpop{0%{transform:scale(1)}30%{transform:scale(1.06)}60%{transform:scale(.98)}100%{transform:scale(1)}}
+
+/* ── sticker book ── */
+.sticker-head{
+  flex:0 0 auto;display:flex;align-items:baseline;justify-content:space-between;
+  padding:2px 2px 8px;
+}
+.sticker-head h2{margin:0;font-size:19px;font-weight:900;color:#57483B}
+.sticker-head span{font-size:12px;font-weight:900;color:#A6957F}
+.sticker-stats{flex:0 0 auto;display:flex;gap:8px;padding:0 0 10px}
+.stat{
+  flex:1;background:rgba(255,255,255,.85);border-radius:15px;
+  padding:8px 10px;font-size:12px;font-weight:800;color:#8B7C6E;
+  box-shadow:0 3px 9px rgba(168,146,124,.1);
+  display:flex;align-items:center;justify-content:space-between;gap:4px;
+}
+.stat b{font-size:15px;font-weight:900;color:#B4507A}
+.stat.stars b{color:#D99A2B}
+.sticker-grid{
+  flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);
+  gap:9px;align-content:start;padding-bottom:6px;
+}
+.sticker-slot{
+  aspect-ratio:1;border-radius:20px;background:#fff;
+  display:grid;place-items:center;
+  font-size:clamp(24px,7.6vw,32px);
+  box-shadow:0 4px 11px rgba(168,146,124,.13);
+}
+.sticker-slot.empty{
+  background:rgba(255,255,255,.42);
+  box-shadow:inset 0 0 0 2px #F0E4D5;
+  color:#DCCDBB;font-size:19px;font-weight:900;
+}
+.sticker-note{
+  flex:0 0 auto;margin:2px 0 8px;text-align:center;
+  font-size:12.5px;font-weight:800;color:#A6957F;
+}
+
+/* ── reward overlay ── */
+.overlay{
+  position:fixed;inset:0;z-index:60;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(74,64,56,.3);
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  padding:24px;
+}
+.overlay.show{display:flex}
+.reward-card{
+  width:100%;max-width:320px;background:#FFFDF8;
+  border-radius:30px;padding:22px 20px 16px;text-align:center;
+  box-shadow:0 20px 50px rgba(120,100,80,.3);
+  animation:rewardIn .42s cubic-bezier(.2,1.35,.5,1);
+}
+@keyframes rewardIn{0%{transform:scale(.75) translateY(20px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+.reward-kicker{font-size:12px;font-weight:900;color:#C7A88C;letter-spacing:.02em}
+.reward-sticker{
+  font-size:64px;line-height:1.15;margin:4px 0 2px;
+  display:inline-block;
+}
+.reward-sticker.pop{animation:pop .6s ease}
+.reward-title{font-size:17px;font-weight:900;color:#57483B}
+.reward-name{font-size:14px;font-weight:900;color:#B4507A;margin-top:1px}
+.reward-count{font-size:12px;font-weight:800;color:#AC9C8A;margin:4px 0 14px}
+.big-btn{
+  width:100%;min-height:56px;border:none;border-radius:19px;
+  background:linear-gradient(180deg,#FFE2BC,#FFD09A);
+  color:#6B4A2C;font-size:16px;font-weight:900;font-family:inherit;
+  cursor:pointer;box-shadow:0 6px 14px rgba(224,170,110,.35);
+  transition:filter .12s;
+}
+.big-btn:active{filter:brightness(.97)}
+.mom-inline{
+  width:100%;min-height:48px;border:none;border-radius:16px;margin:0 0 9px;
+  background:linear-gradient(180deg,#FFE9F2,#FFD7E4);color:#B4507A;
+  font-size:13.5px;font-weight:900;font-family:inherit;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  box-shadow:0 4px 10px rgba(230,150,185,.22);
+}
+.mom-inline:active{filter:brightness(.97)}
+.mom-inline .cnt{
+  font-size:11.5px;background:rgba(255,255,255,.8);
+  border-radius:999px;padding:2px 8px;color:#B4507A;font-weight:900;
+}
+.link-btn{
+  margin-top:6px;width:100%;min-height:44px;
+  border:none;background:transparent;color:#A6957F;
+  font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;
+}
+
+/* ── toast & confetti ── */
+.toast{
+  position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 60px);
+  transform:translate(-50%,-14px);
+  background:#5A4A3C;color:#fff;font-size:12.5px;font-weight:800;
+  padding:9px 15px;border-radius:14px;max-width:90vw;text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  z-index:80;box-shadow:0 8px 20px rgba(90,74,60,.3);
+}
+.toast.show{opacity:.96;transform:translate(-50%,0)}
+.confetti{position:fixed;inset:0;z-index:70;pointer-events:none;overflow:hidden}
+.confetti span{
+  position:absolute;top:-40px;
+  animation-name:fall;animation-timing-function:linear;animation-fill-mode:forwards;
+  will-change:transform;
+}
+@keyframes fall{
+  from{transform:translateY(0) rotate(0);opacity:1}
+  to{transform:translateY(108vh) rotate(430deg);opacity:.12}
+}
+@media (max-height:700px){
+  .menu-card{min-height:82px}
+  .home-mascot{width:76px}
+  .counter-num{font-size:44px}
+}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<div id="app">
+  <header id="topbar">
+    <button id="homeBtn" class="icon-btn invisible" type="button" aria-label="처음으로">🏠</button>
+    <div class="spacer"></div>
+    <button id="rangePill" class="range-pill" type="button" aria-label="숫자 범위 설정, 엄마용 길게 누르기">1~5 <span class="lock">🔒</span></button>
+    <button id="soundBtn" class="icon-btn" type="button" aria-label="소리 끄기">🔊</button>
+    <a class="applist-pill" href="/" aria-label="전체 앱 목록으로 이동">🏠 앱 목록</a>
+  </header>
+
+  <div id="momTip" class="momtip hidden"><b>👩 엄마</b><span id="momTipText"></span></div>
+
+  <main id="stage">
+
+    <!-- HOME -->
+    <section id="screen-home" class="screen active">
+      <div class="home-top">
+        <div class="mascot-wrap home-mascot"></div>
+        <h1 class="home-title">숫자랑 놀자</h1>
+        <p class="home-sub">엄마랑 같이 놀아요</p>
+      </div>
+      <div class="menu">
+        <button class="menu-card c-mint" data-mode="count" type="button">
+          <span class="ico">🍎</span><span class="lb">숫자 세기</span><span class="sub">하나부터 열까지</span>
+        </button>
+        <button class="menu-card c-sky" data-mode="match" type="button">
+          <span class="ico">🔢</span><span class="lb">몇 개일까?</span><span class="sub">개수를 골라요</span>
+        </button>
+        <button class="menu-card c-lilac" data-mode="shape" type="button">
+          <span class="ico">⭐</span><span class="lb">모양 친구</span><span class="sub">같은 모양 찾기</span>
+        </button>
+        <button class="menu-card c-peach" data-mode="add" type="button">
+          <span class="ico">➕</span><span class="lb">함께 모아요</span><span class="sub">그림으로 더하기</span>
+        </button>
+        <button class="menu-card wide c-pink" data-mode="coop" type="button">
+          <span class="ico">👩🧸</span><span class="lb">엄마랑 같이 별 모으기</span><span class="sub">번갈아 한 번씩 · 별 다섯</span>
+        </button>
+        <button class="menu-card wide c-cream" data-mode="sticker" type="button">
+          <span class="ico">🏆</span><span class="lb">내 스티커북</span><span class="sub">모은 스티커와 하트</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- COUNT -->
+    <section id="screen-count" class="screen">
+      <div class="play-head">
+        <div class="mascot-wrap"></div>
+        <div class="bubble" data-bubble>톡톡 눌러서 세어 볼까?</div>
+      </div>
+      <div class="count-stage">
+        <div class="counter">
+          <div class="counter-num" id="countNum">?</div>
+          <div class="counter-word" id="countWord">톡톡 눌러 보세요</div>
+        </div>
+        <div class="item-grid" id="countGrid"></div>
+      </div>
+    </section>
+
+    <!-- MATCH -->
+    <section id="screen-match" class="screen">
+      <div class="play-head">
+        <div class="mascot-wrap"></div>
+        <div class="bubble" data-bubble>몇 개일까요?</div>
+      </div>
+      <div class="quiz" id="matchArea"></div>
+    </section>
+
+    <!-- SHAPE -->
+    <section id="screen-shape" class="screen">
+      <div class="play-head">
+        <div class="mascot-wrap"></div>
+        <div class="bubble" data-bubble>같은 모양을 찾아볼까?</div>
+      </div>
+      <div class="quiz" id="shapeArea"></div>
+    </section>
+
+    <!-- ADD -->
+    <section id="screen-add" class="screen">
+      <div class="play-head">
+        <div class="mascot-wrap"></div>
+        <div class="bubble" data-bubble>모두 몇 개일까요?</div>
+      </div>
+      <div class="quiz" id="addArea"></div>
+    </section>
+
+    <!-- COOP -->
+    <section id="screen-coop" class="screen">
+      <div class="coop-stars" id="coopStars"></div>
+      <div class="coop-head">
+        <div class="turn-badge" id="coopTurn">👩 엄마 차례</div>
+        <div class="coop-msg" id="coopMsg" data-bubble>몇 개일까요?</div>
+      </div>
+      <div class="quiz" id="coopArea"></div>
+    </section>
+
+    <!-- STICKER -->
+    <section id="screen-sticker" class="screen">
+      <div class="sticker-head"><h2>내 스티커북</h2><span id="stickerCount">모은 스티커 0개</span></div>
+      <div class="sticker-stats">
+        <div class="stat">💖 엄마랑 하트 <b id="heartTotal">0</b></div>
+        <div class="stat stars">⭐ 함께 모은 별 <b id="starTotal">0</b></div>
+      </div>
+      <div class="sticker-grid" id="stickerGrid"></div>
+      <p class="sticker-note" id="stickerNote">놀이를 마치면 스티커를 받아요!</p>
+    </section>
+
+  </main>
+
+  <button id="momBar" class="mom-bar hidden" type="button">💖 엄마가 주는 칭찬 <span class="cnt" id="heartCnt">0</span></button>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="confetti" class="confetti"></div>
+
+<div id="reward" class="overlay">
+  <div class="reward-card">
+    <div class="reward-kicker" id="rewardKicker">놀이 완료!</div>
+    <div class="reward-sticker" id="rewardSticker">🐻</div>
+    <div class="reward-title" id="rewardTitle">새 스티커를 받았어요!</div>
+    <div class="reward-name" id="rewardName">곰돌이</div>
+    <div class="reward-count" id="rewardCount">모은 스티커 1개</div>
+    <button class="mom-inline" id="rewardPraise" type="button">💖 엄마가 주는 칭찬 <span class="cnt" id="rewardHeart">0</span></button>
+    <button class="big-btn" id="rewardBtn" type="button">한 번 더 놀기 🌟</button>
+    <button class="link-btn" id="rewardHome" type="button">🏠 처음으로</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ───────── helpers ───────── */
+var $ = function(s,r){ return (r||document).querySelector(s); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+var rnd = function(n){ return Math.floor(Math.random()*n); };
+var pick = function(a){ return a[rnd(a.length)]; };
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=rnd(i+1); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function restartAnim(el, cls){ if(!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+var Store = {
+  get: function(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:JSON.parse(v); }catch(e){ return d; } },
+  set: function(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+
+/* ───────── audio ───────── */
+var soundOn = Store.get('tmath.sound.v1', true) !== false;
+var ac = null, master = null;
+
+function initAudio(){
+  if(ac){ if(ac.state === 'suspended'){ try{ ac.resume(); }catch(e){} } return ac; }
+  try{
+    var C = window.AudioContext || window.webkitAudioContext;
+    if(!C) return null;
+    ac = new C();
+    master = ac.createGain();
+    master.gain.value = soundOn ? 1 : 0;
+    master.connect(ac.destination);
+  }catch(e){ ac = null; }
+  return ac;
+}
+
+function note(freq, when, dur, vol){
+  if(!ac || !soundOn) return;
+  when = when || 0; dur = dur || 0.6; vol = vol || 0.2;
+  try{
+    var t = ac.currentTime + when;
+    var o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master);
+    o.start(t); o.stop(t + dur + 0.05);
+
+    var o2 = ac.createOscillator(), g2 = ac.createGain();
+    o2.type = 'triangle'; o2.frequency.value = freq * 2;
+    g2.gain.setValueAtTime(0.0001, t);
+    g2.gain.exponentialRampToValueAtTime(vol * 0.2, t + 0.008);
+    g2.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.45);
+    o2.connect(g2); g2.connect(master);
+    o2.start(t); o2.stop(t + dur * 0.5 + 0.05);
+  }catch(e){}
+}
+
+var PENTA = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51, 1567.98, 1760];
+function sfxTap(n){ note(PENTA[(n - 1) % 10], 0, 0.55, 0.2); }
+function sfxCorrect(){ [523.25,659.25,783.99,1046.5].forEach(function(f,i){ note(f, i*0.1, 0.7, 0.16); }); }
+function sfxGentle(){ note(392, 0, 0.5, 0.1); note(329.63, 0.14, 0.62, 0.09); }
+function sfxSticker(){ [659.25,783.99,987.77,1318.51,1567.98].forEach(function(f,i){ note(f, i*0.085, 0.6, 0.14); }); }
+function sfxHeart(){ [1046.5,1318.51,1567.98,2093].forEach(function(f,i){ note(f, i*0.07, 0.8, 0.12); }); }
+
+/* ───────── speech ───────── */
+var koVoice = null;
+function loadVoices(){
+  try{
+    if(!('speechSynthesis' in window)) return;
+    var vs = window.speechSynthesis.getVoices() || [];
+    for(var i=0;i<vs.length;i++){ if(/^ko/i.test(vs[i].lang)){ koVoice = vs[i]; break; } }
+  }catch(e){}
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  try{ window.speechSynthesis.addEventListener('voiceschanged', loadVoices); }catch(e){}
+}
+function speak(text){
+  if(!soundOn) return;
+  if(!('speechSynthesis' in window)) return;
+  try{
+    var S = window.speechSynthesis;
+    S.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ko-KR';
+    if(koVoice) u.voice = koVoice;
+    u.rate = 0.95; u.pitch = 1.25; u.volume = 0.9;
+    S.speak(u);
+  }catch(e){}
+}
+function stopSpeech(){ try{ if('speechSynthesis' in window) window.speechSynthesis.cancel(); }catch(e){} }
+
+/* ───────── storage bits ───────── */
+var STICKERS = [
+  {emoji:'🐻',name:'곰돌이'},{emoji:'🐰',name:'토끼'},{emoji:'🐱',name:'고양이'},{emoji:'🐶',name:'강아지'},
+  {emoji:'🦊',name:'여우'},{emoji:'🐼',name:'판다'},{emoji:'🐸',name:'개구리'},{emoji:'🐤',name:'병아리'},
+  {emoji:'🦄',name:'유니콘'},{emoji:'⭐',name:'반짝별'},{emoji:'🌈',name:'무지개'},{emoji:'🌸',name:'꽃'}
+];
+function getStickers(){ var v = Store.get('tmath.stickers.v1', []); return Array.isArray(v) ? v : []; }
+function setStickers(a){ Store.set('tmath.stickers.v1', a); }
+function getHearts(){ var v = Store.get('tmath.hearts.v1', 0); return (typeof v === 'number' && v >= 0) ? v : 0; }
+function addHearts(n){ Store.set('tmath.hearts.v1', getHearts() + n); }
+function getStars(){ var v = Store.get('tmath.stars.v1', 0); return (typeof v === 'number' && v >= 0) ? v : 0; }
+function addStars(n){ Store.set('tmath.stars.v1', getStars() + n); }
+
+var rangeMax = Store.get('tmath.range.v1', 5);
+if(rangeMax !== 5 && rangeMax !== 10) rangeMax = 5;
+
+/* ───────── mascot ───────── */
+var MASCOT = '<svg viewBox="0 0 120 120" aria-hidden="true">'
+  + '<ellipse cx="60" cy="112" rx="28" ry="5" fill="#E8D6BF" opacity=".5"/>'
+  + '<circle cx="30" cy="32" r="17" fill="#F3D9BC"/><circle cx="90" cy="32" r="17" fill="#F3D9BC"/>'
+  + '<circle cx="30" cy="32" r="9.5" fill="#EFC6A4"/><circle cx="90" cy="32" r="9.5" fill="#EFC6A4"/>'
+  + '<circle cx="60" cy="64" r="44" fill="#FBE7CE"/>'
+  + '<ellipse cx="60" cy="80" rx="27" ry="21" fill="#FFF7EA"/>'
+  + '<ellipse class="eye" cx="43" cy="57" rx="6" ry="7" fill="#4A4038"/>'
+  + '<ellipse class="eye" cx="77" cy="57" rx="6" ry="7" fill="#4A4038"/>'
+  + '<ellipse cx="30" cy="75" rx="7.5" ry="5.5" fill="#FFC0C4" opacity=".75"/>'
+  + '<ellipse cx="90" cy="75" rx="7.5" ry="5.5" fill="#FFC0C4" opacity=".75"/>'
+  + '<ellipse cx="60" cy="72" rx="6.5" ry="5" fill="#8C6A54"/>'
+  + '<path d="M51 82 Q60 91 69 82" fill="none" stroke="#8C6A54" stroke-width="3.4" stroke-linecap="round"/>'
+  + '</svg>';
+$$('.mascot-wrap').forEach(function(el){ el.innerHTML = MASCOT; });
+
+/* ───────── shapes ───────── */
+var SHAPES = ['circle','triangle','square','star','heart'];
+var SHAPE_LABEL = {circle:'동그라미',triangle:'세모',square:'네모',star:'별',heart:'하트'};
+var SHAPE_COLORS = ['#FFB3A7','#9FD4F0','#A9E0B0','#FFD08A','#C2B0F0','#F4AFD4','#FFC49B'];
+var SHAPE_DEF = {
+  circle:{body:'<circle cx="50" cy="50" r="38"/>',eyes:[[38,44],[62,44]],smile:'M39 60 Q50 70 61 60'},
+  square:{body:'<rect x="14" y="14" width="72" height="72" rx="18"/>',eyes:[[37,44],[63,44]],smile:'M38 61 Q50 71 62 61'},
+  triangle:{body:'<path d="M50 20 L83 80 L17 80 Z" stroke-linejoin="round" stroke-width="9"/>',eyes:[[41,62],[59,62]],smile:'M42 71 Q50 78 58 71'},
+  star:{body:'<path d="M50 8 L60 36.3 L89.9 37 L66.2 55.3 L74.7 84 L50 67 L25.3 84 L33.8 55.3 L10.1 37 L40 36.3 Z" stroke-linejoin="round" stroke-width="4"/>',eyes:[[41,48],[59,48]],smile:'M42 57 Q50 65 58 57'},
+  heart:{body:'<path d="M50 86 C50 86 12 62 12 38 C12 24 22 14 35 14 C43 14 48 19 50 24 C52 19 57 14 65 14 C78 14 88 24 88 38 C88 62 50 86 50 86 Z"/>',eyes:[[38,40],[62,40]],smile:'M41 51 Q50 61 59 51'}
+};
+function shapeSVG(kind, color){
+  var d = SHAPE_DEF[kind] || SHAPE_DEF.circle;
+  var stroke = (kind === 'triangle' || kind === 'star') ? ' stroke="' + color + '"' : '';
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    + '<g fill="' + color + '"' + stroke + '>' + d.body + '</g>'
+    + '<g fill="#5A4A3C">'
+    +   '<ellipse cx="' + d.eyes[0][0] + '" cy="' + d.eyes[0][1] + '" rx="4.2" ry="4.8"/>'
+    +   '<ellipse cx="' + d.eyes[1][0] + '" cy="' + d.eyes[1][1] + '" rx="4.2" ry="4.8"/>'
+    + '</g>'
+    + '<path d="' + d.smile + '" fill="none" stroke="#5A4A3C" stroke-width="3.2" stroke-linecap="round"/>'
+    + '</svg>';
+}
+
+/* ───────── items ───────── */
+var ITEMS = ['🍎','🍓','🍊','🍌','🍇','🐶','🐱','🐰','🐤','🐻','🦋','🐠','🍪','🌻'];
+var ITEMS_ANIMAL = ['🐶','🐱','🐰','🐤','🐻','🐸','🐥'];
+var KO_NUM = ['','하나','둘','셋','넷','다섯','여섯','일곱','여덟','아홉','열'];
+var KO_WORD = ['','하나','둘','셋','넷','다섯','여섯','일곱','여덟','아홉','열'];
+
+var MOM_TIPS = {
+  count:[
+    '손가락으로 하나씩 짚으며 "하나, 둘!" 같이 세어 볼까요?',
+    '아기 손을 잡고 같이 톡톡 눌러 주세요.',
+    '다 세면 크게 "와~" 하고 안아 주세요!'
+  ],
+  match:[
+    '먼저 엄마가 하나씩 짚어 볼까요? 아기가 이어서 세요.',
+    '맞히면 아기 손을 하이파이브 해 주세요!',
+    '틀려도 괜찮아요. 같이 다시 세어 봐요.'
+  ],
+  shape:[
+    '"이건 동그라미구나!" 하고 이름을 말해 주세요.',
+    '집에 있는 접시·블록으로 같은 모양을 찾아보세요.',
+    '모양을 손으로 공중에 그려 보게 해 주세요.'
+  ],
+  add:[
+    '장난감 두 개를 옆에 놓고 실제로 모아 보세요.',
+    '"둘에 하나를 더하면 셋!" 손가락으로 같이 세요.',
+    '엄마가 먼저 크게 틀려 보여 주면 아기가 웃어요.'
+  ],
+  coop:[
+    '엄마 차례엔 크게 생각하는 척, 아기 차례엔 박수로 응원해 주세요.',
+    '별 다섯 개를 같이 모아 볼까요?',
+    '별이 하나 늘 때마다 같이 "짝짝!" 해 주세요.'
+  ]
+};
+var tipIdx = {count:0, match:0, shape:0, add:0, coop:0};
+
+/* ───────── state ───────── */
+var screens = {};
+['home','count','match','shape','add','coop','sticker'].forEach(function(k){ screens[k] = $('#screen-' + k); });
+var current = 'home';
+var roundBusy = false;
+var roundToken = 0;
+var bubbleTimer = null;
+var countLevel = 0;
+var countState = null;
+var coopState = null;
+
+var DEFAULT_BUBBLE = {
+  count:'톡톡 눌러서 세어 볼까?',
+  match:'몇 개일까요?',
+  shape:'같은 모양을 찾아볼까?',
+  add:'모두 몇 개일까요?'
+};
+
+function bubbleTarget(){
+  if(current === 'coop') return $('#coopMsg');
+  var s = screens[current];
+  return s ? s.querySelector('[data-bubble]') : null;
+}
+function defaultBubble(){
+  if(current === 'coop') return (coopState && coopState.prompt) ? coopState.prompt : '같이 해 볼까요?';
+  return DEFAULT_BUBBLE[current] || '';
+}
+function setBubble(text, ms){
+  var el = bubbleTarget();
+  if(!el) return;
+  el.textContent = text;
+  clearTimeout(bubbleTimer);
+  if(ms && ms > 0){
+    bubbleTimer = setTimeout(function(){
+      var e2 = bubbleTarget();
+      if(e2) e2.textContent = defaultBubble();
+    }, ms);
+  }
+}
+
+function mascots(){ return $$('.mascot-wrap', screens[current] || document); }
+function reactOk(){
+  mascots().forEach(function(m){
+    m.classList.remove('shake');
+    restartAnim(m, 'happy');
+    setTimeout(function(){ m.classList.remove('happy'); }, 1300);
+  });
+}
+function reactOops(){
+  mascots().forEach(function(m){
+    m.classList.remove('happy');
+    restartAnim(m, 'shake');
+    setTimeout(function(){ m.classList.remove('shake'); }, 900);
+  });
+}
+
+/* ───────── navigation ───────── */
+function go(name){
+  current = name;
+  roundToken++;
+  roundBusy = false;
+  clearTimeout(bubbleTimer);
+  Object.keys(screens).forEach(function(k){ screens[k].classList.toggle('active', k === name); });
+  var play = (name !== 'home' && name !== 'sticker');
+  $('#homeBtn').classList.toggle('invisible', name === 'home');
+  $('#momTip').classList.toggle('hidden', !play);
+  $('#momBar').classList.toggle('hidden', !play);
+  if(name === 'sticker') renderStickers();
+  updateHeartCnt();
+  if(screens[name]) screens[name].scrollTop = 0;
+}
+
+function setMomTip(mode){
+  var list = MOM_TIPS[mode];
+  if(!list) return;
+  var i = tipIdx[mode] % list.length;
+  tipIdx[mode] = (i + 1) % list.length;
+  $('#momTipText').textContent = list[i];
+}
+
+function start(mode){
+  clearTimeout(bubbleTimer);
+  roundBusy = false;
+  roundToken++;
+  if(mode === 'count') startCount();
+  else if(mode === 'match') startMatch();
+  else if(mode === 'shape') startShape();
+  else if(mode === 'add') startAdd();
+  else if(mode === 'coop') startCoop();
+}
+
+/* ───────── feedback ───────── */
+function confetti(n, glyphs){
+  var box = $('#confetti');
+  var g = glyphs || ['⭐','✨','💛','🌸','💚','💙','🎉','⭐'];
+  n = n || 24;
+  for(var i=0;i<n;i++){
+    var s = document.createElement('span');
+    s.textContent = pick(g);
+    s.style.left = (Math.random() * 96) + '%';
+    s.style.fontSize = (14 + Math.random() * 20) + 'px';
+    s.style.animationDuration = (1.6 + Math.random() * 1.4) + 's';
+    s.style.animationDelay = (Math.random() * 0.35) + 's';
+    box.appendChild(s);
+    (function(el){ setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 3600); })(s);
+  }
+}
+
+function gentleWrong(el, hintEl){
+  sfxGentle();
+  reactOops();
+  restartAnim(el, 'wobble');
+  setTimeout(function(){ if(el) el.classList.remove('wobble'); }, 500);
+  setBubble('다시 한번 볼까?', 2400);
+  speak('다시 한번 볼까');
+  if(hintEl){
+    hintEl.classList.remove('hint');
+    void hintEl.offsetWidth;
+    hintEl.classList.add('hint');
+    setTimeout(function(){ hintEl.classList.remove('hint'); }, 2600);
+  }
+}
+
+function onCorrect(msg, kicker){
+  sfxCorrect();
+  confetti(26);
+  reactOk();
+  setBubble(msg || '참 잘했어요!', 3000);
+  speak('참 잘했어요!');
+  var t = roundToken;
+  setTimeout(function(){ if(t === roundToken) openReward(kicker); }, 1400);
+}
+
+/* ───────── reward ───────── */
+function awardSticker(){
+  var have = getStickers();
+  var missing = null;
+  for(var i=0;i<STICKERS.length;i++){
+    if(have.indexOf(STICKERS[i].emoji) === -1){ missing = STICKERS[i]; break; }
+  }
+  var st = missing || pick(STICKERS);
+  have.push(st.emoji);
+  setStickers(have);
+  return st;
+}
+
+function openReward(kicker){
+  var st = awardSticker();
+  $('#rewardKicker').textContent = kicker || '놀이 완료!';
+  $('#rewardSticker').textContent = st.emoji;
+  $('#rewardName').textContent = st.name;
+  $('#rewardTitle').textContent = '새 스티커를 받았어요!';
+  $('#rewardCount').textContent = '모은 스티커 ' + getStickers().length + '개';
+  updateHeartCnt();
+  $('#reward').classList.add('show');
+  sfxSticker();
+  restartAnim($('#rewardSticker'), 'pop');
+  setTimeout(function(){ speak('새 스티커를 받았어요'); }, 450);
+}
+
+/* ───────── count ───────── */
+function countLadder(){
+  if(rangeMax <= 5) return [[1,2],[1,3],[1,4],[1,5]];
+  return [[1,3],[1,4],[1,6],[1,8],[1,10]];
+}
+
+function startCount(){
+  var ladder = countLadder();
+  var r = ladder[Math.min(countLevel, ladder.length - 1)];
+  var total = r[0] + rnd(r[1] - r[0] + 1);
+  var kind = pick(ITEMS);
+  countState = { total: total, tapped: 0 };
+
+  var grid = $('#countGrid');
+  grid.innerHTML = '';
+  for(var i=0;i<total;i++){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'item';
+    b.textContent = kind;
+    b.setAttribute('aria-label', (i + 1) + '번째 ' + kind);
+    b.addEventListener('click', (function(el){ return function(){ tapCount(el); }; })(b));
+    grid.appendChild(b);
+  }
+  setCounter('?', '톡톡 눌러 보세요');
+  setBubble('톡톡 눌러서 세어 볼까?');
+  setMomTip('count');
+}
+
+function setCounter(num, word){
+  var n = $('#countNum');
+  n.textContent = num;
+  n.style.transform = 'scale(1.16)';
+  setTimeout(function(){ n.style.transform = ''; }, 170);
+  $('#countWord').textContent = word;
+}
+
+function tapCount(el){
+  initAudio();
+  if(roundBusy || !countState) return;
+  if(el.classList.contains('tapped')){
+    note(PENTA[Math.max(0, countState.tapped - 1) % 10], 0, 0.35, 0.12);
+    return;
+  }
+  el.classList.add('tapped');
+  restartAnim(el, 'pop');
+  countState.tapped++;
+  var n = countState.tapped;
+  setCounter(String(n), KO_WORD[n] || '');
+  sfxTap(n);
+  speak(KO_NUM[n]);
+  if(n >= countState.total){
+    roundBusy = true;
+    var t = roundToken;
+    setTimeout(function(){
+      if(t !== roundToken) return;
+      $$('#countGrid .item').forEach(function(el2, i){
+        setTimeout(function(){ restartAnim(el2, 'pop'); }, i * 80);
+      });
+    }, 120);
+    setTimeout(function(){
+      if(t !== roundToken) return;
+      countLevel = Math.min(countLevel + 1, countLadder().length - 1);
+      onCorrect(countState.total + '개를 다 셌어요!');
+    }, 720);
+  }
+}
+
+/* ───────── number quiz builder ───────── */
+function makeChoices(answer, n, min, max){
+  var out = [answer];
+  var near = [];
+  for(var d=1; d<=3; d++){
+    if(answer - d >= min) near.push(answer - d);
+    if(answer + d <= max) near.push(answer + d);
+  }
+  shuffle(near);
+  for(var i=0;i<near.length && out.length<n;i++){
+    if(out.indexOf(near[i]) === -1) out.push(near[i]);
+  }
+  var guard = 0;
+  while(out.length < n && guard++ < 60){
+    var v = min + rnd(max - min + 1);
+    if(out.indexOf(v) === -1) out.push(v);
+  }
+  return shuffle(out);
+}
+
+function numBtn(v){
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'num-btn';
+  b.innerHTML = '<b>' + v + '</b><span>' + (KO_WORD[v] || '') + '</span>';
+  b.setAttribute('aria-label', String(v));
+  return b;
+}
+
+function renderNumberQuiz(root, total, kind, onPick){
+  root.innerHTML = '';
+  var card = document.createElement('div');
+  card.className = 'quiz-card';
+  var qs = (total <= 2) ? 'clamp(56px,18vw,80px)'
+         : (total <= 4) ? 'clamp(46px,14vw,66px)'
+         : (total <= 6) ? 'clamp(38px,11.5vw,54px)'
+         : 'clamp(30px,9vw,44px)';
+  card.style.setProperty('--qi', qs);
+  for(var i=0;i<total;i++){
+    var d = document.createElement('span');
+    d.className = 'qi';
+    d.textContent = kind;
+    card.appendChild(d);
+  }
+  var choices = document.createElement('div');
+  choices.className = 'choices';
+  var maxV = Math.min(10, total + 3);
+  var minV = Math.max(1, total - 3);
+  var opts = makeChoices(total, 3, minV, maxV);
+  opts.forEach(function(v){
+    var b = numBtn(v);
+    b.addEventListener('click', function(){ onPick(v, b, card); });
+    choices.appendChild(b);
+  });
+  root.appendChild(card);
+  root.appendChild(choices);
+  return { card: card, choices: choices };
+}
+
+/* ───────── match ───────── */
+function startMatch(){
+  var hi = Math.min(rangeMax, 8);
+  var total = 1 + rnd(hi);
+  var kind = pick(ITEMS);
+  setBubble('몇 개일까요?');
+  setMomTip('match');
+  renderNumberQuiz($('#matchArea'), total, kind, function(v, btn, card){
+    initAudio();
+    if(roundBusy) return;
+    if(v === total){
+      roundBusy = true;
+      btn.classList.add('correct');
+      card.classList.add('glow');
+      onCorrect('맞아요! ' + total + '개예요!');
+    } else {
+      gentleWrong(btn, card);
+    }
+  });
+}
+
+/* ───────── shape ───────── */
+function renderShapeQuiz(root, onPick){
+  var target = pick(SHAPES);
+  var others = shuffle(SHAPES.filter(function(s){ return s !== target; })).slice(0,3);
+  var opts = shuffle([target].concat(others));
+  var tColor = pick(SHAPE_COLORS);
+
+  root.innerHTML = '';
+
+  var tw = document.createElement('div');
+  tw.className = 'target-wrap';
+  var tc = document.createElement('div');
+  tc.className = 'target-card';
+  tc.setAttribute('role', 'img');
+  tc.setAttribute('aria-label', '찾을 모양 ' + SHAPE_LABEL[target]);
+  tc.innerHTML = shapeSVG(target, tColor);
+  tw.appendChild(tc);
+
+  var grid = document.createElement('div');
+  grid.className = 'shape-grid';
+  opts.forEach(function(s){
+    var color = (s === target)
+      ? pick(SHAPE_COLORS.filter(function(c){ return c !== tColor; }))
+      : pick(SHAPE_COLORS);
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'shape-card';
+    b.innerHTML = shapeSVG(s, color);
+    b.setAttribute('aria-label', SHAPE_LABEL[s]);
+    b.addEventListener('click', function(){ onPick(s, b, tc); });
+    grid.appendChild(b);
+  });
+
+  root.appendChild(tw);
+  root.appendChild(grid);
+  return { target: target, targetCard: tc, grid: grid };
+}
+
+function startShape(){
+  setBubble('같은 모양을 찾아볼까?');
+  setMomTip('shape');
+  var q = renderShapeQuiz($('#shapeArea'), function(s, btn, tc){
+    initAudio();
+    if(roundBusy) return;
+    if(s === q.target){
+      roundBusy = true;
+      btn.classList.add('correct');
+      onCorrect('같은 ' + SHAPE_LABEL[s] + '를 찾았어요!');
+    } else {
+      gentleWrong(btn, tc);
+    }
+  });
+}
+
+/* ───────── add ───────── */
+function startAdd(){
+  var hi = (rangeMax <= 5) ? 5 : 8;
+  var sum = 2 + rnd(hi - 1);              // 2 .. hi
+  var lo = Math.max(1, sum - 4);
+  var h2 = Math.min(4, sum - 1);
+  var a = lo + rnd(h2 - lo + 1);
+  var b = sum - a;
+  var kind = pick(ITEMS_ANIMAL);
+
+  setBubble('모두 몇 개일까요?');
+  setMomTip('add');
+
+  var root = $('#addArea');
+  root.innerHTML = '';
+
+  var wrap = document.createElement('div');
+  wrap.className = 'add-wrap';
+
+  function group(n){
+    var g = document.createElement('div');
+    g.className = 'add-group';
+    for(var i=0;i<n;i++){
+      var s = document.createElement('span');
+      s.className = 'i';
+      s.textContent = kind;
+      g.appendChild(s);
+    }
+    return g;
+  }
+  function op(t){
+    var d = document.createElement('div');
+    d.className = 'add-op';
+    d.textContent = t;
+    return d;
+  }
+
+  var result = document.createElement('div');
+  result.className = 'add-result';
+  result.id = 'addResult';
+  result.textContent = '?';
+
+  wrap.appendChild(group(a));
+  wrap.appendChild(op('+'));
+  wrap.appendChild(group(b));
+  wrap.appendChild(op('='));
+  wrap.appendChild(result);
+
+  var choices = document.createElement('div');
+  choices.className = 'choices';
+  var opts = makeChoices(sum, 3, 1, hi);
+  opts.forEach(function(v){
+    var btn = numBtn(v);
+    btn.addEventListener('click', function(){
+      initAudio();
+      if(roundBusy) return;
+      if(v === sum){
+        roundBusy = true;
+        btn.classList.add('correct');
+        result.textContent = String(sum);
+        result.classList.add('filled');
+        onCorrect(a + ' 더하기 ' + b + '는 ' + sum + '!');
+      } else {
+        gentleWrong(btn, wrap);
+      }
+    });
+    choices.appendChild(btn);
+  });
+
+  root.appendChild(wrap);
+  root.appendChild(choices);
+}
+
+/* ───────── coop (mom + baby) ───────── */
+function renderCoopStars(fresh){
+  var box = $('#coopStars');
+  box.innerHTML = '';
+  for(var i=0;i<5;i++){
+    var s = document.createElement('span');
+    s.textContent = '⭐';
+    if(coopState && i < coopState.stars){
+      s.className = 'on';
+      if(fresh && i === coopState.stars - 1) s.className = 'on fresh';
+    }
+    box.appendChild(s);
+  }
+}
+
+function renderCoopTurn(){
+  var el = $('#coopTurn');
+  if(coopState.turn === 'mom'){
+    el.textContent = '👩 엄마 차례';
+    el.className = 'turn-badge';
+  } else {
+    el.textContent = '🧸 아기 차례';
+    el.className = 'turn-badge baby';
+  }
+  void el.offsetWidth;
+  el.classList.add('turnpop');
+  setTimeout(function(){ el.classList.remove('turnpop'); }, 500);
+}
+
+function startCoop(){
+  coopState = { stars: 0, turn: 'mom', prompt: '같이 해 볼까요?' };
+  renderCoopStars(false);
+  renderCoopTurn();
+  setMomTip('coop');
+  coopQuestion();
+}
+
+function coopQuestion(){
+  var root = $('#coopArea');
+  var hi = (rangeMax <= 5) ? 5 : 8;
+
+  if(coopState.turn === 'mom'){
+    var total = 1 + rnd(hi);
+    var kind = pick(ITEMS);
+    coopState.prompt = '몇 개일까요? 같이 세어 봐요!';
+    setBubble(coopState.prompt);
+    renderNumberQuiz(root, total, kind, function(v, btn, card){
+      initAudio();
+      if(roundBusy) return;
+      if(v === total) coopCorrect(btn);
+      else gentleWrong(btn, card);
+    });
+  } else {
+    coopState.prompt = '같은 모양을 찾아요!';
+    setBubble(coopState.prompt);
+    var q = renderShapeQuiz(root, function(s, btn, tc){
+      initAudio();
+      if(roundBusy) return;
+      if(s === q.target) coopCorrect(btn);
+      else gentleWrong(btn, tc);
+    });
+  }
+}
+
+function coopCorrect(btn){
+  roundBusy = true;
+  if(btn) btn.classList.add('correct');
+  coopState.stars++;
+  renderCoopStars(true);
+  sfxCorrect();
+  confetti(16);
+  speak('참 잘했어요');
+  setBubble('참 잘했어요! 별 하나!', 1800);
+  var t = roundToken;
+
+  if(coopState.stars >= 5){
+    addStars(5);
+    setTimeout(function(){
+      if(t !== roundToken) return;
+      onCorrect('별 다섯 개를 다 모았어요!', '함께 별을 모았어요!');
+    }, 760);
+  } else {
+    setTimeout(function(){
+      if(t !== roundToken) return;
+      coopState.turn = (coopState.turn === 'mom') ? 'baby' : 'mom';
+      renderCoopTurn();
+      roundBusy = false;
+      coopQuestion();
+    }, 1150);
+  }
+}
+
+/* ───────── mom praise ───────── */
+function updateHeartCnt(){
+  var el = $('#heartCnt');
+  if(el) el.textContent = String(getHearts());
+  var el2 = $('#rewardHeart');
+  if(el2) el2.textContent = String(getHearts());
+}
+
+function momPraise(){
+  initAudio();
+  addHearts(1);
+  updateHeartCnt();
+  confetti(18, ['💖','💗','💕','❤️','✨','⭐']);
+  sfxHeart();
+  speak('엄마가 칭찬해요! 정말 잘했어요!');
+  setBubble('엄마가 하트를 주셨어요! 💖', 2400);
+  restartAnim($('#momBar'), 'heartpop');
+  setTimeout(function(){ var b = $('#momBar'); if(b) b.classList.remove('heartpop'); }, 700);
+}
+
+/* ───────── sticker book ───────── */
+function renderStickers(){
+  var have = getStickers();
+  var uniq = [];
+  have.forEach(function(e){ if(uniq.indexOf(e) === -1) uniq.push(e); });
+  $('#stickerCount').textContent = '모은 스티커 ' + uniq.length + '개';
+  $('#heartTotal').textContent = String(getHearts());
+  $('#starTotal').textContent = String(getStars());
+
+  var grid = $('#stickerGrid');
+  grid.innerHTML = '';
+  STICKERS.forEach(function(s){
+    var d = document.createElement('div');
+    if(uniq.indexOf(s.emoji) !== -1){
+      d.className = 'sticker-slot';
+      d.textContent = s.emoji;
+      d.setAttribute('title', s.name);
+    } else {
+      d.className = 'sticker-slot empty';
+      d.textContent = '?';
+    }
+    grid.appendChild(d);
+  });
+
+  var note = $('#stickerNote');
+  if(uniq.length === 0) note.textContent = '놀이를 마치면 스티커를 받아요!';
+  else if(uniq.length >= STICKERS.length) note.textContent = '스티커를 모두 모았어요! 최고예요 🎉';
+  else note.textContent = '한 판 놀 때마다 스티커가 하나씩 늘어요';
+}
+
+/* ───────── range pill (mom only, long press) ───────── */
+var rangeHintShown = false;
+function renderRange(){
+  var el = $('#rangePill');
+  el.innerHTML = '1~' + rangeMax + ' <span class="lock">🔒</span>';
+  el.setAttribute('aria-label', '숫자 범위 1~' + rangeMax + ', 엄마용 길게 누르기');
+}
+function toast(msg){
+  var t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function(){ t.classList.remove('show'); }, 1900);
+}
+function toggleRange(){
+  rangeMax = (rangeMax === 5) ? 10 : 5;
+  Store.set('tmath.range.v1', rangeMax);
+  renderRange();
+  countLevel = 0;
+  toast(rangeMax === 5 ? '이제 1~5까지 세어요' : '이제 1~10까지 세어요');
+}
+(function bindRangePill(){
+  var pill = $('#rangePill');
+  var timer = null, fired = false;
+  pill.addEventListener('pointerdown', function(){
+    fired = false;
+    clearTimeout(timer);
+    timer = setTimeout(function(){ fired = true; toggleRange(); }, 620);
+  });
+  pill.addEventListener('pointerup', function(){
+    clearTimeout(timer);
+    if(!fired){
+      if(!rangeHintShown){
+        rangeHintShown = true;
+        toast('엄마용: 길게 누르면 1~5 / 1~10을 바꿔요');
+      } else {
+        toast('길게 누르면 1~5 / 1~10을 바꿔요');
+      }
+    }
+  });
+  pill.addEventListener('pointerleave', function(){ clearTimeout(timer); });
+  pill.addEventListener('pointercancel', function(){ clearTimeout(timer); });
+  pill.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  pill.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleRange(); }
+  });
+})();
+
+/* ───────── sound toggle ───────── */
+function renderSound(){
+  var b = $('#soundBtn');
+  b.textContent = soundOn ? '🔊' : '🔇';
+  b.setAttribute('aria-label', soundOn ? '소리 끄기' : '소리 켜기');
+}
+function setSound(on){
+  soundOn = on;
+  Store.set('tmath.sound.v1', on);
+  if(master){ try{ master.gain.value = on ? 1 : 0; }catch(e){} }
+  if(!on) stopSpeech();
+  renderSound();
+}
+
+/* ───────── wiring ───────── */
+$$('.menu-card').forEach(function(b){
+  b.addEventListener('click', function(){
+    initAudio();
+    var m = b.getAttribute('data-mode');
+    if(m === 'sticker'){ go('sticker'); return; }
+    go(m);
+    start(m);
+  });
+});
+
+$('#homeBtn').addEventListener('click', function(){ initAudio(); go('home'); });
+
+$('#soundBtn').addEventListener('click', function(){
+  initAudio();
+  setSound(!soundOn);
+  if(soundOn) note(880, 0, 0.4, 0.14);
+});
+
+$('#momBar').addEventListener('click', function(){ momPraise(); });
+$('#rewardPraise').addEventListener('click', function(){ momPraise(); });
+
+$('#rewardBtn').addEventListener('click', function(){
+  initAudio();
+  $('#reward').classList.remove('show');
+  roundBusy = false;
+  start(current);
+});
+
+$('#rewardHome').addEventListener('click', function(){
+  $('#reward').classList.remove('show');
+  roundBusy = false;
+  go('home');
+});
+
+document.addEventListener('pointerdown', function(){ initAudio(); }, { passive: true });
+
+/* ───────── init ───────── */
+renderSound();
+renderRange();
+updateHeartCnt();
+renderStickers();
+setMomTip('count');
+go('home');
+
+})();
+</script>
+
+<script>
+/* PWA: 홈 화면 앱 + 오프라인 캐시 */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+</script>
+</body>
+</html>

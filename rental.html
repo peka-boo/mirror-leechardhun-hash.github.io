@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="원룸·오피스텔 임대 호실 관리 앱 (가상 예시 데이터)">
+<meta name="theme-color" content="#2f6feb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="원룸관리">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<title>임대 호실 관리</title>
+<style>
+  :root{
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --ink:#1c2430;
+    --ink-soft:#5b6675;
+    --line:#e3e8ef;
+    --primary:#2f6feb;
+    --primary-soft:#eaf1ff;
+    --ok:#0f9d58;
+    --ok-soft:#e7f6ee;
+    --warn:#d98200;
+    --warn-soft:#fdf2e0;
+    --danger:#d64545;
+    --danger-soft:#fdecec;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(20,30,50,.06), 0 8px 24px rgba(20,30,50,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+
+  /* header */
+  .app-header{
+    background:linear-gradient(135deg,#1f2b3d 0%,#2f4a7a 55%,#2f6feb 100%);
+    color:#fff;
+    padding:22px 0 64px;
+  }
+  .app-header .wrap{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .app-header h1{margin:0;font-size:22px;letter-spacing:-.02em}
+  .app-header .sub{margin:6px 0 0;font-size:13px;color:rgba(255,255,255,.78)}
+  .month-badge{
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.24);
+    padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap;
+  }
+
+  main{padding:20px 0 64px}
+
+  /* summary */
+  .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:-46px}
+  .stat{
+    background:var(--card);border-radius:var(--radius);padding:14px 16px;
+    box-shadow:var(--shadow);border:1px solid var(--line);
+  }
+  .stat .label{font-size:12.5px;color:var(--ink-soft);font-weight:600;display:flex;align-items:center;gap:6px}
+  .stat .value{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-top:6px}
+  .stat .value small{font-size:13px;font-weight:600;color:var(--ink-soft);margin-left:2px}
+  .stat .foot{font-size:12px;color:var(--ink-soft);margin-top:4px}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.danger{background:var(--danger)} .dot.mute{background:#b6c0cd}
+
+  /* toolbar */
+  .toolbar{
+    display:flex;gap:12px;align-items:center;justify-content:space-between;
+    margin:22px 0 14px;flex-wrap:wrap;
+  }
+  .filters{display:flex;gap:6px;background:#e9edf3;padding:4px;border-radius:999px;flex-wrap:wrap}
+  .filters button{
+    border:0;background:transparent;padding:8px 14px;border-radius:999px;
+    font-size:13.5px;font-weight:600;color:var(--ink-soft);transition:.15s;white-space:nowrap;
+  }
+  .filters button:hover{color:var(--ink)}
+  .filters button[aria-selected="true"]{background:#fff;color:var(--primary);box-shadow:0 1px 3px rgba(20,30,50,.12)}
+  .filters .count{font-size:11.5px;opacity:.7;margin-left:4px}
+
+  .search{position:relative;flex:1 1 240px;max-width:340px}
+  .search input{
+    width:100%;padding:11px 14px 11px 38px;border-radius:12px;border:1px solid var(--line);
+    background:#fff;outline:none;transition:.15s;font-size:14px;
+  }
+  .search input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;fill:#8b97a6}
+
+  .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .btn{
+    border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 14px;
+    font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:.15s;
+  }
+  .btn:hover{border-color:#cfd7e2;background:#fafbfd}
+  .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+  .btn.primary:hover{background:#2760d0;border-color:#2760d0}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--ink-soft)}
+  .btn.ghost:hover{background:#eef1f6}
+  .btn.danger{color:var(--danger)}
+  .btn.sm{padding:7px 11px;font-size:12.5px;border-radius:9px}
+
+  /* room cards */
+  .rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+  .room{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;
+    transition:.15s;
+  }
+  .room:hover{border-color:#cfd9e8;transform:translateY(-1px)}
+  .room-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .room-no{font-size:19px;font-weight:700;letter-spacing:-.02em}
+  .room-no small{font-size:12px;font-weight:500;color:var(--ink-soft);margin-left:6px}
+  .badge{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;white-space:nowrap}
+  .badge.occupied{background:var(--ok-soft);color:var(--ok)}
+  .badge.vacant{background:#eef1f6;color:#68727f}
+  .badge.leaving{background:var(--warn-soft);color:var(--warn)}
+  .badge.paid{background:var(--ok-soft);color:var(--ok)}
+  .badge.unpaid{background:var(--danger-soft);color:var(--danger)}
+
+  .tenant{display:flex;align-items:center;gap:8px;font-size:14px}
+  .tenant .name{font-weight:600}
+  .tenant .phone{color:var(--ink-soft);font-size:13px}
+  .tenant.vacant-text{color:#8b97a6;font-size:13.5px}
+
+  .kv{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;font-size:13px}
+  .kv .k{color:var(--ink-soft);font-size:12px}
+  .kv .v{font-weight:600;font-variant-numeric:tabular-nums}
+  .kv .v.dday-ok{color:var(--ink)}
+  .kv .v.dday-near{color:var(--warn)}
+  .kv .v.dday-over{color:var(--danger)}
+
+  .room-foot{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding-top:11px;border-top:1px dashed var(--line);margin-top:auto;flex-wrap:wrap;
+  }
+  .pay-toggle{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;user-select:none}
+  .pay-toggle input{position:absolute;opacity:0;width:0;height:0}
+  .switch{
+    width:40px;height:23px;border-radius:999px;background:#cfd7e2;position:relative;transition:.18s;flex:none;
+  }
+  .switch::after{
+    content:"";position:absolute;top:2.5px;left:2.5px;width:18px;height:18px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:.18s;
+  }
+  .pay-toggle input:checked + .switch{background:var(--ok)}
+  .pay-toggle input:checked + .switch::after{transform:translateX(17px)}
+  .pay-toggle input:focus-visible + .switch{box-shadow:0 0 0 3px var(--primary-soft)}
+  .room-btns{display:flex;gap:4px}
+
+  .empty{
+    text-align:center;color:var(--ink-soft);padding:48px 16px;background:#fff;
+    border:1px dashed var(--line);border-radius:var(--radius);font-size:14px;
+  }
+  .saved-note{font-size:12px;color:#8b97a6;margin:14px 2px 0;display:flex;align-items:center;gap:6px}
+  .saved-note .dot{background:var(--ok);width:6px;height:6px}
+
+  /* modal */
+  .modal{
+    position:fixed;inset:0;background:rgba(18,25,38,.45);display:flex;align-items:center;justify-content:center;
+    padding:16px;z-index:50;backdrop-filter:blur(2px);
+  }
+  #roomModal{z-index:60}
+  .modal[hidden]{display:none}
+  .sheet{
+    background:#fff;border-radius:18px;width:100%;max-width:560px;max-height:90vh;overflow:auto;
+    box-shadow:0 24px 60px rgba(10,20,40,.28);animation:pop .16s ease-out;
+  }
+  .sheet.wide{max-width:680px}
+  @keyframes pop{from{transform:translateY(8px);opacity:.6}to{transform:none;opacity:1}}
+  .sheet-head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:18px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2;border-radius:18px 18px 0 0;
+  }
+  .sheet-head h2{margin:0;font-size:17px;letter-spacing:-.01em}
+  .sheet-body{padding:18px 20px 22px;display:flex;flex-direction:column;gap:14px}
+  .sheet-foot{padding:0 20px 20px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+  .icon-btn{border:0;background:transparent;border-radius:9px;padding:6px;line-height:0}
+  .icon-btn:hover{background:#eef1f6}
+  .icon-btn svg{width:20px;height:20px;fill:#7b8797}
+
+  .field{display:flex;flex-direction:column;gap:6px;flex:1 1 160px}
+  .field label{font-size:12.5px;font-weight:700;color:var(--ink-soft)}
+  .field input,.field select,.field textarea{
+    border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;outline:none;transition:.15s;width:100%;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .field textarea{min-height:74px;resize:vertical}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .hint{font-size:12px;color:#8b97a6}
+
+  /* detail */
+  .detail-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .detail-top .room-no{font-size:22px}
+  .dgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px;background:#f7f9fc;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .dgrid .k{font-size:12px;color:var(--ink-soft)}
+  .dgrid .v{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+  .section-title{font-size:13px;font-weight:800;color:var(--ink-soft);letter-spacing:.01em;margin:4px 0 -2px}
+
+  .record-form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;background:#f7f9fc;border:1px solid var(--line);border-radius:12px;padding:12px}
+  .record-form .field{flex:1 1 120px}
+  .record-form .field.grow{flex:2 1 220px}
+
+  .timeline{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+  .rec{
+    border:1px solid var(--line);border-radius:12px;padding:12px 13px;background:#fff;
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .rec-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .rec-date{font-size:12.5px;font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .rec-kind{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px}
+  .rec-kind.repair{background:#eaf1ff;color:#2f6feb}
+  .rec-kind.note{background:#eef1f6;color:#5b6675}
+  .rec-kind.moveout{background:var(--warn-soft);color:var(--warn)}
+  .rec-text{font-size:14px;white-space:pre-wrap;word-break:break-word}
+  .rec-actions{margin-left:auto;display:flex;gap:2px}
+  .rec-actions button{border:0;background:transparent;font-size:12px;font-weight:600;color:var(--ink-soft);padding:4px 6px;border-radius:7px}
+  .rec-actions button:hover{background:#eef1f6;color:var(--ink)}
+  .rec-actions button.del:hover{background:var(--danger-soft);color:var(--danger)}
+
+  .memo-box{border:1px solid var(--line);border-radius:12px;padding:12px 13px;background:#fff;font-size:14px;white-space:pre-wrap;word-break:break-word}
+  .muted{color:#8b97a6;font-size:13px}
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:#1f2b3d;color:#fff;
+    padding:11px 18px;border-radius:12px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;
+    transition:.22s;z-index:80;box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:900px){
+    .summary{grid-template-columns:repeat(3,1fr)}
+  }
+  @media (max-width:640px){
+    .app-header{padding:18px 0 58px}
+    .app-header h1{font-size:19px}
+    .summary{grid-template-columns:repeat(2,1fr);margin-top:-36px;gap:10px}
+    .stat{padding:12px 13px}
+    .stat .value{font-size:20px}
+    .summary .stat:first-child{grid-column:span 2}
+    .toolbar{flex-direction:column;align-items:stretch;gap:10px}
+    .search{max-width:none}
+    .filters{justify-content:space-between}
+    .actions{justify-content:stretch}
+    .actions .btn.primary{flex:1 1 100%;justify-content:center}
+    .rooms{grid-template-columns:1fr}
+    .dgrid{grid-template-columns:1fr 1fr}
+    .sheet{max-height:94vh;border-radius:16px}
+  }
+  @media print{
+    .toolbar,.actions,.app-header .month-badge,.room-btns,.pay-toggle{display:none}
+    body{background:#fff}
+    .room{box-shadow:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="wrap">
+    <div>
+      <h1 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span id="buildingTitleText">임대 호실 관리</span><button type="button" id="editTitleBtn" style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.14);color:#fff;cursor:pointer">✏️ 제목 변경</button></h1>
+      <p class="sub">원룸·오피스텔 호실·임차인·월세 납부 관리 · 모든 데이터는 이 브라우저에만 저장됩니다</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="month-badge" id="monthBadge"></div>
+      <a href="/" style="display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.14);color:#fff;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap">🏠 앱 목록</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="summary" id="summary" aria-label="요약 대시보드"></section>
+
+  <section class="toolbar">
+    <div class="filters" role="tablist" aria-label="상태별 필터" id="filters">
+      <button role="tab" data-filter="all" aria-selected="true">전체 <span class="count" id="c-all"></span></button>
+      <button role="tab" data-filter="unpaid" aria-selected="false">미납 <span class="count" id="c-unpaid"></span></button>
+      <button role="tab" data-filter="vacant" aria-selected="false">공실 <span class="count" id="c-vacant"></span></button>
+      <button role="tab" data-filter="leaving" aria-selected="false">퇴거예정 <span class="count" id="c-leaving"></span></button>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+      <input type="search" id="search" placeholder="호실 번호·임차인 이름 검색" aria-label="호실 또는 임차인 검색" autocomplete="off">
+    </div>
+  </section>
+
+  <section class="actions" style="margin-bottom:16px">
+    <button class="btn primary" id="addRoom">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>
+      호실 추가
+    </button>
+    <button class="btn" id="exportJson">JSON 내보내기</button>
+    <button class="btn" id="importJson">JSON 불러오기</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <button class="btn ghost" id="resetSample">예시 데이터로 되돌리기</button>
+  </section>
+
+  <section class="rooms" id="roomList"></section>
+  <p class="empty" id="empty" hidden>조건에 맞는 호실이 없습니다.</p>
+  <p class="saved-note" id="savedNote"><span class="dot"></span><span id="savedText">자동 저장 켜짐 — 수정 내용은 이 브라우저에 저장됩니다</span></p>
+</main>
+
+<!-- 호실 추가/수정 -->
+<div class="modal" id="roomModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="roomModalTitle">
+    <div class="sheet-head">
+      <h2 id="roomModalTitle">호실 추가</h2>
+      <button class="icon-btn" data-close aria-label="닫기"><svg viewBox="0 0 24 24"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg></button>
+    </div>
+    <form id="roomForm" novalidate>
+      <div class="sheet-body">
+        <div class="row">
+          <div class="field"><label for="f-number">호실 번호 *</label><input id="f-number" required placeholder="예: 101호" maxlength="20"></div>
+          <div class="field"><label for="f-status">상태</label>
+            <select id="f-status">
+              <option value="occupied">입주</option>
+              <option value="vacant">공실</option>
+              <option value="leaving">퇴거예정</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="f-tenant">임차인 이름 (가상)</label><input id="f-tenant" placeholder="예: 홍길동" maxlength="30"></div>
+          <div class="field"><label for="f-phone">연락처 (가상)</label><input id="f-phone" placeholder="예: 010-0000-0000" inputmode="tel" maxlength="20"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="f-deposit">보증금 (원)</label><input id="f-deposit" type="number" min="0" step="10000" placeholder="10000000"></div>
+          <div class="field"><label for="f-rent">월세 (원)</label><input id="f-rent" type="number" min="0" step="10000" placeholder="550000"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="f-due">계약 만기일</label><input id="f-due" type="date"></div>
+          <div class="field"><label for="f-paid">이번 달 납부</label>
+            <select id="f-paid">
+              <option value="false">미납</option>
+              <option value="true">납부 완료</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label for="f-moveout">퇴거 사유 (퇴거예정·퇴거 시)</label><textarea id="f-moveout" placeholder="예: 직장 이전으로 인한 퇴거 요청"></textarea></div>
+        <p class="hint">실제 세입자 개인정보는 입력하지 말고 가상 예시 데이터만 사용하세요. 입력 내용은 이 브라우저(localStorage)에만 저장됩니다.</p>
+      </div>
+      <div class="sheet-foot">
+        <button type="button" class="btn" data-close>취소</button>
+        <button type="submit" class="btn primary" id="roomSubmit">저장</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 호실 상세 -->
+<div class="modal" id="detailModal" hidden>
+  <div class="sheet wide" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+    <div class="sheet-head">
+      <h2 id="detailTitle">호실 상세</h2>
+      <button class="icon-btn" data-close aria-label="닫기"><svg viewBox="0 0 24 24"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg></button>
+    </div>
+    <div class="sheet-body" id="detailBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var STORAGE_KEY = 'rental-rooms-v1';
+  var TITLE_KEY = 'rental-building-title-v1';
+  function getBuildingTitle(){
+    try { return localStorage.getItem(TITLE_KEY) || '임대 호실 관리'; } catch(e){ return '임대 호실 관리'; }
+  }
+  function setBuildingTitle(t){
+    var next = String(t || '').trim() || '임대 호실 관리';
+    try { localStorage.setItem(TITLE_KEY, next); } catch(e){}
+    var el = document.getElementById('buildingTitleText');
+    if (el) el.textContent = next;
+    document.title = next;
+    return next;
+  }
+  var STATUS_LABEL = { occupied:'입주', vacant:'공실', leaving:'퇴거예정' };
+  var KIND_LABEL = { repair:'수리', note:'특이사항', moveout:'퇴거' };
+
+  function todayStr(){
+    var d = new Date();
+    var m = String(d.getMonth()+1).padStart(2,'0');
+    var day = String(d.getDate()).padStart(2,'0');
+    return d.getFullYear()+'-'+m+'-'+day;
+  }
+  function currentMonth(){ return todayStr().slice(0,7); }
+
+  function uid(){ return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  function won(n){
+    var num = Number(n) || 0;
+    return num.toLocaleString('ko-KR');
+  }
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  /* ---------- sample (fictional) data ---------- */
+  function sampleRooms(){
+    var t = todayStr();
+    var y = new Date(); y.setDate(y.getDate()+20); var near = y.toISOString().slice(0,10);
+    var z = new Date(); z.setDate(z.getDate()+120); var far = z.toISOString().slice(0,10);
+    var p = new Date(); p.setDate(p.getDate()-12); var past = p.toISOString().slice(0,10);
+    return [
+      { id:uid(), number:'101호', status:'occupied', tenant:'김민준', phone:'010-1234-5678',
+        deposit:10000000, rent:550000, dueDate:far, paid:true, paidMonth:currentMonth(),
+        moveOut:'', records:[
+          { id:uid(), date:past, kind:'repair', text:'주방 싱크대 배수관 누수 — 배관 교체 완료 (수리비 8만원)' }
+        ] },
+      { id:uid(), number:'102호', status:'occupied', tenant:'이서연', phone:'010-2345-6789',
+        deposit:5000000, rent:450000, dueDate:near, paid:false, paidMonth:'',
+        moveOut:'', records:[
+          { id:uid(), date:todayStr(), kind:'note', text:'만기 30일 이내 — 재계약 여부 확인 필요' }
+        ] },
+      { id:uid(), number:'103호', status:'vacant', tenant:'', phone:'',
+        deposit:10000000, rent:520000, dueDate:'', paid:false, paidMonth:'',
+        moveOut:'', records:[] },
+      { id:uid(), number:'201호', status:'occupied', tenant:'박도윤', phone:'010-3456-7890',
+        deposit:10000000, rent:600000, dueDate:near, paid:true, paidMonth:currentMonth(),
+        moveOut:'', records:[] },
+      { id:uid(), number:'202호', status:'leaving', tenant:'최지우', phone:'010-4567-8901',
+        deposit:5000000, rent:480000, dueDate:far, paid:false, paidMonth:'',
+        moveOut:'직장 이전(지방 발령)으로 12월 말 퇴거 요청, 보증금 반환 일정 협의 중',
+        records:[
+          { id:uid(), date:past, kind:'moveout', text:'퇴거 의사 통보 접수 — 12월 28일 퇴거 예정' },
+          { id:uid(), date:past, kind:'repair', text:'화장실 변기 물탱크 밸브 교체 (수리비 4만 5천원)' }
+        ] },
+      { id:uid(), number:'203호', status:'occupied', tenant:'정하람', phone:'010-5678-9012',
+        deposit:10000000, rent:550000, dueDate:past, paid:true, paidMonth:currentMonth(),
+        moveOut:'', records:[
+          { id:uid(), date:past, kind:'note', text:'계약 만기 지남 — 묵시적 갱신 상태, 갱신 계약서 작성 예정' }
+        ] },
+      { id:uid(), number:'301호', status:'occupied', tenant:'한지호', phone:'010-6789-0123',
+        deposit:15000000, rent:650000, dueDate:far, paid:false, paidMonth:'',
+        moveOut:'', records:[] },
+      { id:uid(), number:'302호', status:'vacant', tenant:'', phone:'',
+        deposit:5000000, rent:450000, dueDate:'', paid:false, paidMonth:'',
+        moveOut:'', records:[
+          { id:uid(), date:past, kind:'repair', text:'도배·장판 교체 완료, 입주자 모집 중' }
+        ] }
+    ];
+  }
+
+  /* ---------- state ---------- */
+  var state = { rooms: [], filter:'all', query:'' };
+  var storageOK = true;
+
+  function normalizeRoom(r){
+    return {
+      id: r.id || uid(),
+      number: String(r.number || '').trim(),
+      status: STATUS_LABEL[r.status] ? r.status : 'occupied',
+      tenant: String(r.tenant || '').trim(),
+      phone: String(r.phone || '').trim(),
+      deposit: Number(r.deposit) || 0,
+      rent: Number(r.rent) || 0,
+      dueDate: r.dueDate || '',
+      paid: !!r.paid,
+      paidMonth: r.paidMonth || (r.paid ? currentMonth() : ''),
+      moveOut: r.moveOut || '',
+      records: Array.isArray(r.records) ? r.records.map(function(x){
+        return { id: x.id || uid(), date: x.date || todayStr(), kind: KIND_LABEL[x.kind] ? x.kind : 'note', text: String(x.text||'') };
+      }) : []
+    };
+  }
+
+  function load(){
+    var raw = null;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch(e){ storageOK = false; }
+    if (!raw){
+      state.rooms = sampleRooms().map(normalizeRoom);
+      save(true);
+      return;
+    }
+    try {
+      var data = JSON.parse(raw);
+      var rooms = Array.isArray(data) ? data : (data && data.rooms);
+      if (!Array.isArray(rooms)) throw new Error('bad shape');
+      state.rooms = rooms.map(normalizeRoom);
+    } catch(e){
+      state.rooms = sampleRooms().map(normalizeRoom);
+    }
+  }
+
+  var saveTimer = null;
+  function save(silent){
+    if (!storageOK) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version:1, savedAt:new Date().toISOString(), rooms: state.rooms }));
+      if (!silent){
+        var el = document.getElementById('savedText');
+        var now = new Date();
+        el.textContent = '자동 저장됨 · ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' (이 브라우저에 저장)';
+      }
+    } catch(e){
+      storageOK = false;
+      toast('브라우저 저장 공간에 저장하지 못했습니다. JSON 내보내기로 백업하세요.');
+    }
+  }
+
+  function toast(msg){
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){ el.classList.remove('show'); }, 2600);
+  }
+
+  /* ---------- derived ---------- */
+  function isPaidThisMonth(r){ return !!r.paid && r.paidMonth === currentMonth(); }
+
+  function dayDiff(dateStr){
+    if (!dateStr) return null;
+    var due = new Date(dateStr + 'T00:00:00');
+    if (isNaN(due.getTime())) return null;
+    var now = new Date(); now.setHours(0,0,0,0);
+    return Math.round((due - now) / 86400000);
+  }
+  function dueLabel(dateStr){
+    var d = dayDiff(dateStr);
+    if (d === null) return { text:'-', cls:'' };
+    if (d < 0) return { text: Math.abs(d)+'일 지남', cls:'dday-over' };
+    if (d === 0) return { text:'오늘 만기', cls:'dday-over' };
+    if (d <= 30) return { text:'D-'+d, cls:'dday-near' };
+    return { text:'D-'+d, cls:'dday-ok' };
+  }
+
+  function stats(){
+    var s = { total: state.rooms.length, occupied:0, vacant:0, leaving:0, paidCount:0, unpaidCount:0, paidSum:0, unpaidSum:0 };
+    state.rooms.forEach(function(r){
+      s[r.status] = (s[r.status]||0) + 1;
+      if (r.status === 'vacant') { return; }
+      if (isPaidThisMonth(r)) { s.paidCount++; s.paidSum += r.rent; }
+      else { s.unpaidCount++; s.unpaidSum += r.rent; }
+    });
+    return s;
+  }
+
+  /* ---------- render ---------- */
+  function renderSummary(){
+    var s = stats();
+    var monthLabel = document.getElementById('monthBadge');
+    var d = new Date();
+    monthLabel.textContent = d.getFullYear() + '년 ' + (d.getMonth()+1) + '월';
+
+    var cards = [
+      { label:'전체 호실', value:s.total, unit:'실', foot:'등록된 호실 수' },
+      { label:'입주', value:s.occupied, unit:'실', foot:'계약 중', dot:'ok' },
+      { label:'공실', value:s.vacant, unit:'실', foot:'입주자 모집 필요', dot:'mute' },
+      { label:'퇴거예정', value:s.leaving, unit:'실', foot:'퇴거 사유 확인', dot:'warn' },
+      { label:'이번 달 납부', value:s.paidCount, unit:'/'+ (s.paidCount + s.unpaidCount) +'실',
+        foot:'완료 ' + won(s.paidSum) + '원 · 미납 ' + won(s.unpaidSum) + '원', dot: s.unpaidCount ? 'danger' : 'ok' }
+    ];
+    document.getElementById('summary').innerHTML = cards.map(function(c){
+      return '<div class="stat">' +
+        '<div class="label">' + (c.dot ? '<span class="dot ' + c.dot + '"></span>' : '') + esc(c.label) + '</div>' +
+        '<div class="value">' + won(c.value) + '<small>' + esc(c.unit) + '</small></div>' +
+        '<div class="foot">' + esc(c.foot) + '</div>' +
+      '</div>';
+    }).join('');
+
+    var s2 = stats();
+    document.getElementById('c-all').textContent = s2.total;
+    document.getElementById('c-unpaid').textContent = s2.unpaidCount;
+    document.getElementById('c-vacant').textContent = s2.vacant;
+    document.getElementById('c-leaving').textContent = s2.leaving;
+  }
+
+  function matches(r){
+    if (state.filter === 'unpaid'){
+      if (r.status === 'vacant' || isPaidThisMonth(r)) return false;
+    } else if (state.filter === 'vacant'){
+      if (r.status !== 'vacant') return false;
+    } else if (state.filter === 'leaving'){
+      if (r.status !== 'leaving') return false;
+    }
+    if (state.query){
+      var q = state.query.toLowerCase();
+      var hay = (r.number + ' ' + r.tenant + ' ' + r.phone).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  }
+
+  function roomCard(r){
+    var due = dueLabel(r.dueDate);
+    var paid = isPaidThisMonth(r);
+    var isVacant = r.status === 'vacant';
+    return '<article class="room" data-id="' + esc(r.id) + '">' +
+      '<div class="room-head">' +
+        '<div class="room-no">' + esc(r.number) + '<small>' + (r.records.length ? '기록 ' + r.records.length + '건' : '') + '</small></div>' +
+        '<span class="badge ' + r.status + '">' + STATUS_LABEL[r.status] + '</span>' +
+      '</div>' +
+      (isVacant
+        ? '<div class="tenant vacant-text">임차인 없음</div>'
+        : '<div class="tenant"><span class="name">' + esc(r.tenant || '이름 미입력') + '</span><span class="phone">' + esc(r.phone || '') + '</span></div>') +
+      '<div class="kv">' +
+        '<div><div class="k">보증금</div><div class="v">' + won(r.deposit) + '원</div></div>' +
+        '<div><div class="k">월세</div><div class="v">' + won(r.rent) + '원</div></div>' +
+        '<div><div class="k">계약 만기</div><div class="v ' + due.cls + '">' + (r.dueDate ? esc(r.dueDate) + ' <span style="font-weight:600">(' + due.text + ')</span>' : '-') + '</div></div>' +
+        '<div><div class="k">이번 달</div><div class="v">' + (isVacant ? '<span class="muted">해당 없음</span>' : (paid ? '<span class="badge paid">납부 완료</span>' : '<span class="badge unpaid">미납</span>')) + '</div></div>' +
+      '</div>' +
+      '<div class="room-foot">' +
+        (isVacant
+          ? '<span class="muted">공실 호실</span>'
+          : '<label class="pay-toggle" title="이번 달 월세 납부 체크"><input type="checkbox" data-act="pay" ' + (paid ? 'checked' : '') + '><span class="switch"></span>' + (paid ? '납부 완료' : '미납') + '</label>') +
+        '<div class="room-btns">' +
+          '<button class="btn sm" data-act="detail">상세·기록</button>' +
+          '<button class="btn sm" data-act="edit">수정</button>' +
+          '<button class="btn sm danger" data-act="del">삭제</button>' +
+        '</div>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function render(){
+    renderSummary();
+    var list = state.rooms.filter(matches);
+    var el = document.getElementById('roomList');
+    el.innerHTML = list.map(roomCard).join('');
+    document.getElementById('empty').hidden = list.length > 0;
+    document.querySelectorAll('#filters button').forEach(function(b){
+      b.setAttribute('aria-selected', b.dataset.filter === state.filter ? 'true' : 'false');
+    });
+  }
+
+  /* ---------- room modal ---------- */
+  var editingId = null;
+  var reopenDetailId = null;
+  var roomModal = document.getElementById('roomModal');
+
+  function openRoomModal(room){
+    editingId = room ? room.id : null;
+    document.getElementById('roomModalTitle').textContent = room ? '호실 수정' : '호실 추가';
+    document.getElementById('f-number').value = room ? room.number : '';
+    document.getElementById('f-status').value = room ? room.status : 'occupied';
+    document.getElementById('f-tenant').value = room ? room.tenant : '';
+    document.getElementById('f-phone').value = room ? room.phone : '';
+    document.getElementById('f-deposit').value = room ? room.deposit : '';
+    document.getElementById('f-rent').value = room ? room.rent : '';
+    document.getElementById('f-due').value = room ? room.dueDate : '';
+    document.getElementById('f-paid').value = room && isPaidThisMonth(room) ? 'true' : 'false';
+    document.getElementById('f-moveout').value = room ? room.moveOut : '';
+    roomModal.hidden = false;
+    setTimeout(function(){ document.getElementById('f-number').focus(); }, 30);
+  }
+  function closeModal(m){
+    m.hidden = true;
+    if (m === roomModal && reopenDetailId){
+      var rid = reopenDetailId;
+      reopenDetailId = null;
+      editingId = null;
+      openDetail(rid);
+    }
+  }
+
+  function dateValue(el){
+    if (!el) return '';
+    if (el.validity && el.validity.badInput) return '';
+    return el.value;
+  }
+
+  document.getElementById('roomForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var number = document.getElementById('f-number').value.trim();
+    if (!number){ toast('호실 번호를 입력하세요.'); return; }
+    var paidSel = document.getElementById('f-paid').value === 'true';
+    var status = document.getElementById('f-status').value;
+    var data = {
+      number: number,
+      status: status,
+      tenant: document.getElementById('f-tenant').value.trim(),
+      phone: document.getElementById('f-phone').value.trim(),
+      deposit: Number(document.getElementById('f-deposit').value) || 0,
+      rent: Number(document.getElementById('f-rent').value) || 0,
+      dueDate: dateValue(document.getElementById('f-due')),
+      paid: paidSel,
+      paidMonth: paidSel ? currentMonth() : '',
+      moveOut: document.getElementById('f-moveout').value.trim()
+    };
+    if (status === 'vacant'){ data.tenant = ''; data.phone = ''; }
+    var wasEditing = !!editingId;
+    if (editingId){
+      var room = state.rooms.find(function(x){ return x.id === editingId; });
+      if (room) Object.assign(room, data);
+    } else {
+      data.id = uid();
+      data.records = [];
+      state.rooms.push(normalizeRoom(data));
+    }
+    var backToDetail = reopenDetailId;
+    reopenDetailId = null;
+    editingId = null;
+    save();
+    render();
+    closeModal(roomModal);
+    if (backToDetail) openDetail(backToDetail);
+    toast(wasEditing ? '호실 정보를 수정했습니다.' : '호실을 추가했습니다.');
+  });
+
+  /* ---------- detail modal ---------- */
+  var detailId = null;
+  var detailModal = document.getElementById('detailModal');
+  var recordEditingId = null;
+
+  function openDetail(id){
+    detailId = id;
+    recordEditingId = null;
+    renderDetail();
+    detailModal.hidden = false;
+  }
+
+  function renderDetail(){
+    var r = state.rooms.find(function(x){ return x.id === detailId; });
+    if (!r){ closeModal(detailModal); return; }
+    var paid = isPaidThisMonth(r);
+    var due = dueLabel(r.dueDate);
+    var records = r.records.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+
+    var recHtml = records.length ? records.map(function(rec){
+      return '<div class="rec" data-rec="' + esc(rec.id) + '">' +
+        '<div class="rec-head">' +
+          '<span class="rec-date">' + esc(rec.date) + '</span>' +
+          '<span class="rec-kind ' + rec.kind + '">' + KIND_LABEL[rec.kind] + '</span>' +
+          '<span class="rec-actions">' +
+            '<button type="button" data-ra="edit">수정</button>' +
+            '<button type="button" data-ra="del" class="del">삭제</button>' +
+          '</span>' +
+        '</div>' +
+        '<div class="rec-text">' + esc(rec.text) + '</div>' +
+      '</div>';
+    }).join('') : '<p class="muted">아직 기록이 없습니다. 아래에서 수리 내역이나 특이사항을 날짜별로 추가하세요.</p>';
+
+    document.getElementById('detailBody').innerHTML =
+      '<div class="detail-top">' +
+        '<div class="room-no">' + esc(r.number) + '</div>' +
+        '<div style="display:flex;gap:6px;align-items:center">' +
+          '<span class="badge ' + r.status + '">' + STATUS_LABEL[r.status] + '</span>' +
+          '<span class="badge ' + (paid ? 'paid' : 'unpaid') + '">' + (r.status === 'vacant' ? '공실' : (paid ? '이번 달 납부 완료' : '이번 달 미납')) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="dgrid">' +
+        '<div><div class="k">임차인</div><div class="v">' + esc(r.tenant || '-') + '</div></div>' +
+        '<div><div class="k">연락처</div><div class="v">' + esc(r.phone || '-') + '</div></div>' +
+        '<div><div class="k">보증금</div><div class="v">' + won(r.deposit) + '원</div></div>' +
+        '<div><div class="k">월세</div><div class="v">' + won(r.rent) + '원</div></div>' +
+        '<div><div class="k">계약 만기일</div><div class="v ' + due.cls + '">' + (r.dueDate ? esc(r.dueDate) + ' (' + due.text + ')' : '-') + '</div></div>' +
+        '<div><div class="k">기록 수</div><div class="v">' + r.records.length + '건</div></div>' +
+      '</div>' +
+
+      '<div class="section-title">퇴거 사유</div>' +
+      '<form id="moveOutForm" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">' +
+        '<div class="field" style="flex:1 1 100%"><textarea id="moveOutText" placeholder="예: 직장 이전으로 인한 퇴거 요청, 보증금 반환 일정 협의 중">' + esc(r.moveOut) + '</textarea></div>' +
+        '<button type="submit" class="btn sm">퇴거 사유 저장</button>' +
+      '</form>' +
+
+      '<div class="section-title">수리 내역 · 특이사항 기록 (날짜별)</div>' +
+      '<form class="record-form" id="recordForm">' +
+        '<div class="field"><label for="recDate">날짜</label><input type="date" id="recDate" value="' + todayStr() + '" required></div>' +
+        '<div class="field"><label for="recKind">구분</label>' +
+          '<select id="recKind">' +
+            '<option value="repair">수리</option>' +
+            '<option value="note">특이사항</option>' +
+            '<option value="moveout">퇴거</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="field grow"><label for="recText">내용</label><input id="recText" placeholder="예: 화장실 배관 누수 수리 (비용 8만원)" maxlength="300" required></div>' +
+        '<button class="btn primary sm" type="submit" id="recSubmit">기록 추가</button>' +
+        '<button class="btn sm" type="button" id="recCancel" hidden>취소</button>' +
+      '</form>' +
+      '<div class="timeline" id="timeline">' + recHtml + '</div>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap">' +
+        '<button class="btn" type="button" id="detailEdit">호실 정보 수정</button>' +
+        '<button class="btn" type="button" data-close>닫기</button>' +
+      '</div>';
+
+    // events inside detail
+    document.getElementById('moveOutForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      r.moveOut = document.getElementById('moveOutText').value.trim();
+      save(); render(); toast('퇴거 사유를 저장했습니다.');
+    });
+
+    document.getElementById('recordForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      var date = document.getElementById('recDate').value || todayStr();
+      var kind = document.getElementById('recKind').value;
+      var text = document.getElementById('recText').value.trim();
+      if (!text){ toast('기록 내용을 입력하세요.'); return; }
+      if (recordEditingId){
+        var rec = r.records.find(function(x){ return x.id === recordEditingId; });
+        if (rec){ rec.date = date; rec.kind = kind; rec.text = text; }
+        toast('기록을 수정했습니다.');
+      } else {
+        r.records.push({ id: uid(), date: date, kind: kind, text: text });
+        toast('기록을 추가했습니다.');
+      }
+      save(); render(); renderDetail();
+    });
+
+    document.getElementById('recCancel').addEventListener('click', function(){ resetRecordForm(); });
+
+    document.getElementById('detailEdit').addEventListener('click', function(){
+      reopenDetailId = r.id;
+      closeModal(detailModal);
+      openRoomModal(r);
+    });
+
+    document.getElementById('timeline').addEventListener('click', function(e){
+      var btn = e.target.closest('button[data-ra]');
+      if (!btn) return;
+      var recEl = btn.closest('.rec');
+      var recId = recEl.getAttribute('data-rec');
+      var rec = r.records.find(function(x){ return x.id === recId; });
+      if (!rec) return;
+      if (btn.getAttribute('data-ra') === 'del'){
+        if (!confirm('이 기록을 삭제할까요?\n\n' + rec.date + ' · ' + KIND_LABEL[rec.kind] + '\n' + rec.text)) return;
+        r.records = r.records.filter(function(x){ return x.id !== recId; });
+        save(); render(); renderDetail(); toast('기록을 삭제했습니다.');
+      } else {
+        recordEditingId = recId;
+        document.getElementById('recDate').value = rec.date;
+        document.getElementById('recKind').value = rec.kind;
+        document.getElementById('recText').value = rec.text;
+        document.getElementById('recSubmit').textContent = '기록 수정';
+        document.getElementById('recCancel').hidden = false;
+        document.getElementById('recText').focus();
+      }
+    });
+  }
+
+  function resetRecordForm(){
+    recordEditingId = null;
+    document.getElementById('recDate').value = todayStr();
+    document.getElementById('recKind').value = 'repair';
+    document.getElementById('recText').value = '';
+    document.getElementById('recSubmit').textContent = '기록 추가';
+    document.getElementById('recCancel').hidden = true;
+  }
+
+  /* ---------- events ---------- */
+  document.getElementById('roomList').addEventListener('click', function(e){
+    var card = e.target.closest('.room');
+    if (!card) return;
+    var id = card.getAttribute('data-id');
+    var room = state.rooms.find(function(x){ return x.id === id; });
+    if (!room) return;
+    var btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    var act = btn.getAttribute('data-act');
+    if (act === 'detail') openDetail(id);
+    else if (act === 'edit') openRoomModal(room);
+    else if (act === 'del'){
+      if (!confirm(room.number + ' 호실을 삭제할까요?\n삭제 후에는 되돌릴 수 없습니다.')) return;
+      state.rooms = state.rooms.filter(function(x){ return x.id !== id; });
+      save(); render(); toast('호실을 삭제했습니다.');
+    }
+  });
+
+  document.getElementById('roomList').addEventListener('change', function(e){
+    var input = e.target;
+    if (!input.matches('input[data-act="pay"]')) return;
+    var card = input.closest('.room');
+    var id = card.getAttribute('data-id');
+    var room = state.rooms.find(function(x){ return x.id === id; });
+    if (!room) return;
+    room.paid = input.checked;
+    room.paidMonth = input.checked ? currentMonth() : '';
+    save(); render();
+    toast(room.number + ' ' + (input.checked ? '납부 완료로 표시했습니다.' : '미납으로 표시했습니다.'));
+  });
+
+  document.getElementById('filters').addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-filter]');
+    if (!btn) return;
+    state.filter = btn.getAttribute('data-filter');
+    render();
+  });
+
+  var searchTimer = null;
+  document.getElementById('search').addEventListener('input', function(e){
+    var v = e.target.value;
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function(){ state.query = v.trim(); render(); }, 120);
+  });
+
+  document.getElementById('addRoom').addEventListener('click', function(){ openRoomModal(null); });
+
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest ? e.target.closest('[data-close]') : null;
+    if (!btn) return;
+    var m = btn.closest('.modal');
+    if (m) closeModal(m);
+  });
+  document.querySelectorAll('.modal').forEach(function(m){
+    m.addEventListener('click', function(e){ if (e.target === m) closeModal(m); });
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){
+      document.querySelectorAll('.modal').forEach(function(m){ if (!m.hidden) closeModal(m); });
+    }
+  });
+
+  /* ---------- export / import ---------- */
+  document.getElementById('editTitleBtn').addEventListener('click', function(){
+    var cur = getBuildingTitle();
+    var next = prompt('원룸(건물) 제목을 입력해 주세요', cur);
+    if (next === null) return;
+    var saved = setBuildingTitle(next);
+    toast('건물 제목이 "' + saved + '"(으)로 변경됐습니다.');
+  });
+  setBuildingTitle(getBuildingTitle());
+
+  document.getElementById('exportJson').addEventListener('click', function(){
+    var payload = { app:getBuildingTitle(), version:1, exportedAt:new Date().toISOString(), rooms: state.rooms };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '임대호실-백업-' + todayStr() + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    toast('JSON 백업 파일을 내려받았습니다.');
+  });
+
+  document.getElementById('importJson').addEventListener('click', function(){
+    document.getElementById('importFile').click();
+  });
+
+  document.getElementById('importFile').addEventListener('change', function(e){
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var data = JSON.parse(String(reader.result));
+        var rooms = Array.isArray(data) ? data : (data && data.rooms);
+        if (!Array.isArray(rooms) || !rooms.length) throw new Error('empty');
+        if (!confirm('불러온 파일의 호실 ' + rooms.length + '건으로 현재 목록을 모두 바꿉니다.\n계속할까요?')) return;
+        if (data && data.app && typeof data.app === 'string') setBuildingTitle(data.app);
+        state.rooms = rooms.map(normalizeRoom);
+        save(); render();
+        toast('JSON 파일에서 ' + rooms.length + '건을 불러왔습니다.');
+      } catch(err){
+        alert('JSON 파일을 읽을 수 없습니다. 이 앱에서 내보낸 파일인지 확인해 주세요.');
+      } finally {
+        e.target.value = '';
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('resetSample').addEventListener('click', function(){
+    if (!confirm('모든 호실 데이터를 지우고 가상 예시 데이터로 되돌립니다.\n계속할까요?')) return;
+    state.rooms = sampleRooms().map(normalizeRoom);
+    save(); render();
+    toast('예시 데이터로 되돌렸습니다.');
+  });
+
+  /* ---------- boot ---------- */
+  load();
+  render();
+  if (!storageOK){
+    document.getElementById('savedText').textContent = '이 브라우저에서는 자동 저장을 사용할 수 없습니다 (JSON 백업을 사용하세요)';
+  }
+  window.__rentalApp = { state: state, save: save, render: render, stats: stats, dayDiff: dayDiff };
+})();
+</script>
+<script>
+/* PWA: 홈 화면 앱 + 오프라인 캐시 */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+</script>
+</body>
+</html>

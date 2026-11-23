@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="후니 라디오">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="전 세계 라디오 방송국을 국가 → 지역 → 방송국 순서로 골라 듣는 후니가 듣고 싶은 세계라디오 모음집">
+<title>후니가 듣고 싶은 세계라디오 모음집</title>
+<style>
+  :root{
+    --bg:#070c16;
+    --bg2:#0b1322;
+    --card:#111c2e;
+    --card2:#16243a;
+    --line:#22314c;
+    --ink:#e9f0ff;
+    --ink2:#9fb0cc;
+    --ink3:#6d7f9c;
+    --accent:#4f8dff;
+    --accent2:#7bd1ff;
+    --gold:#ffcf5c;
+    --ok:#3ddc97;
+    --warn:#ffb057;
+    --danger:#ff6b6b;
+    --r:16px;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --safe-t:env(safe-area-inset-top,0px);
+    --safe-b:env(safe-area-inset-bottom,0px);
+    --safe-l:env(safe-area-inset-left,0px);
+    --safe-r:env(safe-area-inset-right,0px);
+    --player-h:76px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;width:100%;overflow-x:hidden}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{
+    background:
+      radial-gradient(1200px 600px at 82% -10%, rgba(79,141,255,.20), transparent 60%),
+      radial-gradient(900px 500px at 6% 0%, rgba(123,209,255,.12), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+    font-size:15px;line-height:1.45;
+    min-height:100vh;
+    min-height:100dvh;
+    padding-bottom:calc(var(--player-h) + 26px + var(--safe-b));
+  }
+  button,input{font:inherit;color:inherit}
+  button{cursor:pointer;border:0;background:none;touch-action:manipulation}
+  a{color:var(--accent2)}
+  .wrap{max-width:1180px;margin:0 auto;padding-left:calc(16px + var(--safe-l));padding-right:calc(16px + var(--safe-r))}
+
+  /* ---------- header ---------- */
+  .app-header{position:sticky;top:0;z-index:30;background:rgba(7,12,22,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(34,49,76,.7);padding-top:var(--safe-t)}
+  .hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:10px;padding-bottom:2px}
+  .brand{display:flex;align-items:center;gap:9px;min-width:0}
+  .brand .globe{font-size:20px;line-height:1;flex:none;filter:drop-shadow(0 0 10px rgba(123,209,255,.45))}
+  .brand h1{margin:0;min-width:0;display:flex;flex-direction:column;gap:1px;line-height:1.18;letter-spacing:-.02em}
+  .brand h1 .t1{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.01em;white-space:nowrap}
+  .brand h1 .t2{font-size:19px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .brand .tag{font-size:11.5px;color:var(--ink3);margin-left:2px;white-space:nowrap}
+  /* 전체 앱 목록(런처)으로 이동 */
+  .home-pill{flex:none;display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 13px;border-radius:999px;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;
+    font-size:12.5px;font-weight:700;line-height:1;text-decoration:none;white-space:nowrap;
+    -webkit-tap-highlight-color:transparent}
+  .home-pill:active{background:rgba(255,255,255,.24)}
+  @media (max-width:370px){ .brand h1 .t2{font-size:17.5px} }
+  footer .freset{color:var(--ink3);font-size:11.5px;text-decoration:underline;padding:0;vertical-align:baseline}
+  footer .freset b{color:var(--ink2);font-weight:700}
+  .search-wrap{padding:8px 0 11px}
+  .searchbar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+      border-radius:999px;padding:9px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03);min-width:0}
+  .searchbar .ico{font-size:14px;opacity:.75;flex:none}
+  .searchbar input{flex:1;min-width:0;background:none;border:0;outline:none;font-size:14.5px;color:var(--ink);padding:0}
+  .searchbar input::placeholder{color:var(--ink3)}
+  .searchbar input::-webkit-search-cancel-button,
+  .searchbar input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
+  .searchbar .clr{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.08);color:var(--ink2);font-size:12px;display:grid;place-items:center;flex:none}
+  .searchbar .clr[hidden]{display:none}
+
+  /* ---------- net note ---------- */
+  .srcbar{display:flex;align-items:center;gap:7px;margin:10px 0 0;padding:7px 11px;border-radius:10px;font-size:12px;
+    color:#ffd9a8;background:rgba(255,176,87,.10);border:1px solid rgba(255,176,87,.26)}
+  .srcbar[hidden]{display:none}
+
+  /* ---------- crumbs ---------- */
+  .crumbs{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:11px 0 1px;font-size:13px;color:var(--ink2)}
+  .crumbs .cb{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink2);font-weight:600}
+  .crumbs .cb:hover{color:var(--ink);background:rgba(255,255,255,.09)}
+  .crumbs .sep{color:var(--ink3);opacity:.7}
+  .crumbs .cur{color:var(--ink);font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* ---------- section ---------- */
+  main{padding:4px 0 8px;min-width:0}
+  .sec{margin:18px 0 4px}
+  .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 10px;flex-wrap:wrap}
+  .sec-h h2{margin:0;font-size:15px;letter-spacing:-.01em;min-width:0}
+  .sec-h h2 .em{color:var(--accent2)}
+  .sec-h .side{font-size:12px;color:var(--ink3);font-weight:600}
+  .chips{display:inline-flex;gap:4px;background:rgba(255,255,255,.05);border:1px solid var(--line);padding:3px;border-radius:999px}
+  .chips button{padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;color:var(--ink2)}
+  .chips button.on{background:var(--accent);color:#fff}
+
+  /* ---------- country tiles ---------- */
+  .countries{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px}
+  .ct{display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:14px;background:linear-gradient(180deg,var(--card2),var(--card));
+      border:1px solid var(--line);text-align:left;transition:.15s;min-height:60px;min-width:0}
+  .ct:hover{border-color:rgba(79,141,255,.55);transform:translateY(-1px)}
+  .ct .flag{font-size:22px;line-height:1;flex:none;width:26px;text-align:center}
+  .ct .nm{min-width:0;flex:1;overflow:hidden}
+  .ct .nm b{display:block;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ct .nm span{display:block;font-size:10.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ct .cnt{font-size:10.5px;font-weight:800;color:var(--accent2);background:rgba(123,209,255,.12);border-radius:8px;padding:2px 6px;flex:none}
+  .ct.pin{background:linear-gradient(135deg,rgba(79,141,255,.24),rgba(123,209,255,.10));border-color:rgba(79,141,255,.5)}
+
+  /* ---------- region tiles ---------- */
+  .regions{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+  .rt{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 14px;border-radius:14px;
+      background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);text-align:left;min-height:56px;min-width:0}
+  .rt:hover{border-color:rgba(79,141,255,.55)}
+  .rt .nm{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rt .nm small{display:block;font-size:11px;color:var(--ink3);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rt .cnt{font-size:12px;font-weight:800;color:var(--ink2);background:rgba(255,255,255,.07);border-radius:999px;padding:3px 8px;flex:none}
+
+  /* ---------- station tiles ---------- */
+  .stations{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+  .st{position:relative;cursor:pointer;display:flex;flex-direction:column;gap:7px;padding:9px 8px 10px;border-radius:16px;
+      background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);text-align:left;transition:.15s;min-width:0}
+  .st:hover{border-color:rgba(79,141,255,.5);transform:translateY(-1px)}
+  .st .ico{position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;display:grid;place-items:center;
+      background:linear-gradient(140deg,#243250,#1a2740);isolation:isolate}
+  .st .ico .ph{font-size:26px;opacity:.9}
+  .st .ico img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0e1727;padding:8px}
+  .st .nm{font-size:12px;font-weight:700;line-height:1.28;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.56em;word-break:break-word}
+  .st .mt{font-size:10.5px;color:var(--ink3);font-weight:700;display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden}
+  .st .badge{position:absolute;top:6px;right:6px;z-index:4;font-size:9px;font-weight:800;letter-spacing:.02em;
+      padding:2px 5px;border-radius:6px;background:rgba(255,176,87,.18);color:var(--warn);border:1px solid rgba(255,176,87,.35)}
+  .st .fav{position:absolute;top:5px;left:5px;z-index:5;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+      font-size:13px;background:rgba(7,12,22,.66);color:#8ea3c4;border:1px solid rgba(255,255,255,.1);opacity:.55;transition:.12s}
+  .st:hover .fav{opacity:1}
+  .st.is-fav .fav{opacity:1;color:var(--gold);border-color:rgba(255,207,92,.45);background:rgba(7,12,22,.75)}
+  .st.is-playing{border-color:var(--ok);box-shadow:0 0 0 1px rgba(61,220,151,.5),0 8px 24px rgba(61,220,151,.15)}
+  .st.is-playing .ico{box-shadow:inset 0 0 0 2px rgba(61,220,151,.55)}
+  .eq{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);display:none;align-items:flex-end;gap:2px;height:14px;z-index:3}
+  .eq i{width:3px;background:var(--ok);border-radius:2px;animation:bar .9s ease-in-out infinite}
+  .eq i:nth-child(2){animation-delay:.15s}.eq i:nth-child(3){animation-delay:.3s}.eq i:nth-child(4){animation-delay:.45s}
+  @keyframes bar{0%,100%{height:4px}50%{height:14px}}
+  .st.is-playing .eq{display:flex}
+  .st.is-playing .ico .ph{opacity:.35}
+
+  /* ---------- list rows ---------- */
+  .rows{display:flex;flex-direction:column;gap:8px}
+  .rw{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-align:left;min-width:0}
+  .rw:hover{border-color:rgba(79,141,255,.5)}
+  .rw .ico{width:42px;height:42px;border-radius:10px;flex:none;overflow:hidden;position:relative;display:grid;place-items:center;background:#182639;font-size:18px}
+  .rw .ico img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0e1727;padding:5px}
+  .rw .tx{min-width:0;flex:1}
+  .rw .tx b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rw .tx span{display:block;font-size:11.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rw .play{font-size:12px;font-weight:800;color:var(--accent2);padding:6px 10px;border-radius:999px;background:rgba(79,141,255,.14);border:1px solid rgba(79,141,255,.3);flex:none}
+  .rw.is-playing{border-color:var(--ok)}
+
+  /* ---------- states ---------- */
+  .empty{padding:34px 16px;text-align:center;color:var(--ink2);background:rgba(255,255,255,.03);border:1px dashed var(--line);border-radius:16px}
+  .empty .big{font-size:26px;margin-bottom:8px;opacity:.8}
+  .empty p{margin:4px 0;font-size:13px}
+  .loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:44px 0;color:var(--ink2);font-size:13px}
+  .spin{width:18px;height:18px;border-radius:50%;border:2px solid rgba(123,209,255,.25);border-top-color:var(--accent2);animation:sp .8s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .slim{display:flex;align-items:center;gap:8px;padding:6px 0;color:var(--ink3);font-size:12px}
+  .note{font-size:11.5px;color:var(--ink3);margin-top:10px;line-height:1.55}
+  .filt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:#ffd9a8;
+    background:rgba(255,176,87,.09);border:1px solid rgba(255,176,87,.28);padding:8px 11px;border-radius:10px;margin:0 0 12px}
+  .filt button{font-size:12px;font-weight:800;color:var(--accent2);background:rgba(79,141,255,.16);
+    border:1px solid rgba(79,141,255,.35);border-radius:8px;padding:3px 9px}
+  .err{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);border-radius:14px;padding:14px;color:#ffd3d3;font-size:13px}
+  .err button{margin-top:10px;padding:8px 14px;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;font-size:13px}
+
+  /* ---------- player ---------- */
+  .player{position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:rgba(9,15,26,.98);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+    border-top:1px solid rgba(34,49,76,.9);box-shadow:0 -10px 30px rgba(0,0,0,.5);
+    padding:9px 0 calc(9px + var(--safe-b));
+    padding-left:var(--safe-l);padding-right:var(--safe-r)}
+  .p-in{max-width:1180px;margin:0 auto;padding:0 14px;display:flex;align-items:center;gap:10px;min-width:0}
+  .p-art{width:44px;height:44px;border-radius:11px;flex:none;overflow:hidden;position:relative;background:#182639;display:grid;place-items:center;font-size:19px;border:1px solid var(--line)}
+  .p-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0e1727;padding:5px}
+  .p-meta{min-width:0;flex:1}
+  .p-name{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .p-sub{font-size:11.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .p-status{font-size:10.5px;font-weight:800;margin-top:3px;display:flex;align-items:center;gap:5px;color:var(--ink3)}
+  .p-status .dot{width:6px;height:6px;border-radius:50%;background:var(--ink3);flex:none}
+  .p-status.loading{color:var(--warn)}.p-status.loading .dot{background:var(--warn);animation:pulse 1s infinite}
+  .p-status.playing{color:var(--ok)}.p-status.playing .dot{background:var(--ok);animation:pulse 1.4s infinite}
+  .p-status.error{color:var(--danger)}.p-status.error .dot{background:var(--danger)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .p-btn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:15px;flex:none;background:rgba(255,255,255,.07);color:var(--ink);border:1px solid var(--line)}
+  .p-btn.main{width:46px;height:46px;background:linear-gradient(135deg,var(--accent),#2f6fe0);border:0;color:#fff;font-size:17px;box-shadow:0 6px 18px rgba(79,141,255,.35)}
+  .p-btn.main:disabled{opacity:.45;box-shadow:none}
+  .p-btn.fav{font-size:16px}
+  .p-btn.fav.on{color:var(--gold);border-color:rgba(255,207,92,.45);background:rgba(255,207,92,.12)}
+  .vol{display:flex;align-items:center;gap:7px;flex:none}
+  .vol input{-webkit-appearance:none;appearance:none;width:86px;height:4px;border-radius:3px;background:#2a3b57;outline:none}
+  .vol input::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#dfe9ff;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+  .vol input::-moz-range-thumb{width:13px;height:13px;border:0;border-radius:50%;background:#dfe9ff}
+  .vol .vic{font-size:13px;color:var(--ink3)}
+
+  /* ---------- modal ---------- */
+  .modal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:rgba(4,8,15,.72);backdrop-filter:blur(4px)}
+  .modal[hidden]{display:none}
+  .modal .card{width:100%;max-width:430px;background:linear-gradient(180deg,#152134,#0e1828);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow);max-height:86dvh;overflow:auto}
+  .modal h3{margin:0 0 10px;font-size:16px}
+  .modal p{margin:0 0 9px;font-size:13px;color:var(--ink2);line-height:1.55}
+  .modal p b{color:var(--ink)}
+  .modal .acts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+  .modal .acts a,.modal .acts button{display:block;text-align:center;padding:11px 14px;border-radius:12px;font-size:13.5px;font-weight:700;text-decoration:none;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink)}
+  .modal .acts .primary{background:linear-gradient(135deg,var(--accent),#2f6fe0);border:0;color:#fff}
+  .modal .acts .ghost{background:none;color:var(--ink2)}
+
+  footer{padding:24px 0 8px;text-align:center;color:var(--ink3);font-size:11px;line-height:1.7}
+
+  /* ---------- phone ---------- */
+  @media (max-width:640px){
+    :root{--player-h:70px}
+    body{font-size:14.5px;padding-bottom:calc(var(--player-h) + 20px + var(--safe-b))}
+    .wrap{padding-left:calc(12px + var(--safe-l));padding-right:calc(12px + var(--safe-r))}
+    .brand .tag{display:none}
+    .brand h1{font-size:17.5px}
+    .brand .globe{font-size:20px}
+    .hdr{padding-top:8px}
+    .search-wrap{padding:7px 0 9px}
+    .searchbar{padding:8px 12px}
+    .searchbar input{font-size:16px}
+    .crumbs{font-size:12px;padding-top:9px;gap:5px}
+    .crumbs .cb{padding:4px 9px;border-radius:999px}
+    .sec{margin:15px 0 3px}
+    .sec-h{margin-bottom:8px;gap:8px}
+    .sec-h h2{font-size:14.5px}
+    .sec-h .side{font-size:11.5px}
+    .chips button{padding:4px 9px;font-size:11.5px}
+    .countries{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .ct{padding:8px 9px;gap:7px;min-height:54px;border-radius:13px}
+    .ct .flag{font-size:19px;width:22px}
+    .ct .nm b{font-size:12.5px;line-height:1.25}
+    .ct .nm span{font-size:9.5px}
+    .ct .cnt{font-size:9.5px;padding:2px 4px;border-radius:7px}
+    .regions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .rt{padding:12px 12px;min-height:52px;border-radius:13px}
+    .rt .nm{font-size:13.5px}
+    .stations{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .st{padding:7px 6px 8px;border-radius:14px;gap:6px}
+    .st .nm{font-size:11px;line-height:1.3;min-height:2.6em}
+    .st .mt{font-size:9.5px}
+    .st .fav{width:28px;height:28px;font-size:14px;opacity:.85}
+    .st .ico img{padding:6px}
+    .rw{padding:8px 10px;gap:9px}
+    .rw .ico{width:38px;height:38px}
+    .p-in{padding:0 12px;gap:8px}
+    .p-art{width:40px;height:40px;border-radius:10px}
+    .p-name{font-size:12.5px}
+    .p-sub{font-size:10.5px}
+    .p-status{font-size:10px;margin-top:2px}
+    .p-btn{width:38px;height:38px}
+    .p-btn.main{width:44px;height:44px}
+    .p-btn.fav{width:34px;height:34px;font-size:15px}
+    .vol{display:none}
+    footer{font-size:10.5px;padding-bottom:2px}
+    .modal .card{padding:18px;border-radius:18px}
+  }
+  @media (hover:none){
+    .st .fav{background:rgba(7,12,22,.72)}
+  }
+  @media (min-width:641px) and (max-width:900px){
+    .stations{grid-template-columns:repeat(auto-fill,minmax(112px,1fr))}
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="wrap hdr">
+    <div class="brand">
+      <span class="globe">🌍</span>
+      <h1><span class="t1">후니가 듣고 싶은</span><span class="t2">세계라디오 모음집</span></h1>
+    </div>
+    <a class="home-pill" href="/" aria-label="전체 앱 목록으로 이동">🏠 앱 목록</a>
+  </div>
+  <div class="wrap search-wrap">
+    <div class="searchbar">
+      <span class="ico">🔍</span>
+      <input id="q" type="text" inputmode="search" autocomplete="off" enterkeyhint="search" placeholder="국가 · 지역 · 방송국 검색" aria-label="검색">
+      <button class="clr" id="qclr" hidden aria-label="검색어 지우기">✕</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap"><div class="srcbar" id="netnote" hidden><span>📴</span><span>인터넷 연결이 없어 저장된 목록으로 보여드립니다.</span></div></div>
+
+<nav class="wrap crumbs" id="crumbs" aria-label="이동 경로"></nav>
+
+<main class="wrap" id="main">
+  <div class="empty"><div class="big">🌍</div><p>국가 목록을 준비하고 있습니다…</p></div>
+</main>
+
+<footer class="wrap">
+  방송국 데이터 <b>Radio Browser</b> · 스트림은 각 방송사가 제공합니다.<br>
+  실제로 재생되는 HTTPS 방송국만 담았습니다.<span id="hidbox" hidden> · <button class="freset" id="hidreset">숨긴 방송국 <b id="hidn">0</b>개 되돌리기</button></span>
+</footer>
+
+<div class="player">
+  <div class="p-in">
+    <div class="p-art" id="p-art">📻</div>
+    <div class="p-meta">
+      <div class="p-name" id="p-name">방송국을 선택하세요</div>
+      <div class="p-sub" id="p-sub">국가 → 지역 → 방송국</div>
+      <div class="p-status" id="p-status"><span class="dot"></span><span id="p-statustx">대기 중</span></div>
+    </div>
+    <button class="p-btn fav" id="p-fav" aria-label="즐겨찾기" title="즐겨찾기" style="display:none">☆</button>
+    <button class="p-btn main" id="p-play" aria-label="재생" disabled>▶</button>
+    <div class="vol">
+      <span class="vic">🔈</span>
+      <input id="vol" type="range" min="0" max="100" value="80" aria-label="볼륨">
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="card" role="dialog" aria-modal="true">
+    <h3 id="m-title"></h3>
+    <div id="m-body"></div>
+    <div class="acts" id="m-acts"></div>
+  </div>
+</div>
+
+<script>
+/* 내장 데이터 — 2026-11-23 de1.api.radio-browser.info 에서 받은 뒤,
+   방송국마다 https 주소로 직접 접속해 실제 재생(playing)까지 확인한 방송국만 남겼습니다.
+   인터넷이 없어도 이 데이터로 첫 화면이 즉시 뜹니다. */
+var EMBEDDED_DATA = {"v":"2026-11-23b","countries":[{"c":"AD","en":"Andorra","n":5},{"c":"AE","en":"The United Arab Emirates","n":634},{"c":"AF","en":"Afghanistan","n":95},{"c":"AG","en":"Antigua And Barbuda","n":6},{"c":"AI","en":"Anguilla","n":5},{"c":"AL","en":"Albania","n":100},{"c":"AM","en":"Armenia","n":11},{"c":"AO","en":"Angola","n":63},{"c":"AQ","en":"Antarctica","n":9},{"c":"AR","en":"Argentina","n":1040},{"c":"AS","en":"American Samoa","n":11},{"c":"AT","en":"Austria","n":312},{"c":"AU","en":"Australia","n":1614},{"c":"AW","en":"Aruba","n":7},{"c":"AZ","en":"Azerbaijan","n":36},{"c":"BA","en":"Bosnia And Herzegovina","n":142},{"c":"BB","en":"Barbados","n":14},{"c":"BD","en":"Bangladesh","n":26},{"c":"BE","en":"Belgium","n":458},{"c":"BF","en":"Burkina Faso","n":4},{"c":"BG","en":"Bulgaria","n":328},{"c":"BH","en":"Bahrain","n":12},{"c":"BI","en":"Burundi","n":3},{"c":"BJ","en":"Benin","n":10},{"c":"BM","en":"Bermuda","n":5},{"c":"BN","en":"Brunei Darussalam","n":3},{"c":"BO","en":"Bolivia","n":67},{"c":"BQ","en":"Bonaire","n":10},{"c":"BR","en":"Brazil","n":1582},{"c":"BS","en":"The Bahamas","n":7},{"c":"BT","en":"Bhutan","n":1},{"c":"BW","en":"Botswana","n":4},{"c":"BY","en":"Belarus","n":59},{"c":"BZ","en":"Belize","n":2},{"c":"CA","en":"Canada","n":1372},{"c":"CC","en":"The Cocos Keeling Islands","n":1},{"c":"CD","en":"The Democratic Republic Of The Congo","n":20},{"c":"CF","en":"The Central African Republic","n":3},{"c":"CG","en":"The Congo","n":1},{"c":"CH","en":"Switzerland","n":544},{"c":"CI","en":"Coted Ivoire","n":60},{"c":"CL","en":"Chile","n":499},{"c":"CM","en":"Cameroon","n":52},{"c":"CN","en":"China","n":1970},{"c":"CO","en":"Colombia","n":682},{"c":"CR","en":"Costa Rica","n":54},{"c":"CU","en":"Cuba","n":23},{"c":"CV","en":"Cabo Verde","n":17},{"c":"CW","en":"Curacao","n":20},{"c":"CX","en":"Christmas Island","n":2},{"c":"CY","en":"Cyprus","n":61},{"c":"CZ","en":"Czechia","n":267},{"c":"DE","en":"Germany","n":5624},{"c":"DK","en":"Denmark","n":220},{"c":"DM","en":"Dominica","n":5},{"c":"DO","en":"The Dominican Republic","n":109},{"c":"DZ","en":"Algeria","n":92},{"c":"EC","en":"Ecuador","n":155},{"c":"EE","en":"Estonia","n":127},{"c":"EG","en":"Egypt","n":61},{"c":"ER","en":"Eritrea","n":4},{"c":"ES","en":"Spain","n":1223},{"c":"ET","en":"Ethiopia","n":23},{"c":"FI","en":"Finland","n":135},{"c":"FJ","en":"Fiji","n":13},{"c":"FK","en":"The Falkland Islands Malvinas","n":4},{"c":"FO","en":"The Faroe Islands","n":13},{"c":"FR","en":"France","n":2814},{"c":"GA","en":"Gabon","n":1},{"c":"GB","en":"The United Kingdom Of Great Britain And Northern Ireland","n":1957},{"c":"GD","en":"Grenada","n":5},{"c":"GE","en":"Georgia","n":28},{"c":"GF","en":"French Guiana","n":4},{"c":"GG","en":"Guernsey","n":1},{"c":"GH","en":"Ghana","n":91},{"c":"GI","en":"Gibraltar","n":6},{"c":"GL","en":"Greenland","n":4},{"c":"GN","en":"Guinea","n":4},{"c":"GP","en":"Guadeloupe","n":13},{"c":"GR","en":"Greece","n":1906},{"c":"GT","en":"Guatemala","n":71},{"c":"GU","en":"Guam","n":6},{"c":"GW","en":"Guinea Bissau","n":1},{"c":"GY","en":"Guyana","n":9},{"c":"HK","en":"Hong Kong","n":64},{"c":"HN","en":"Honduras","n":40},{"c":"HR","en":"Croatia","n":265},{"c":"HT","en":"Haiti","n":31},{"c":"HU","en":"Hungary","n":335},{"c":"ID","en":"Indonesia","n":510},{"c":"IE","en":"Ireland","n":196},{"c":"IL","en":"Israel","n":130},{"c":"IM","en":"Isle Of Man","n":6},{"c":"IN","en":"India","n":743},{"c":"IO","en":"British Indian Ocean Territory","n":2},{"c":"IQ","en":"Iraq","n":21},{"c":"IR","en":"Islamic Republic Of Iran","n":23},{"c":"IS","en":"Iceland","n":26},{"c":"IT","en":"Italy","n":1604},{"c":"JE","en":"Jersey","n":2},{"c":"JM","en":"Jamaica","n":40},{"c":"JO","en":"Jordan","n":30},{"c":"JP","en":"Japan","n":116},{"c":"KE","en":"Kenya","n":57},{"c":"KG","en":"Kyrgyzstan","n":7},{"c":"KH","en":"Cambodia","n":11},{"c":"KI","en":"Kiribati","n":1},{"c":"KM","en":"The Comoros","n":4},{"c":"KN","en":"Saint Kitts And Nevis","n":4},{"c":"KP","en":"The Democratic Peoples Republic Of Korea","n":9},{"c":"KR","en":"The Republic Of Korea","n":77},{"c":"KW","en":"Kuwait","n":202},{"c":"KY","en":"The Cayman Islands","n":8},{"c":"KZ","en":"Kazakhstan","n":39},{"c":"LA","en":"The Lao Peoples Democratic Republic","n":3},{"c":"LB","en":"Lebanon","n":116},{"c":"LC","en":"Saint Lucia","n":12},{"c":"LI","en":"Liechtenstein","n":2},{"c":"LK","en":"Sri Lanka","n":62},{"c":"LR","en":"Liberia","n":1},{"c":"LS","en":"Lesotho","n":1},{"c":"LT","en":"Lithuania","n":113},{"c":"LU","en":"Luxembourg","n":31},{"c":"LV","en":"Latvia","n":157},{"c":"LY","en":"Libya","n":6},{"c":"MA","en":"Morocco","n":58},{"c":"MC","en":"Monaco","n":6},{"c":"MD","en":"The Republic Of Moldova","n":83},{"c":"ME","en":"Montenegro","n":43},{"c":"MG","en":"Madagascar","n":15},{"c":"MH","en":"The Marshall Islands","n":1},{"c":"MK","en":"Republic Of North Macedonia","n":46},{"c":"ML","en":"Mali","n":13},{"c":"MM","en":"Myanmar","n":4},{"c":"MN","en":"Mongolia","n":9},{"c":"MO","en":"Macao","n":20},{"c":"MQ","en":"Martinique","n":13},{"c":"MS","en":"Montserrat","n":1},{"c":"MT","en":"Malta","n":16},{"c":"MU","en":"Mauritius","n":11},{"c":"MV","en":"Maldives","n":4},{"c":"MW","en":"Malawi","n":50},{"c":"MX","en":"Mexico","n":1581},{"c":"MY","en":"Malaysia","n":78},{"c":"MZ","en":"Mozambique","n":14},{"c":"NA","en":"Namibia","n":14},{"c":"NC","en":"New Caledonia","n":7},{"c":"NE","en":"The Niger","n":3},{"c":"NG","en":"Nigeria","n":72},{"c":"NI","en":"Nicaragua","n":23},{"c":"NL","en":"The Netherlands","n":1196},{"c":"NO","en":"Norway","n":124},{"c":"NP","en":"Nepal","n":146},{"c":"NU","en":"Niue","n":1},{"c":"NZ","en":"New Zealand","n":212},{"c":"OM","en":"Oman","n":9},{"c":"PA","en":"Panama","n":32},{"c":"PE","en":"Peru","n":252},{"c":"PF","en":"French Polynesia","n":7},{"c":"PG","en":"Papua New Guinea","n":2},{"c":"PH","en":"The Philippines","n":726},{"c":"PK","en":"Pakistan","n":58},{"c":"PL","en":"Poland","n":941},{"c":"PM","en":"Saint Pierre And Miquelon","n":2},{"c":"PR","en":"Puerto Rico","n":50},{"c":"PS","en":"State Of Palestine","n":9},{"c":"PT","en":"Portugal","n":330},{"c":"PW","en":"Palau","n":1},{"c":"PY","en":"Paraguay","n":64},{"c":"QA","en":"Qatar","n":17},{"c":"RE","en":"Reunion","n":35},{"c":"RO","en":"Romania","n":849},{"c":"RS","en":"Serbia","n":359},{"c":"RU","en":"The Russian Federation","n":2477},{"c":"RW","en":"Rwanda","n":7},{"c":"SA","en":"Saudi Arabia","n":48},{"c":"SC","en":"Seychelles","n":3},{"c":"SD","en":"The Sudan","n":5},{"c":"SE","en":"Sweden","n":198},{"c":"SG","en":"Singapore","n":63},{"c":"SH","en":"Ascension And Tristan Da Cunha Saint Helena","n":2},{"c":"SI","en":"Slovenia","n":126},{"c":"SK","en":"Slovakia","n":137},{"c":"SL","en":"Sierra Leone","n":3},{"c":"SM","en":"San Marino","n":5},{"c":"SN","en":"Senegal","n":31},{"c":"SO","en":"Somalia","n":2},{"c":"SR","en":"Suriname","n":8},{"c":"SS","en":"South Sudan","n":2},{"c":"SV","en":"El Salvador","n":58},{"c":"SX","en":"Dutch Part Sint Maarten","n":1},{"c":"SY","en":"Syrian Arab Republic","n":22},{"c":"TD","en":"Chad","n":1},{"c":"TF","en":"The French Southern Territories","n":2},{"c":"TG","en":"Togo","n":6},{"c":"TH","en":"Thailand","n":97},{"c":"TM","en":"Turkmenistan","n":4},{"c":"TN","en":"Tunisia","n":57},{"c":"TO","en":"Tonga","n":3},{"c":"TR","en":"Türkiye","n":692},{"c":"TT","en":"Trinidad And Tobago","n":22},{"c":"TW","en":"Taiwan, Republic Of China","n":168},{"c":"TZ","en":"United Republic Of Tanzania","n":20},{"c":"UA","en":"Ukraine","n":288},{"c":"UG","en":"Uganda","n":149},{"c":"UM","en":"The United States Minor Outlying Islands","n":25},{"c":"US","en":"The United States Of America","n":7122},{"c":"UY","en":"Uruguay","n":130},{"c":"UZ","en":"Uzbekistan","n":11},{"c":"VA","en":"The Holy See","n":13},{"c":"VC","en":"Saint Vincent And The Grenadines","n":10},{"c":"VE","en":"Bolivarian Republic Of Venezuela","n":165},{"c":"VG","en":"British Virgin Islands","n":3},{"c":"VI","en":"US Virgin Islands","n":8},{"c":"VN","en":"Vietnam","n":30},{"c":"VU","en":"Vanuatu","n":3},{"c":"WF","en":"Wallis And Futuna","n":1},{"c":"XK","en":"Kosovo","n":15},{"c":"YE","en":"Yemen","n":12},{"c":"YT","en":"Mayotte","n":3},{"c":"ZA","en":"South Africa","n":200},{"c":"ZM","en":"Zambia","n":80},{"c":"ZW","en":"Zimbabwe","n":25}],"stations":{"KR":[{"u":"c038a859-7be1-11e9-aa30-52543be04c81","n":"KBS Classic FM","l":"https://1fm.gscdn.kbs.co.kr/1fm_192_2.m3u8?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly8xZm0uZ3NjZG4ua2JzLmNvLmtyLyoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTU0ODMyMDN9fX1dfQ__&Key-Pair-Id=APKAICDSGT3Y7IXGJ3TA&Signature=BoTnI5qzcHs4YGgK5x57cOwQFtOwughSu90Vfy~zbDudTOZ4EEsrrTTE8idH0Oeb8W6thGMoIaoW8Ut4BGBzLhGm13klgtXcPcbcETX6VqUslp4zyfTjqrcYezTjDWgv5UOqHBZL~TzaFElvpnQWqy1B~fAYUO4MllGjho7bL46Fveu29mFcfOkpjHNcasGQJkSE3ebXC6VXJIS6UApotpckFjW8LHK75Wtyf-akwRXEMoUQoDO87MQSoyTqh1o-cNqWuuOJtc3vhosPq1SOlStW6IjLg8NYLiwTacd-mWhFiQTnWNlqykR40jDOT2Ms855BuvWtRM-~cmtF51ZN9A__","h":"http://www.kbs.co.kr/","f":"http://www.kbs.co.kr//resources/images/favorite/favorite.png","c":"","b":0,"s":"Seoul","co":"The Republic Of Korea","cc":"KR","k":169,"a":""},{"u":"24163c48-89c6-4d34-99b7-a3c2e9d4cadd","n":"yojosuknam Radio","l":"https://stream.yojosuknam.com/live.mp3","h":"https://music.yojosuknam.com/radio","f":"https://music.yojosuknam.com/radio/icon-512.png","c":"MP3","b":0,"s":"Gyeonggi-do","co":"The Republic Of Korea","cc":"KR","k":94,"a":""},{"u":"2672e98d-b642-456e-8d77-e331ab4e007c","n":"KBS Cool FM","l":"https://2fm-ad.gscdn.kbs.co.kr/2fm_ad_192_1.m3u8?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly8yZm0tYWQuZ3NjZG4ua2JzLmNvLmtyLyoiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTU0Njg5MTB9fX1dfQ__&Key-Pair-Id=APKAICDSGT3Y7IXGJ3TA&Signature=if3Suk5GSmea4IcFdhAqboeYgVZGWSVZN~Wu34zUhPBl-176orlRUNzPcit-dD~02Z7IploB2icMfKEG7L7VqGZf5IJ3kCgssKAJLnQdLVHLB0U6Ajzz4nu5M0VkV79nwBWIRhBG-DztmSrquxN2hEqpevqAz85GYELyluBEbTFSqgt7nXuU~pGDKLafPnlIk9Qkep-HGERj7Dw4qVs72SBvvIhhSOlr4nNWCt22cvOMReu3slv063-NBwsitMbAsbDgPAilMb69xflw5flHmL5CtDjwvYz1LJ-7Dr8fJndB~zsyChZiiysIm0MmRpbFqW2Otkqn4qpfL6SApYXWWQ__","h":"http://www.kbs.co.kr/","f":"https://res.static.kbs.co.kr/favicon.png","c":"","b":0,"s":"Seoul","co":"The Republic Of Korea","cc":"KR","k":90,"a":""},{"u":"3043d560-4358-4583-9e29-9fce6777a09c","n":"CBS 음악 FM","l":"https://m-aac.cbs.co.kr/cbs939/_definst_/cbs939.stream/playlist.m3u8","h":"","f":"","c":"AAC","b":97,"s":"","co":"The Republic Of Korea","cc":"KR","k":65,"a":""},{"u":"7a72aa80-3902-4d73-a548-db81ac780240","n":"Big B Radio - Kpop","l":"https://antares.dribbcast.com/proxy/kpop?mp=/s","h":"https://bigbradio.net/kpop","f":"","c":"MP3","b":192,"s":"","co":"The Republic Of Korea","cc":"KR","k":62,"a":""},{"u":"10fbdfdd-2a6f-49fb-a035-8963c57f52e8","n":"YTN 라디오","l":"https://radiolive.ytn.co.kr/radio/_definst_/20211118_fmlive/playlist.m3u8","h":"https://www.ytn.co.kr/","f":"","c":"AAC","b":120,"s":"","co":"The Republic Of Korea","cc":"KR","k":40,"a":""},{"u":"7e0188a0-b332-405d-af8f-57da3223369b","n":"Listen.moe Kpop (MP3)","l":"https://listen.moe/kpop/fallback","h":"https://listen.moe/","f":"https://listen.moe/favicon.ico","c":"MP3","b":192,"s":"","co":"The Republic Of Korea","cc":"KR","k":39,"a":""},{"u":"19f6670a-7d9f-4c71-af22-c112f7fee450","n":"CBS 파워라디오 [Music FM]","l":"https://lhttp-hw.qtfm.cn/live/15318233/64k.mp3","h":"https://cbsfm.modoo.at/","f":"https://pic.qtfm.cn/2024/0524/20240524014731.gif","c":"MP3","b":0,"s":"","co":"The Republic Of Korea","cc":"KR","k":34,"a":""},{"u":"3058649c-068d-43e8-8c47-4a5a89dbdc4c","n":"CBS 표준FM 98.1","l":"https://m-aac.cbs.co.kr/mweb_cbs981/_definst_/cbs981.stream/playlist.m3u8","h":"https://www.cbs.co.kr/radio/","f":"","c":"AAC","b":97,"s":"Seoul","co":"The Republic Of Korea","cc":"KR","k":30,"a":""},{"u":"16c1e8aa-1e9e-422b-9611-842b61a70983","n":"KBS_kor","l":"https://1radio-bora.gscdn.kbs.co.kr/1radio-bora-01/1radio-bora-01_hd.m3u8?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly8xcmFkaW8tYm9yYS5nc2Nkbi5rYnMuY28ua3IvMXJhZGlvLWJvcmEtMDEvKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5NTUxMDg4OH19fV19&Key-Pair-Id=APKAICDSGT3Y7IXGJ3TA&Signature=eIKtqSb4dyT~L-OILnkywSdpTyzpe2I60BcLCTAk~IfzIbMAey8hFt0fs2QzB4Nlt130fpi6OUxDJJZp3xCM3D0xPFp2gEo-ud0Qmj~W6f4v2~cHFlX69pVOr0~~9sVk9ZXtY0qIruQc0mVwKwDyA66L5OmvqZ90k4E4cEr7J3BY97oC7YKsK69SsN-nM7IsLyUIDRSLfcytIFRe3cXtnu7dRccs6pn5tkIinGMkOgUNB2gBqnIfgi5agEIBbLjocTk4vZoPYy0-nXg5ypiEzq-mLHydhZmi0I68Njg6v0IO03BN0QSlu4yd~H~EdPwGpwWvANbsGKAGs20K1CxUMw__","h":"https://radio.kbs.co.kr/","f":"https://static.kbs.co.kr/www/20250220173400/resources/images/favicon/favicon.png","c":"","b":0,"s":"","co":"The Republic Of Korea","cc":"KR","k":30,"a":""},{"u":"03750ff6-6222-4672-8817-864830fac0eb","n":"Arirang Radio","l":"https://amdlive-ch03-ctnd-com.akamaized.net/arirang_3ch/arirang_3ch_audio/chunklist_b128000.m3u8","h":"https://www.arirang.com/radio","f":"https://www.arirang.com/favicon.ico","c":"","b":0,"s":"","co":"The Republic Of Korea","cc":"KR","k":25,"a":""},{"u":"1ade2300-f75f-4dcd-aa77-06d276537c0e","n":"AFN GO HUMPHREYS The Eagle","l":"https://18533.live.streamtheworld.com/AFNP_OSNAAC_SC","h":"https://afngo.net/afnpacific/Humphreys","f":"https://afngo.net/static/media/Humphreys.80cba9f67149f1bf7018.png","c":"AAC+","b":32,"s":"","co":"The Republic Of Korea","cc":"KR","k":23,"a":""},{"u":"c60ab0ce-723c-43a9-85a4-ff544710f27f","n":"OBS 라디오","l":"https://vod3.obs.co.kr:444/live/obsstream1/radio.stream/playlist.m3u8","h":"https://www.obs.co.kr/radio/","f":"https://play-lh.googleusercontent.com/EQd7zsUgIsdtDSAldbre7DT0V2vsW-As6J51zcMnfycMpyJRgFIO311XvDExg-g-TA=w480-h960","c":"AAC","b":148,"s":"Gyeonggi","co":"The Republic Of Korea","cc":"KR","k":19,"a":""},{"u":"54ac5316-5788-452f-a15b-5a53c79d0375","n":"K-RADIO","l":"https://s5.radio.co/s0a9796fe3/listen","h":"https://www.am1660.com/","f":"","c":"MP3","b":128,"s":"","co":"The Republic Of Korea","cc":"KR","k":18,"a":""},{"u":"9b8512b7-436d-4da8-8777-633ad9b6671f","n":"CBS JOY4U","l":"https://m-aac.cbs.co.kr/mweb_cbscmc/_definst_/cbscmc.stream/playlist.m3u8","h":"https://www.cbs.co.kr/radio/","f":"","c":"AAC","b":98,"s":"Seoul","co":"The Republic Of Korea","cc":"KR","k":18,"a":""},{"u":"6ad5927a-7ef7-456c-ad54-059873ff9f28","n":"TBS FM 95.1","l":"https://cdnfm.tbs.seoul.kr/tbs/_definst_/tbs_fm_web_360.smil/chunklist.m3u8","h":"https://tbs.seoul.kr/fm/index.do","f":"https://zuiai.tv/zb_users/upload/2026/3/2026030564925917_mini.jpg","c":"AAC","b":414,"s":"","co":"The Republic Of Korea","cc":"KR","k":17,"a":""},{"u":"6f6ea925-4bc3-4dbc-8990-7f48c6f24cb9","n":"REPLAY NEWS - 한국어 5분마다 뉴스 라디오","l":"https://replaynewskr.ice.infomaniak.ch/replaynewskr-128.mp3","h":"https://www.replaynews.net/","f":"https://www.publicsante.com/BIENVENU/LOGO%20REPLAY%20NEWS-KO.png","c":"MP3","b":128,"s":"incheon","co":"The Republic Of Korea","cc":"KR","k":15,"a":""},{"u":"b666f9d5-126e-48ce-8826-81fcfb065485","n":"EBS FM 104.5","l":"https://ebsonairiosaod.ebs.co.kr/fmradiobandiaod/bandiappaac/playlist.m3u8","h":"https://www.ebs.co.kr/","f":"","c":"AAC","b":128,"s":"","co":"The Republic Of Korea","cc":"KR","k":15,"a":""},{"u":"656c6a0b-f0a8-4c8f-a0ef-97c72d130eef","n":"하늘호수24","l":"https://cast2.sayclub.com/saycast2/24sky/llhls.m3u8","h":"https://me.sayclub.com/bdcst/bdcst-home?bdcstDomainId=24sky","f":"https://sky24.inlive.co.kr/images/9.png","c":"AAC","b":125,"s":"","co":"The Republic Of Korea","cc":"KR","k":12,"a":""},{"u":"2b1b77a5-16d9-49eb-9359-38341f5674e4","n":"Fred Film Radio(한국어)","l":"https://s10.webradio-hosting.com/proxy/fredradiokr/stream","h":"http://www.fred.fm/","f":"","c":"MP3","b":128,"s":"Seoul","co":"The Republic Of Korea","cc":"KR","k":11,"a":""},{"u":"1a512cf7-f77c-49c0-b42d-4e3db0656b6a","n":"JeonjuFM","l":"https://radiostream.communityradio.kr/jcfm1","h":"https://jcfm.kr/","f":"https://static.mytuner.mobi/media/tvos_radios/694/gongdongceradio-jeonjufm-935mhz.70bc301e.png","c":"MP3","b":128,"s":"","co":"The Republic Of Korea","cc":"KR","k":11,"a":""},{"u":"2f47d2d9-ac17-49cd-9e1c-b5b295800e37","n":"Gugak FM","l":"https://mgugaklive.nowcdn.co.kr/gugakradio/gugakradio.stream/playlist.m3u8","h":"https://www.igbf.kr/gugak_web/main/","f":"","c":"AAC","b":194,"s":"","co":"The Republic Of Korea","cc":"KR","k":10,"a":""},{"u":"e89958f1-bc76-44fe-b681-841b5ec4ceae","n":"TBS eFM 101.3","l":"https://cdnefm.tbs.seoul.kr/tbs/_definst_/tbs_efm_web_360.smil/chunklist.m3u8","h":"https://tbs.seoul.kr/eFm/index.do","f":"https://zuiai.tv/zb_users/upload/2026/3/2026030564925917_mini.jpg","c":"AAC","b":414,"s":"","co":"The Republic Of Korea","cc":"KR","k":10,"a":""},{"u":"b2b7599e-16b9-4225-9ffa-263b0cb541a6","n":"안동MBC FM4U","l":"https://live.andongmbc.co.kr/live/fmlive/playlist.m3u8","h":"https://andongmbc.co.kr/main/radio/radio.php","f":"","c":"AAC","b":36,"s":"","co":"The Republic Of Korea","cc":"KR","k":9,"a":""},{"u":"3df9fa02-ae92-4423-8f01-e007129c00ee","n":"국방FM","l":"https://mediaworks.dema.mil.kr/live_edge/audio.sdp/playlist.m3u8","h":"https://radio.dema.mil.kr/web/radio/main.do","f":"","c":"AAC","b":128,"s":"","co":"The Republic Of Korea","cc":"KR","k":8,"a":""},{"u":"4540380c-8d7c-49da-b0dc-699c1fb30ebc","n":"ebs tune in","l":"https://ebsonair.ebs.co.kr/fmradiofamilypc/familypc1m/playlist.m3u8","h":"http://www.ebs.co.kr/","f":"","c":"AAC","b":614,"s":"","co":"The Republic Of Korea","cc":"KR","k":8,"a":""},{"u":"d9db0a16-9100-4917-b5f5-bd48a42a1e70","n":"경인방송","l":"https://stream.ifm.kr/live/aod1/playlist.m3u8","h":"https://www.ifm.kr/","f":"","c":"AAC","b":125,"s":"","co":"The Republic Of Korea","cc":"KR","k":6,"a":""},{"u":"157bcaf5-d718-4ddf-bd97-adf23c78edc7","n":"Listen.Moe KPop Vorbis","l":"https://listen.moe/kpop/stream","h":"https://listen.moe/","f":"","c":"OGG","b":192,"s":"","co":"The Republic Of Korea","cc":"KR","k":6,"a":""},{"u":"80e86ed2-df7c-4378-bda7-4ba5e5aae1bb","n":"Soshi-Subs","l":"https://092007.xyz/radio/soshisubs","h":"https://092007.xyz/","f":"https://092007.xyz/apple-touch-icon.png","c":"OGG","b":0,"s":"","co":"The Republic Of Korea","cc":"KR","k":5,"a":""}],"US":[{"u":"d1a54d2e-623e-4970-ab11-35f7b56c5ec3","n":"Classic Vinyl HD","l":"https://icecast.walmradio.com:8443/classic","h":"https://walmradio.com/classic","f":"https://icecast.walmradio.com:8443/classic.jpg","c":"MP3","b":320,"s":"New York","co":"The United States Of America","cc":"US","k":1238,"a":""},{"u":"510aeeac-e7a0-41c2-aea2-e572e811ffe7","n":"Fox News Radio","l":"https://live.amperwave.net/direct/foxnewsradio-foxnewsradioaac-imc?source=fnr.web","h":"https://radio.foxnews.com/","f":"https://static.foxnews.com/radio.foxnews.com/content/uploads/2017/10/default_logo-150x150.png","c":"AAC+","b":64,"s":"","co":"The United States Of America","cc":"US","k":457,"a":""},{"u":"960cf833-0601-11e8-ae97-52543be04c81","n":"SomaFM Groove Salad (128k MP3)","l":"https://ice4.somafm.com/groovesalad-128-mp3","h":"https://somafm.com/groovesalad/","f":"https://somafm.com/img3/groovesalad-400.jpg","c":"MP3","b":128,"s":"California","co":"The United States Of America","cc":"US","k":350,"a":""},{"u":"64bb1467-2585-4454-a96f-34cfbc864d41","n":"WALM 2 HD","l":"https://icecast.walmradio.com:8443/walm2","h":"https://walmradio.com/walm2","f":"https://icecast.walmradio.com:8443/walm.jpg","c":"MP3","b":320,"s":"New York","co":"The United States Of America","cc":"US","k":324,"a":""},{"u":"6ce8da92-859f-4f96-a5e4-503c1ddfbfbf","n":"Classic Vinyl HD Opus","l":"https://icecast.walmradio.com:8443/classic_opus","h":"https://walmradio.com/classic","f":"https://icecast.walmradio.com:8443/classic.jpg","c":"OGG","b":192,"s":"New York","co":"The United States Of America","cc":"US","k":209,"a":""},{"u":"49ad5236-61ab-4c07-b4b6-a8da11bffe83","n":"80s Drive","l":"https://samcloud.spacial.com/api/listen?sid=111415&m=sc&rid=293634&t=ssl?&80sradio128mp3stereo44","h":"https://mytuner-radio.com/radio/80s-drive-479732/","f":"https://static2.mytuner.mobi/media/tvos_radios/s39agjsfxs3v.png","c":"MP3","b":128,"s":"Detroit","co":"The United States Of America","cc":"US","k":180,"a":""},{"u":"0b2c57db-885d-46d8-bbee-0651449759f1","n":"MSNBC","l":"https://tunein.cdnstream1.com/3511_96.mp3","h":"https://www.msnbc.com/","f":"https://nodeassets.nbcnews.com/cdnassets/projects/ramen/favicon/msnbc/all-other-sizes-PNG.ico/favicon-96x96.png","c":"MP3","b":96,"s":"","co":"The United States Of America","cc":"US","k":179,"a":""},{"u":"42c0308b-908d-4243-92e5-05d658ecb781","n":"KEXP","l":"https://kexp.streamguys1.com/kexp160.aac?listenerid=f4bcb5c771d830fbdd4195088a946ea6&awparams=companionAds%3Atrue","h":"https://www.kexp.org/","f":"https://www.kexp.org/static/assets/img/logo-header.svg","c":"AAC","b":162,"s":"Washington","co":"The United States Of America","cc":"US","k":160,"a":""},{"u":"b7da048a-bc9b-4493-afd8-172ff13c80e1","n":"Christmas Vinyl HD","l":"https://icecast.walmradio.com:8443/christmas","h":"https://walmradio.com/christmas","f":"https://icecast.walmradio.com:8443/christmas.png","c":"MP3","b":320,"s":"New York","co":"The United States Of America","cc":"US","k":142,"a":""},{"u":"96394224-0601-11e8-ae97-52543be04c81","n":"SomaFM Indie Pop Rocks! (128k AAC)","l":"https://ice4.somafm.com/indiepop-128-aac","h":"https://somafm.com/indiepop/","f":"https://somafm.com/img3/indiepop-400.jpg","c":"AAC","b":128,"s":"California","co":"The United States Of America","cc":"US","k":136,"a":""},{"u":"960c7c81-0601-11e8-ae97-52543be04c81","n":"SomaFM Secret Agent (128k MP3)","l":"https://ice6.somafm.com/secretagent-128-mp3","h":"https://somafm.com/secretagent/","f":"https://somafm.com/img3/secretagent-400.jpg","c":"MP3","b":128,"s":"California","co":"The United States Of America","cc":"US","k":130,"a":""},{"u":"dc7e3511-79b2-41f5-8b1f-a6e8098fcda4","n":"ROCK FM Classic Rock","l":"https://audiotainment-sw.streamabc.net/atsw-classicrock-mp3-128-2538548?","h":"http://www.my-radios.com/es/radio/escuchar/30420/ROCK-FM-CLASSIC-ROCK","f":"http://www.my-radios.com/favicon.ico","c":"MP3","b":0,"s":"","co":"The United States Of America","cc":"US","k":124,"a":""},{"u":"960d3f6f-0601-11e8-ae97-52543be04c81","n":"SomaFM Space Station Soma (128k AAC)","l":"https://ice6.somafm.com/spacestation-128-aac","h":"https://somafm.com/spacestation/","f":"https://somafm.com/img3/spacestation-400.png","c":"AAC","b":128,"s":"California","co":"The United States Of America","cc":"US","k":119,"a":""},{"u":"9614b5e5-0601-11e8-ae97-52543be04c81","n":"SomaFM Underground 80s (128k MP3)","l":"https://ice2.somafm.com/u80s-128-mp3","h":"https://somafm.com/u80s/","f":"https://somafm.com/img3/u80s-400.png","c":"MP3","b":128,"s":"California","co":"The United States Of America","cc":"US","k":104,"a":""},{"u":"dba1b7bc-6b92-409c-a543-8b42eec25636","n":"100 Hip Hop and RNB FM (Official)","l":"https://streaming.shoutcast.com/100-hip-hop-and-rnb-fm","h":"https://uk.radio.net/s/100hiphopandrnb","f":"https://static.mytuner.mobi/media/tvos_radios/887/rnb-and-hip-hop-radio.51c457d0.png","c":"MP3","b":128,"s":"Miami, Florida","co":"The United States Of America","cc":"US","k":103,"a":""},{"u":"b449c3c0-db5f-4f01-a81e-3bc1c769e188","n":"West Coast – G-Funk & Hip-Hop","l":"https://r.bgp.rodeo/listen/west_coast/radio.mp3","h":"https://r.bgp.rodeo/public/west_coast","f":"","c":"MP3","b":320,"s":"California","co":"The United States Of America","cc":"US","k":102,"a":""},{"u":"cd477c35-d625-11e8-a54a-52543be04c81","n":"Miami Beach Radio","l":"https://streaming.radiostreamlive.com/miamibeachradio_devices","h":"https://www.miamibeachradio.com/","f":"https://cdn-elements.radiostreamlive.com/v1/images/favicon.ico","c":"MP3","b":128,"s":"Florida","co":"The United States Of America","cc":"US","k":89,"a":""},{"u":"ceb6b3af-3bfb-4135-bace-9fa6fac9e8ac","n":"metal rock radio","l":"https://kathy.torontocast.com:2800/;","h":"http://www.metalrock.fm/","f":"","c":"MP3","b":128,"s":"","co":"The United States Of America","cc":"US","k":88,"a":""},{"u":"bafbd6cc-65e0-4af7-907b-dd1c425e8917","n":"70s 80s Disco Funk ModernSoul Boogie","l":"https://discofunk.streamingmedia.it/usa","h":"https://funky.radio/discofunk_modernsoul_boogie","f":"","c":"MP3","b":192,"s":"New York NY","co":"The United States Of America","cc":"US","k":85,"a":""},{"u":"961e37ee-0601-11e8-ae97-52543be04c81","n":"SomaFM Left Coast 70s (320k MP3)","l":"https://ice4.somafm.com/seventies-320-mp3","h":"https://somafm.com/seventies/","f":"https://somafm.com/img3/seventies400.jpg","c":"MP3","b":320,"s":"California","co":"The United States Of America","cc":"US","k":78,"a":""},{"u":"386941dd-f125-4268-83d6-e137ceb15daa","n":"Outlaw – Country Music Radio","l":"https://r.bgp.rodeo/listen/outlaw/radio.mp3","h":"https://r.bgp.rodeo/public/outlaw","f":"https://r.bgp.rodeo/static/icons/production/180.png","c":"MP3","b":320,"s":"Texas","co":"The United States Of America","cc":"US","k":73,"a":""},{"u":"7eb9e8ed-47f6-4cae-889a-774f6462db5f","n":".100 Hip hop and RNB FM","l":"https://ice64.securenetsystems.net/LFTM","h":"https://ice64.securenetsystems.net/LFTM","f":"","c":"AAC+","b":32,"s":"US","co":"The United States Of America","cc":"US","k":73,"a":""},{"u":"70012ddb-d075-441a-996c-c9ed1341b146","n":"美国之音","l":"https://stream.zeno.fm/u87dfeeyk2zuv","h":"http://www.xsbnrtv.cn/","f":"","c":"MP3","b":128,"s":"","co":"The United States Of America","cc":"US","k":71,"a":""},{"u":"439fafd7-b35b-4a6c-b22f-d9e4fbd9dfd4","n":"FUNKY RADIO - Only Funk Music (60's & 70's)","l":"https://funkyradio.streamingmedia.it/audio.aac","h":"https://funky.radio/","f":"","c":"AAC+","b":133,"s":"New York NY","co":"The United States Of America","cc":"US","k":68,"a":""},{"u":"360bb528-cea3-4e8e-84c6-3970c55bda71","n":"Funk the Planet","l":"https://streaming.live365.com/a01484","h":"https://funkthepla.net/","f":"https://oetpai.fra1.digitaloceanspaces.com/new_images/onestop_60653111.png","c":"MP3","b":192,"s":"California","co":"The United States Of America","cc":"US","k":66,"a":""},{"u":"809a0f17-d636-497e-a38b-3b3031ce2d40","n":"WKDM 纽约华语广播国语台","l":"https://video1.getstreamhosting.com:8292/stream?.mp3","h":"https://nysino.com/am1380/","f":"http://gbm.123tv.cn/file/2023/08-1690893620.jpg","c":"MP3","b":128,"s":"New York","co":"The United States Of America","cc":"US","k":64,"a":""},{"u":"c16337ec-14be-423d-a9fe-3ec7ed9aa373","n":"自由亚洲","l":"https://stream-283.surfernetwork.com/ub3pfplpqbktv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiJ1YjNwZnBscHFia3R2IiwiaG9zdCI6InN0cmVhbS0yODMuc3VyZmVybmV0d29yay5jb20iLCJ0bSI6ZmFsc2UsInJ0dGwiOjUsImp0aSI6IkpOQzBvRkNQVGNPbDVKVE9nMDhUQUEiLCJpYXQiOjE3OTUzNDIxNzcsImV4cCI6MTc5NTM0MjIzN30.qNxebqNcyqYlTNVVySEnyF8XJ-McD46KndmvSivBbGg","h":"http://www.xsbnrtv.cn/","f":"","c":"MP3","b":128,"s":"","co":"The United States Of America","cc":"US","k":64,"a":""},{"u":"701106b9-59e3-11ea-be63-52543be04c81","n":"SomaFM Heavyweight Reggae (256k MP3)","l":"https://ice5.somafm.com/reggae-256-mp3","h":"https://somafm.com/reggae/","f":"https://somafm.com/img3/reggae400.jpg","c":"MP3","b":320,"s":"California","co":"The United States Of America","cc":"US","k":64,"a":""},{"u":"960d4889-0601-11e8-ae97-52543be04c81","n":"181.FM - Highway 181","l":"https://listen.181fm.com/181-highway_128k.mp3","h":"http://www.181.fm/","f":"http://www.181.fm/favicon.ico","c":"MP3","b":128,"s":"Virginia","co":"The United States Of America","cc":"US","k":62,"a":""},{"u":"64b357e7-d9e9-4cb6-99b5-4cb6cef785cc","n":"WALM - Old Time Radio Opus","l":"https://icecast.walmradio.com:8443/otr_opus","h":"https://walmradio.com/otr","f":"https://icecast.walmradio.com:8443/otr.jpg","c":"OGG","b":32,"s":"New York","co":"The United States Of America","cc":"US","k":57,"a":""},{"u":"cb136507-425b-4934-8991-d7fc8873c849","n":"Sunset Chillout Lounge","l":"https://listen.radioking.com/radio/571682/stream/631712","h":"https://sunsetchilloutlounge.com/","f":"https://sunsetchilloutlounge.com/wp-content/uploads/2023/04/sunrise_sunset_captions_puns_quotes_instagram-7-300x225.jpg","c":"MP3","b":192,"s":"New York","co":"The United States Of America","cc":"US","k":56,"a":""},{"u":"74eac2e4-dd81-48d3-b47f-87f2f2a8b45a","n":"EROTICA LOUNGE","l":"https://stream.zeno.fm/89asra0sfa0uv","h":"https://tunein.com/radio/EROTICA-LOUNGE-s260655/","f":"","c":"MP3","b":128,"s":"New York NY","co":"The United States Of America","cc":"US","k":55,"a":""},{"u":"2e53ff8e-1d21-4e04-b0e9-f68257c4e7e9","n":"Only Hits K-Pop","l":"https://kpop.onlyhit.us/play","h":"https://onlyhit.us/en/radio/kpop","f":"https://cdn.onlyhitsradio.net/logo/kpop.png","c":"MP3","b":128,"s":"","co":"The United States Of America","cc":"US","k":55,"a":""},{"u":"d74c4cd0-5e3a-4ee4-b298-e681347db9f6","n":"CNN International","l":"https://tunein.cdnstream1.com/3519_96.aac","h":"https://www.cnn.com/","f":"null","c":"AAC","b":95,"s":"","co":"The United States Of America","cc":"US","k":53,"a":""},{"u":"960eb2e9-0601-11e8-ae97-52543be04c81","n":"SomaFM Drone Zone (128k MP3)","l":"https://ice6.somafm.com/dronezone-128-mp3","h":"https://somafm.com/dronezone/","f":"https://somafm.com/img3/dronezone-400.jpg","c":"MP3","b":128,"s":"California","co":"The United States Of America","cc":"US","k":51,"a":""},{"u":"c0c02d01-f94e-11e8-a97a-52543be04c81","n":"SomaFM Christmas Lounge 256k","l":"https://ice5.somafm.com/christmas-256-mp3","h":"https://somafm.com/christmas/","f":"https://somafm.com/img3/christmas-400.jpg","c":"MP3","b":256,"s":"California","co":"The United States Of America","cc":"US","k":51,"a":""},{"u":"9638a3a5-0601-11e8-ae97-52543be04c81","n":"181.FM - 90's Country","l":"https://listen.181fm.com/181-90scountry_128k.mp3","h":"http://www.181.fm/","f":"http://www.181.fm/favicon.ico","c":"MP3","b":128,"s":"Virginia","co":"The United States Of America","cc":"US","k":50,"a":""},{"u":"e5b81ad3-bb7d-41a5-a3d3-0f715434778e","n":"Megarock Radio 320k","l":"https://stream3.megarockradio.net:80/","h":"https://megarockradio.net/","f":"https://megarockradio.net/favicon.ico","c":"MP3","b":320,"s":"Missouri","co":"The United States Of America","cc":"US","k":50,"a":""},{"u":"dd02972f-8d91-449d-8d64-bd636a4a9ed0","n":"KEXP: The greatest radio station in the galaxy","l":"https://kexp.streamguys1.com/kexp160.aac","h":"https://kexp.org/","f":"https://www.kexp.org/favicon.ico","c":"AAC","b":162,"s":"Washington","co":"The United States Of America","cc":"US","k":48,"a":""},{"u":"960e0117-0601-11e8-ae97-52543be04c81","n":"SomaFM PopTron (128k MP3)","l":"https://ice6.somafm.com/poptron-128-mp3","h":"https://somafm.com/poptron/","f":"https://somafm.com/img3/poptron-400.png","c":"MP3","b":128,"s":"California","co":"The United States Of America","cc":"US","k":46,"a":""},{"u":"9d6d9530-ce29-45f5-af50-8f052716544e","n":"SomaFM SF Police Scanner","l":"https://ice4.somafm.com/scanner-128-mp3","h":"https://somafm.com/scanner/","f":"https://somafm.com/img3/scanner-400.jpg","c":"MP3","b":128,"s":"California","co":"The United States Of America","cc":"US","k":45,"a":""},{"u":"0eb3dbcf-05f7-480e-83f4-7718102a4820","n":"SmoothJazz.com 128k mp3","l":"https://smoothjazz.cdnstream1.com/2585_128.mp3","h":"https://www.smoothjazz.com/","f":"https://www.smoothjazz.com/sites/default/files/theme/sj-circle-logo.png","c":"MP3","b":128,"s":"California","co":"The United States Of America","cc":"US","k":45,"a":""},{"u":"5886456b-6ed3-40c8-a2c4-4167793d225b","n":"Ambient Sleeping Pill","l":"https://radio.stereoscenic.com/asp-h","h":"https://ambientsleepingpill.com/","f":"https://ambientsleepingpill.com/wp-content/uploads/cropped-asp-small-logo-512-trans-192x192.png","c":"MP3","b":256,"s":"","co":"The United States Of America","cc":"US","k":43,"a":""},{"u":"786d2939-00eb-479d-b3f0-f0f7673ea7e0","n":"Radio Paradise Rock Mix FLAC","l":"https://stream.radioparadise.com/rock-flac","h":"https://radioparadise.com/","f":"https://radioparadise.com/apple-touch-icon.png","c":"OGG","b":1441,"s":"California","co":"The United States Of America","cc":"US","k":43,"a":""},{"u":"e2f8a671-835a-4223-ad0f-33ac7aa9ed05","n":"DnB&EDM","l":"https://edmdnb.com:448/radio/8000/radio.mp3","h":"https://edmdnb.com/","f":"","c":"MP3","b":0,"s":"New York","co":"The United States Of America","cc":"US","k":42,"a":""},{"u":"d8def757-2fbd-4fe9-9807-a47b8a91c63c","n":"WREK Atlanta 91.1","l":"https://streaming.wrek.org/main/320kb.mp3","h":"https://www.wrek.org/","f":"","c":"MP3","b":320,"s":"Georgia","co":"The United States Of America","cc":"US","k":42,"a":""},{"u":"960d4bdc-0601-11e8-ae97-52543be04c81","n":"181.FM - Kickin' Country","l":"https://listen.181fm.com/181-kickincountry_128k.mp3","h":"http://www.181.fm/","f":"","c":"MP3","b":128,"s":"Virginia","co":"The United States Of America","cc":"US","k":42,"a":""},{"u":"961e719c-0601-11e8-ae97-52543be04c81","n":"181.FM - True Blues","l":"https://listen.181fm.com/181-blues_128k.mp3","h":"http://www.181.fm/","f":"http://www.181.fm/favicon.ico","c":"MP3","b":128,"s":"Virginia","co":"The United States Of America","cc":"US","k":42,"a":""},{"u":"961173b5-0601-11e8-ae97-52543be04c81","n":"SomaFM Lush (128k MP3)","l":"https://ice4.somafm.com/lush-128-mp3","h":"https://somafm.com/lush/","f":"https://somafm.com/img3/lush-400.jpg","c":"MP3","b":128,"s":"California","co":"The United States Of America","cc":"US","k":40,"a":""},{"u":"69363afd-b084-41e6-a0d4-79bebb629204","n":"Groovy Radio - 60's and 70's Oldies","l":"https://r1.comcities.com/proxy/emogddug/stream","h":"https://groovyradio.us/","f":"https://kvkvi.com/wp-content/uploads/2024/02/luxa.org-bordered-Groovy-White-600x600-jpg.jpg","c":"MP3","b":160,"s":"Columbus Ohio","co":"The United States Of America","cc":"US","k":40,"a":""},{"u":"393224fb-a0a8-4685-ab4e-a5ced5c80d93","n":"SmoothJazz.com 64k aac+","l":"https://smoothjazz.cdnstream1.com/2585_64.aac","h":"https://www.smoothjazz.com/","f":"https://www.smoothjazz.com/sites/default/files/theme/sj-circle-logo.png","c":"AAC+","b":64,"s":"California","co":"The United States Of America","cc":"US","k":40,"a":""},{"u":"9614e0a1-0601-11e8-ae97-52543be04c81","n":"SomaFM Fluid (128k MP3)","l":"https://ice5.somafm.com/fluid-128-mp3","h":"https://somafm.com/fluid/","f":"https://somafm.com/img3/fluid-400.jpg","c":"MP3","b":128,"s":"California","co":"The United States Of America","cc":"US","k":40,"a":""},{"u":"000f6a5e-fdbb-489c-90c5-89fd4c9e1113","n":"SomaFM Groove Salad (HLS FLAC)","l":"https://hls.somafm.com/hls/groovesalad/FLAC/program.m3u8","h":"https://somafm.com/groovesalad/","f":"https://somafm.com/img3/groovesalad-400.jpg","c":"MP4","b":0,"s":"California","co":"The United States Of America","cc":"US","k":38,"a":""},{"u":"11c28f97-0177-47d3-bf88-eb24b492c34f","n":"WAMU American University Radio","l":"https://wamu.cdnstream1.com/wamu.mp3","h":"https://wamu.org/","f":"","c":"MP3","b":96,"s":"Washington, DC","co":"The United States Of America","cc":"US","k":37,"a":""},{"u":"bbd2fa5a-0b6c-4833-81b4-ca69acb8f264","n":"Hip Hop Workout Radio","l":"https://stream.revma.ihrhls.com/zc7785","h":"https://stream.revma/","f":"https://zeno.fm/_ipx/q_100&fit_cover&s_160x160/https://images.zeno.fm/wwYkKshlr8K1X3i0JLV-I51b8dt3bzZXTKlYyMf6F-o/rs:fill:256:256/g:ce:0:0/aHR0cHM6Ly9wcm94eS56ZW5vLmZtL2NvbnRlbnQvc3RhdGlvbnMvYWd4emZucGxibTh0YzNSaGRITnlNZ3NTQ2tGMWRHaERiR2xsYm5RWWdJQ1E5SWJRdHdzTUN4SU9VM1JoZEdsdmJsQnliMlpwYkdVWWdJRFFvNFM2aWdvTW9nRUVlbVZ1YncvaW1hZ2UvP3U9MTY2MTM3NDkxOTAwMA.webp","c":"AAC","b":0,"s":"","co":"The United States Of America","cc":"US","k":37,"a":""},{"u":"da3527f7-b71e-49e0-a9d5-57102350ffc5","n":"Bloomberg Radio Boston","l":"https://playerservices.streamtheworld.com/api/livestream-redirect/WRCAAMAAC.aac","h":"https://www.bloombergradio.com/","f":"https://www.bloombergradio.com/content/plugins/bloomberg-favicon/dist/img/amber-120x120.png","c":"AAC+","b":112,"s":"Watertown MA","co":"The United States Of America","cc":"US","k":36,"a":""},{"u":"6b500823-fc4e-4bf7-8bde-c2c08cd51fed","n":"101.5 Kiss FM","l":"https://stream.zeno.fm/q0si4olfobwvv","h":"https://bestradiostations.wixsite.com/1015kissfm","f":"https://zeno.fm/_ipx/s_224x224/https://images.zeno.fm/4tcZWeT-uxznsndUIr6fJaT43NmEFIBaJLhdro7g4gs/rs:fill:288:288/g:ce:0:0/aHR0cHM6Ly9wcm94eS56ZW5vLmZtL2NvbnRlbnQvc3RhdGlvbnMvNTRhMmJjNWUtOGRkMS00Y2I2LThlOGQtMzg5MTg5NWZhZTkyL2ltYWdlLz91PTE3NDE3MzI1MTMwMDA.webp","c":"MP3","b":128,"s":"New York City, New York","co":"The United States Of America","cc":"US","k":35,"a":""},{"u":"608bc971-3ec5-4c05-8143-de96c3bdb030","n":"Soma FM Groove Salad 320K AAC HLS","l":"https://hls.somafm.com/hls/groovesalad/320k/program.m3u8","h":"https://www.somafm.com/","f":"https://somafm.com/img3/groovesalad-400.png","c":"MP4","b":320000,"s":"San Francisco CA","co":"The United States Of America","cc":"US","k":35,"a":""},{"u":"960de41d-0601-11e8-ae97-52543be04c81","n":"SomaFM Metal Detector (128k AAC)","l":"https://ice2.somafm.com/metal-128-aac","h":"https://somafm.com/metal/","f":"https://somafm.com/img3/metal-400.png","c":"AAC","b":128,"s":"California","co":"The United States Of America","cc":"US","k":34,"a":""},{"u":"02f3876d-ee77-449b-bae4-6cbb335d414b","n":"Radio Paradise Mellow Mix FLAC","l":"https://stream.radioparadise.com/mellow-flac","h":"https://radioparadise.com/","f":"https://radioparadise.com/apple-touch-icon.png","c":"OGG","b":1441,"s":"California","co":"The United States Of America","cc":"US","k":34,"a":""}],"JP":[{"u":"c1792128-4c6a-4fd6-8f16-4115607c0f1b","n":"Retro-Ko Radio","l":"https://radio.retroko.com/listen/retroko/radio.mp3","h":"https://www.retro-ko.com/","f":"https://radio.retroko.com/static/uploads/browser_icon/original.1794115059.png","c":"MP3","b":192,"s":"Kanagawa","co":"Japan","cc":"JP","k":241,"a":""},{"u":"a6d3e86c-0d17-4dd5-a587-5b30f31fd837","n":"NHK WORLD RADIO","l":"https://nhkworld-radio.nhkworld.jp/hls/live/nhkworld-radio-media2/index.m3u8","h":"https://www3.nhk.or.jp/nhkworld/","f":"https://www3.nhk.or.jp/nhkworld/common/assets/parts/images/logo_world.svg","c":"","b":0,"s":"tokyo","co":"Japan","cc":"JP","k":143,"a":""},{"u":"1bca74bf-82e7-4631-87b6-1e96be3bae43","n":"SOUND UP STATION NFRS","l":"https://stream2.rcast.net/70945","h":"https://www.nfrsradio.com/","f":"https://static.wixstatic.com/ficons/1173e1_15807acf4a474b03a67c854178f38727~mv2.ico","c":"MP3","b":96,"s":"Osaka","co":"Japan","cc":"JP","k":142,"a":""},{"u":"248a7684-7e28-4912-9812-efefc2bba2e1","n":"Gensokyo Radio","l":"https://stream.gensokyoradio.net/3","h":"https://gensokyoradio.net/","f":"https://gensokyoradio.net/favicon.ico","c":"MP3","b":256,"s":"","co":"Japan","cc":"JP","k":111,"a":""},{"u":"0eed3332-c2b2-4eda-9d0c-897322162663","n":"NHKワールド・ラジオ日本","l":"https://masterpl.hls.nhkworld.jp/hls/r1/live/master.m3u8","h":"https://www3.nhk.or.jp/nhkworld/ja/","f":"https://www3.nhk.or.jp/nhkworld/assets/images/statics/ja_nw_premium_img_2019.png","c":"AAC+","b":96,"s":"tokyo","co":"Japan","cc":"JP","k":95,"a":""},{"u":"90cbb60b-5a04-4e3a-aa30-5dc9307070e7","n":"BOX : Japan City Pop - 日本のシティポップ","l":"https://play.streamafrica.net/japancitypop","h":"https://boxradio.net/","f":"https://assets.radioapi.me/radios/01J65CR99GVHS3A7CT7D53C415.jpg","c":"MP3","b":0,"s":"","co":"Japan","cc":"JP","k":68,"a":""},{"u":"7ea8bc67-c0b9-4cc6-b1bd-f3e1770fad74","n":"J-Pop Christmas","l":"https://cast3.torontocast.com:1170/;","h":"https://asiadreamradio.com/","f":"https://moremalc.com/jc512.jpeg","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":67,"a":""},{"u":"38930961-d11a-451b-b8ee-cdadce9057ba","n":"Anime Para Ti","l":"https://stream.zeno.fm/qpn8mkt8c4duv","h":"https://www.facebook.com/radioanimeparati","f":"https://images.zeno.fm/TrBD3tEtOJbMAdKu3XR64pWUT2XTjBhzgn2n2w_lFnE/rs:fit:500:500/g:ce:0:0/aHR0cHM6Ly9zdHJlYW0tdG9vbHMuemVub21lZGlhLmNvbS9jb250ZW50L3N0YXRpb25zL2FneHpmbnBsYm04dGMzUmhkSE55TWdzU0NrRjFkR2hEYkdsbGJuUVlnSUNBeF92bDF3b01DeElPVTNSaGRHbHZibEJ5YjJacGJHVVlnSUNBZ0lEeWlBb01vZ0VFZW1WdWJ3L2ltYWdlLz9yZXNpemU9NTAweDUwMCZ1cGRhdGVkPTE2NjI3NzM0MjEwMDA.webp","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":67,"a":""},{"u":"f72771a3-cf3a-4cc5-af91-2493ca31c54d","n":"J-Pop Sakura (asia DREAM radio)","l":"https://quincy.torontocast.com:2070/stream.mp3","h":"https://asiadreamradio.com/","f":"https://moremalc.com/natsukashii.jpeg","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":49,"a":""},{"u":"9d4aa07b-f080-4d6c-87e8-15c080c72dd2","n":"Miku Radio","l":"https://miku.fm/listen/miku/aac-128","h":"https://miku.fm/public/miku","f":"https://miku.fm/static/uploads/browser_icon/60.1740888865.png","c":"AAC","b":128,"s":"","co":"Japan","cc":"JP","k":42,"a":""},{"u":"ee614813-177f-4b83-ae6a-5e5b22d440d1","n":"AshiyaRadio〜アシヤ・ラヂヲ〜","l":"https://s3.radio.co/sc8d895604/listen","h":"https://ashiya.radio/","f":"https://static.wixstatic.com/media/da9e0b_7c54de8c1f934d67bdab3cec46be5c3e~mv2.png/v1/fill/w_1070,h_1080,al_c/da9e0b_7c54de8c1f934d67bdab3cec46be5c3e~mv2.png","c":"AAC","b":192,"s":"","co":"Japan","cc":"JP","k":41,"a":""},{"u":"57cf528a-02be-4805-a510-6d05bb0ff996","n":"REPLAY NEWS - 日本語 5分ごとのニュースラジオ","l":"https://replaynewsja.ice.infomaniak.ch/replaynewsja-128.mp3","h":"https://www.replaynews.net/","f":"https://www.publicsante.com/BIENVENU/LOGO REPLAY NEWS-JA.png","c":"MP3","b":128,"s":"Osaka","co":"Japan","cc":"JP","k":41,"a":""},{"u":"a3923012-3b2c-4930-87b2-00058121709c","n":"Beethoven Piano Sonatas","l":"https://mpc1.mediacp.eu/stream/globaltopcharts","h":"https://cdn.radoxo.com/images/japan/all-classical-new-releases.webp?v=1791194402","f":"https://cdn.radoxo.com/images/japan/beethoven-piano-sonatas.webp?v=1791194402","c":"MP3","b":128,"s":"Hokaido","co":"Japan","cc":"JP","k":33,"a":""},{"u":"da391117-93a3-4f25-8dc3-c8aa604dde6a","n":"Súper Tokio Radio","l":"https://streamer.radio.co/s83eb8ff39/listen","h":"https://supertokio.com/","f":"https://supertokio.com/favicon.ico","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":31,"a":""},{"u":"0bca37e5-153c-40fa-a26f-b52d46523b72","n":"Otaku Music Radio","l":"https://kathy.torontocast.com:2880/;?type=http&nocache=1606748882","h":"https://www.otakumusicradio.com/","f":"","c":"MP3","b":192,"s":"","co":"Japan","cc":"JP","k":29,"a":""},{"u":"10bad67d-8ada-4430-8a45-a92dfd4bfc87","n":"City Poppers","l":"https://stream.zeno.fm/ricmeoweux2uv","h":"https://zeno.fm/radio/citypoppers/","f":"https://images.zeno.fm/DLSVIBWBYKpUn-nz7V1aA5IAtvvjzpPVVSeAH04VGHU/rs:fill:152:152/q:75/g:ce:0:0/aHR0cHM6Ly9wcm94eS56ZW5vLmZtL2NvbnRlbnQvc3RhdGlvbnMvNjY0NzU4MTQtYWJiMy00NWFhLThjZWUtMDk3YzIzOTIyOTQ0L2ltYWdlLz91PTE2NzcxNTExNDEwMDA","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":29,"a":""},{"u":"df402746-9d27-4b53-8d07-ab4634ac8b66","n":"大富ラジオ","l":"https://stream.zeno.fm/oaxp6mswcqltv","h":"http://www.daifutv.com/j/","f":"","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":27,"a":""},{"u":"02cf24a8-b1a6-4196-bf1c-d5553d2090bd","n":"asia DREAM radio - Japan Hits","l":"https://quincy.torontocast.com:2020/stream.mp3","h":"https://asiadreamradio.com/","f":"","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":25,"a":""},{"u":"5a4eb5bc-7fbd-43fb-a6a4-cc4517ce6ac4","n":"J1 HITS","l":"https://jenny.torontocast.com:2000/stream/J1HITS?_=184325","h":"https://www.j1fm.tokyo/","f":"https://mmo.aiircdn.com/387/5e763985f1dab.png","c":"MP3","b":128,"s":"tokyo","co":"Japan","cc":"JP","k":25,"a":""},{"u":"d7fc828c-4305-4fa0-8ca5-2131e26c312f","n":"Chiafuru","l":"https://chiafuru.fun/stream/nanahira-releases@128","h":"https://157.254.194.202/rajio/nanahira-releases/","f":"https://cdn.comic.studio/avatars/37112.3f07b3e0a35911883b8180c5658acbe0.png","c":"OGG","b":0,"s":"","co":"Japan","cc":"JP","k":24,"a":""},{"u":"5a2cbfe7-0518-44e9-aca6-0fd41e466ff0","n":"Fred Film Radio(日本語)","l":"https://s10.webradio-hosting.com/proxy/fredradiojp/stream","h":"http://www.fred.fm/","f":"","c":"MP3","b":128,"s":"Tokyo","co":"Japan","cc":"JP","k":23,"a":""},{"u":"f12f63d5-fe51-4515-b7bf-898bdc9b2dde","n":"All Classical New Releases","l":"https://mpc1.mediacp.eu:8038/stream","h":"https://cdn.radoxo.com/images/japan/all-classical-piano-chamber-works-and-concertos.webp?v=1791194402","f":"https://cdn.radoxo.com/images/japan/all-classical-new-releases.webp?v=1791194402","c":"MP3","b":128,"s":"Hokaido","co":"Japan","cc":"JP","k":22,"a":""},{"u":"836b2af3-7941-4c02-b5bc-ed28e46cda43","n":"Radi.fm 中文古典音乐","l":"https://live.radi.fm/stream/zh.aac","h":"https://radi.fm/ZhongwenGudianYinyue/","f":"https://www.xpand.website/assets/images/Radifm_0600.png","c":"AAC","b":128,"s":"Tokyo","co":"Japan","cc":"JP","k":21,"a":""},{"u":"3e112758-54c7-483b-8c1b-73b3e41aae1e","n":"Animenfo","l":"https://stream.zenolive.com/xwa8ckz7mzzuv.aac","h":"https://radiofm.novawap.com/","f":"https://liveonlineradio.net/wp-content/uploads/2014/11/Animenfo-Radio.jpg","c":"MP3","b":192,"s":"","co":"Japan","cc":"JP","k":21,"a":""},{"u":"ecbcdd6f-ac5f-408f-9d9b-cc979e5344c4","n":"J-Pop Powerplay Kawaii(asia dream radio)","l":"https://kathy.torontocast.com:3060/;?shoutcast","h":"http://asiadreamradio.torontocast.stream/stations/en/index.html","f":"","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":19,"a":""},{"u":"e4f7dac4-db05-446d-9282-d79a56ce7327","n":"Jazz Sakura","l":"https://kathy.torontocast.com:3330/;","h":"https://asiadreamradio.torontocast.stream/stations/en/index.html","f":"","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":18,"a":""},{"u":"d37f6140-a3c4-4b91-9d2c-801894a4c53d","n":"Moon Mission Recordings, Tokyo Deep and Electronic","l":"https://uk5.internet-radio.com/proxy/mmr?mp=/stream;","h":"https://www.moonmission.jp/","f":"https://static.wixstatic.com/media/b4e9b8_d568257bd6474ac0ad5ea280d38461e4~mv2.png/v1/fill/w_403,h_406,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/MOON%20MISSION%202_0%20%E3%83%AD%E3%82%B4%E3%80%80%E9%BB%92%E3%80%801000x1000.png","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":18,"a":""},{"u":"2396ce2c-9fde-4353-98a8-7e307daefddc","n":"Real Love Music - Radio Future Funk","l":"https://stream-152.zeno.fm/48533y95cnruv?zs=doyTUcjfTvCVtBOS3nlI8g","h":"https://zeno.fm/radio/future-fnk/","f":"https://zeno.fm/favicon.ico","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":17,"a":""},{"u":"12ac30d1-1900-4edc-baef-7c027232ee64","n":"J-Rock PowerPlay","l":"https://kathy.torontocast.com:3340/stream","h":"https://asiadreamradio.torontocast.stream/stations/en/index.html","f":"","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":15,"a":""},{"u":"08f17b3c-6072-4cb9-8c42-5e5edd51bcda","n":"An Opera Celebration","l":"https://mpc1.mediacp.eu/stream/beethoveninsequence","h":"https://tuneyou.com/radio/jp/an-opera-celebration","f":"https://cdn.radoxo.com/images/japan/an-opera-celebration.webp?v=1791194402","c":"MP3","b":128,"s":"Hokaido","co":"Japan","cc":"JP","k":14,"a":""},{"u":"e5a8c394-aa9e-4350-8d6c-50cf67141588","n":"Vocaloid Radio (Classic & Legacy Stream)","l":"https://stream.zeno.fm/0qmy834zm7zuv?aw_0_req_lsid=466c98abd83ac97274346856d171d0ba","h":"https://vocaloidradio.com/","f":"https://cdn.onlineradiobox.com/img/l/6/12926.v4.png","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":14,"a":""},{"u":"405566fa-dd30-437e-b20b-934fcdbe768f","n":"Kamakura FM","l":"https://stream.laut.fm/kamakura","h":"https://kamakurafm.co.jp/","f":"","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":12,"a":""},{"u":"e06ae684-fbb4-43d0-ad17-4b9870703e6b","n":"神戸長田FMわぃわぃ (Radio FMYY)","l":"https://tcc117.jp/fmyy/asx/simulbroadcast.mp3","h":"https://tcc117.jp/fmyy/","f":"https://cdn.instant.audio/images/logos/jpradio-jp/fmyy.png","c":"MP3","b":0,"s":"Kobe","co":"Japan","cc":"JP","k":12,"a":""},{"u":"c3567819-a747-4d38-9cdc-a97d601cd5fd","n":"NHK WORLD RADIO-3","l":"https://nhkworld-radio.nhkworld.jp/hls/live/nhkworld-radio-media12/index.m3u8","h":"https://www3.nhk.or.jp/nhkworld/","f":"https://www3.nhk.or.jp/nhkworld/common/assets/parts/images/logo_world.svg","c":"","b":0,"s":"tokyo","co":"Japan","cc":"JP","k":12,"a":""},{"u":"0347b46a-91c7-4fe3-943d-a9eb02cdd9b9","n":"Rainwave All","l":"https://relay.rainwave.cc/all.mp3?1:MF0d8GHw2d","h":"https://rainwave.cc/all/","f":"","c":"MP3","b":0,"s":"tokyo","co":"Japan","cc":"JP","k":12,"a":""},{"u":"1e054608-8472-4535-a9b5-f36c6282b958","n":"83.4MHz FMSETAGAYA","l":"https://fmsetagaya834.out.airtime.pro/fmsetagaya834_a","h":"https://fmsetagaya.com/","f":"https://fmsetagaya.com/wp/wp-content/uploads/2020/02/1400-300x300.jpg","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":11,"a":""},{"u":"b2805728-e405-406a-882a-021e76972b53","n":"Radio Shiga","l":"https://sv10.hdradios.net:21920/stream","h":"https://wp.radioshiga.com/","f":"https://cdn.radoxo.com/images/japan/radio-shiga.webp?v=1791194402","c":"AAC+","b":64,"s":"shiga","co":"Japan","cc":"JP","k":9,"a":""},{"u":"a4fc8fc6-5eae-4e2e-9881-7770556abd01","n":"Gotanno Radio micro FM station","l":"https://radio.gotanno.love/;","h":"https://gotanno.love/","f":"https://yt3.googleusercontent.com/ytc/AIdro_mdnuovYgEJ9KclQYa5ECb4eR_94VbI-hNx4-Ml5YA7OQ=s900-c-k-c0x00ffffff-no-rj","c":"MP3","b":128,"s":"","co":"Japan","cc":"JP","k":9,"a":""},{"u":"ba5af88c-6fa9-4f56-990f-c0eaaf7c37ba","n":"Listen.Moe JPop Vorbis","l":"https://listen.moe/stream","h":"https://listen.moe/","f":"https://listen.moe/favicon.ico","c":"OGG","b":192,"s":"","co":"Japan","cc":"JP","k":9,"a":""}],"GB":[{"u":"c4077677-dc2f-11e9-a8ba-52543be04c81","n":"Heart 80s","l":"https://media-ssl.musicradio.com/Heart80sMP3","h":"https://www.heart.co.uk/80s","f":"https://www.heart.co.uk/assets_v4r/heart/img/favicon-196x196.png","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":490,"a":""},{"u":"598c4d0e-6b06-43fb-bff4-717c591213a9","n":"BBC World Service","l":"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service","h":"https://www.bbc.co.uk/sounds/play/live:bbc_world_service","f":"https://rmp.files.bbci.co.uk/rmp-shared-assets/1.4.0/img/network-logos/national/bbc_world_service_colour.svg","c":"MP3","b":56,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":363,"a":""},{"u":"4ad5bdc7-01e5-47c9-a1f9-751671b4707e","n":"CAPITAL - The UK's No.1 Hit Music Station","l":"https://media-ssl.musicradio.com/CapitalUK","h":"https://www.capitalfm.com/","f":"https://cdn-profiles.tunein.com/s241396/images/logod.jpg","c":"AAC","b":48,"s":"London","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":293,"a":""},{"u":"9f5d0645-ae1e-4e9f-9b2f-91fa63d5b1fa","n":"talkSPORT","l":"https://radio.talksport.com/stream","h":"https://talksport.com/","f":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAcdmwRcs4FcWk_OQqxq4EyZH5YA7ixM2dvQ&usqp=CAU","c":"AAC","b":64,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":177,"a":""},{"u":"478fd7f4-dc36-11e9-a8ba-52543be04c81","n":"Smooth Chill","l":"https://media-ssl.musicradio.com/ChillMP3","h":"https://www.smoothradio.com/chill/","f":"https://www.smoothradio.com/assets_v4r/smooth/img/favicon-196x196.png","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":163,"a":""},{"u":"52bb00fe-dc31-11e9-a8ba-52543be04c81","n":"Heart 90s","l":"https://media-ssl.musicradio.com/Heart90sMP3","h":"https://www.heart.co.uk/90s","f":"https://www.heart.co.uk/assets_v4r/heart/img/favicon-196x196.png","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":136,"a":""},{"u":"0a1e0bb0-dc37-11e9-a8ba-52543be04c81","n":"Gold","l":"https://media-ssl.musicradio.com/GoldMP3","h":"https://www.mygoldmusic.co.uk/","f":"https://www.mygoldmusic.co.uk/assets_v4r/gold/img/favicon-196x196.png","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":129,"a":""},{"u":"ea391ded-00f0-47e0-841c-d92663e11854","n":"BBC News HD (720P)","l":"https://vs-hls-push-ww-live.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_news_channel_hd/t=3840/v=pv14/b=5070016/main.m3u8","h":"https://bbc.co.uk/news","f":"https://upload.wikimedia.org/wikipedia/en/thumb/2/24/BBC_News_HD_Logo.svg/2560px-BBC_News_HD_Logo.svg.png","c":"","b":0,"s":"England","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":125,"a":""},{"u":"fa76f16f-dc31-11e9-a8ba-52543be04c81","n":"Heart Dance","l":"https://media-ssl.musicradio.com/HeartDanceMP3","h":"https://www.heart.co.uk/dance","f":"https://www.heart.co.uk/assets_v4r/heart/img/favicon-196x196.png","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":114,"a":""},{"u":"bd1c441c-132a-4d48-a3f3-bdb386f4b09a","n":"Classic FM HD","l":"https://ice-sov.musicradio.com/ClassicFMHD?hdauth=:2000000000:a290d4b39a16153061d4c743008b9fe8d424a7e5ec6469d40acf51fdcd336e80","h":"https://www.classicfm.com/","f":"https://is1-ssl.mzstatic.com/image/thumb/Purple116/v4/bd/a7/bf/bda7bf4f-16e9-6b60-0d87-a39d432b505e/AppIcon-1x_U007emarketing-0-7-0-85-220.png/492x0w.webp","c":"AAC","b":192,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":113,"a":""},{"u":"a1b40e7a-94fe-4199-bd8f-31a7ed074a53","n":"BBC Radio One","l":"https://a.files.bbci.co.uk/ms6/live/3441A116-B12E-4D2F-ACA8-C1984642FA4B/audio/simulcast/hls/nonuk/audio_syndication_low_sbr_v1/aks/bbc_radio_one.m3u8","h":"http://www.bbc.co.uk/radio1","f":"https://cdn-radiotime-logos.tunein.com/s24939q.png","c":"AAC+","b":101,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":93,"a":""},{"u":"dec031e0-4419-45d2-9f3e-76e91d876c40","n":"PLANET ROCK: Where Rock Lives","l":"https://stream-mz.hellorayo.co.uk/planetrock.aac?direct=true&aw_0_1st.playerid=BMUK_Airable&aw_0_1st.skey=6778249992","h":"https://www.hellorayo.co.uk/planet-rock","f":"https://cdn-profiles.tunein.com/s2377/images/logod.png","c":"AAC+","b":47,"s":"London","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":81,"a":""},{"u":"0f1a8621-d35a-4073-83d3-7ee14207a9a9","n":"KISS - The Best Vibes & Energy","l":"https://live-bauerkiss.sharp-stream.com/kissnational.aac?direct=true&aw_0_1st.skey=1602676850&rp_source=1&=&&___cb=60456375243858","h":"https://www.hellorayo.co.uk/kiss","f":"https://cdn-profiles.tunein.com/s6004/images/logod.png","c":"AAC+","b":47,"s":"London","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":72,"a":""},{"u":"172d8c95-fecd-40b7-af6f-9cdf4e8829e4","n":"Magic Radio UK","l":"https://stream-mz.hellorayo.co.uk/magicnational.mp3?direct=true&aw_0_1st.playerid=BMUK_TuneIn&aw_0_1st.skey=7374499933&stationCode=mag","h":"https://hellorayo.co.uk/magic/play/","f":"https://www.celsoazevedo.com/files/2025/magic.png","c":"MP3","b":112,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":72,"a":""},{"u":"29dc48c6-adf5-49bf-a9d7-dfde3e9cfc6d","n":"UK Bass Radio","l":"https://www.ukbassradio.com/stream","h":"https://www.ukbassradio.com/","f":"https://www.ukbassradio.com/wp-content/uploads/2021/03/cropped-thumbnail_ukbass-radio5.png","c":"MP3","b":192,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":60,"a":""},{"u":"2babf29a-811c-4a51-93c3-9f3531ef2e97","n":"Classic FM Calm","l":"https://media-ice.musicradio.com/ClassicFMCalmMP3","h":"https://www.classicfm.com/calm/","f":"","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":60,"a":""},{"u":"8e32c763-b926-4e57-9b8f-d60f1c5b48e3","n":"LBC News","l":"https://media-ssl.musicradio.com/LBCNewsUK","h":"https://www.globalplayer.com/live/lbcnews/uk/","f":"https://herald.musicradio.com/media/02a3caa1-dacf-47b1-ad54-c10728b66cd9.png","c":"AAC","b":48,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":57,"a":""},{"u":"8c78482a-17db-4057-a7c7-8fa14b3c3ce9","n":"House Nation UK","l":"https://streaming.radio.co/s06bd9d805/listen","h":"https://housenationuk.com/","f":"https://static.mytuner.mobi/media/tvos_radios/aWa7xGKfBh.jpg","c":"MP3","b":192,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":48,"a":""},{"u":"723e042f-3c2f-4562-b8fa-3f9a8d31cf3e","n":"VIRGIN RADIO UK: Rock‘n’Roll Radio From The Top Of The Tower","l":"https://virgin.live.stream.broadcasting.news/stream","h":"https://virginradio.co.uk/","f":"https://cdn-profiles.tunein.com/s266113/images/logod.png","c":"MP3","b":0,"s":"London","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":45,"a":""},{"u":"ac233e42-27af-4c7a-a067-ed54da3808c7","n":"Times Radio 127kbps","l":"https://times.live.stream.broadcasting.news/stream","h":"https://www.thetimes.co.uk/radio","f":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmcsFprqkbGA0cVQaLMAmuvIwoa3qtMDesD-M0mhqt-Q&s","c":"AAC","b":127,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":41,"a":""},{"u":"e392aeac-2fb8-4f34-9543-6f4c8209d3a7","n":"JFSR - Jazz Funk Soul Radio","l":"https://s2.radio.co/s22ae5a8a6/listen","h":"https://jfsr.co.uk/","f":"https://jfsr.co.uk/wp-content/uploads/2020/08/cropped-JFSR-Favicon-300x300.png","c":"AAC","b":320,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":39,"a":""},{"u":"83bb028f-9cd6-489d-a9e0-6dc0821a071b","n":"Radio X Classic Rock","l":"https://media-ice.musicradio.com/RadioXClassicRockMP3","h":"https://www.radiox.co.uk/","f":"https://i.imgur.com/eBIsjQw.jpg","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":39,"a":""},{"u":"9619e7d7-0601-11e8-ae97-52543be04c81","n":"TMM 1","l":"https://listen-msmn.sharp-stream.com/nme1.mp3","h":"https://www.themusicmachine.co.uk/","f":"https://cdn-profiles.tunein.com/s159857/images/logod.png","c":"MP3","b":128,"s":"Camden","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":39,"a":""},{"u":"7cc0c486-92cb-4509-9b93-775e41950ed3","n":"Classic FM Movies","l":"https://media-ice.musicradio.com/ClassicFMMoviesMP3","h":"https://www.classicfm.com/movies/","f":"","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":39,"a":""},{"u":"1bfae443-4fa5-45ed-92a5-8aecd6a70756","n":"Greatest Hits Radio","l":"https://stream-mz.hellorayo.co.uk/net2westmidlands.aac?aw_0_1st.skey=1602676850&direct=true&rp_source=1","h":"https://www.hellorayo.co.uk/greatest-hits/west-midlands","f":"https://assets.planetradio.co.uk/img/ConfigWebHeaderLogoSVGImageUrl/381.svg?ver=1545132394","c":"AAC+","b":48,"s":"West Midlands","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":37,"a":""},{"u":"5ba5ce07-cb82-46ef-874a-7c9613bf2abf","n":"80s Zoom","l":"https://playerservices.streamtheworld.com/api/livestream-redirect/SAM03AAC226_SC.mp3","h":"http://www.80szoom.com/","f":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzUFC8MX_VPOLHcB32vggZZhwC928NeErEyQ&s.jpg","c":"MP3","b":128,"s":"London, England","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":35,"a":""},{"u":"87b30b2a-3c14-4e15-9fbb-0660dd99d7cc","n":"BBC RADIO 1 ANTHEMS: All-day anthems from the 00s to now","l":"https://as-hls-ww.live.cf.md.bbci.co.uk/pool_11351741/live/ww/bbc_radio_one_anthems/bbc_radio_one_anthems.isml/bbc_radio_one_anthems-audio%3d96000.norewind.m3u8","h":"https://www.bbc.co.uk/sounds/play/live/bbc_radio_one_anthems","f":"https://cdn-profiles.tunein.com/s347239/images/logod.png","c":"","b":0,"s":"London","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":32,"a":""},{"u":"d1bc420f-6aaa-426b-a810-b496622717d6","n":"Capital XTRA","l":"https://media-the.musicradio.com/CapitalXTRALondonMP3","h":"https://www.capitalfm.com/","f":"https://www.capitalfm.com/assets_v4r/capital/img/favicon-196x196.png","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":31,"a":""},{"u":"b8148b29-09d0-4aa1-8bfe-43d236260170","n":"Liquid DnB","l":"https://antares.dribbcast.com/proxy/dave1/stream/","h":"https://liquid-dnb.com/","f":"","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":31,"a":""},{"u":"c6c204d3-3ffd-4e85-b0f9-29bf6de7ddf4","n":"Absolute Radio 80s","l":"https://stream-ar.hellorayo.co.uk/absolute80shigh.aac?aw_0_1st.skey=1602676850&direct=true&rp_source=1","h":"https://www.hellorayo.co.uk/absolute-80s","f":"https://media.bauerradio.com/image/upload/c_crop,g_custom/v1717682143/brand_manager/stations/d8fpii0yfv7fimdhxqp1.png","c":"AAC","b":128,"s":"West Midlands","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":30,"a":""},{"u":"fecf5be0-e69b-46fa-9a47-0029ae4849e0","n":"Talksport 2","l":"https://talksport.live.stream.broadcasting.news/stream2","h":"https://talksport.com/","f":"","c":"AAC","b":128,"s":"London, England","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":30,"a":""},{"u":"052ee406-0369-44be-939d-a35d24f376c4","n":"Smooth Christmas","l":"https://media-ice.musicradio.com/SmoothXmasMP3","h":"https://www.smoothradio.com/news/christmas/","f":"","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":29,"a":""},{"u":"bee4aa5e-e55c-499d-9bbd-75ad1b9c76b9","n":"Capital Dance","l":"https://icecast.thisisdax.com/CapitalDanceMP3","h":"https://www.capitaldance.com/","f":"https://www.capitaldance.com/assets_v4r/capitaldance/img/favicon-196x196.png","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":29,"a":""},{"u":"21dbb37d-60a6-4ec2-b5c8-28b46fc2bfea","n":"Happy Hardcore","l":"https://audio-edge-3mayu.fra.h.radiomast.io/73055724-1141-41e2-a69b-24a6ca96c8e7","h":"https://www.happyhardcore.com/","f":"","c":"MP3","b":256,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":28,"a":""},{"u":"da52663e-bf3e-40aa-b863-28c1d12d6464","n":"ROKit Radio : British Comedy 1","l":"https://streaming04.liveboxstream.uk/proxy/roksta14/stream","h":"https://rokitradio.com/","f":"https://rokitradio.com/images/channels/british_comedy_1.jpg","c":"MP3","b":48,"s":"London, England","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":27,"a":""},{"u":"b7925a87-ce5d-48f1-b0df-fb30d75aa2c4","n":"Radio Essex","l":"https://stream.aiir.com/ujzy590c3stvv","h":"https://www.radioessex.com/","f":"https://mmo.aiircdn.com/339/67698698b4c61.png","c":"MP3","b":256,"s":"Essex","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":25,"a":""},{"u":"46fd21d1-1865-4e56-af9d-ce2296f33218","n":"Blues Radio UK","l":"https://blues-radio-uk-3f77be5c.radiocult.fm/stream","h":"https://www.rockradiouk.com/","f":"","c":"MP3","b":160,"s":"Devon","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":24,"a":""},{"u":"1a421361-eb9f-40e9-9ab1-1a4ca39b90dd","n":"House FM","l":"https://uksoutha.streaming.broadcast.radio:19920/housefm","h":"https://hse.fm/","f":"https://hse.fm/cdn/shop/files/logo_on_content_c7615023-6bff-4bf9-8841-9a9916b5a3b0_2500x.png?v=1615321261","c":"MP3","b":128,"s":"London, England","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":24,"a":""},{"u":"c58c0009-ad0d-4ed5-a208-a8e797885a75","n":"House Music Radio","l":"https://uk4-vn.mixstream.net/8128/listen.mp3","h":"https://www.housemusicradio.co.uk/","f":"","c":"MP3","b":320,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":23,"a":""},{"u":"2bf8ecb6-51ee-4c2d-a9ee-b8753ded0624","n":"Forth1","l":"https://stream-al.hellorayo.co.uk/forth1.aac?direct=true&aw_0_1st.skey=1602676850&rp_source=1&aw_0_1st.bauer_listenerid=undefined","h":"https://www.hellorayo.co.uk/forth","f":"","c":"AAC+","b":48,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":23,"a":""},{"u":"45daead0-5c3f-44f4-8bb3-177596bcf8ab","n":"Britcom 4","l":"https://cast2.asurahosting.com/proxy/britcom4/stream.mp3","h":"https://pumpkinfm.com/","f":"https://pumpkinfm.com/wp-content/uploads/2022/03/pfmnewlogoSmall.jpg","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":23,"a":""},{"u":"9f61ef81-bf7d-4bc4-8135-3fc8be52dafb","n":"SOUL RADIO Only Classic Soul","l":"https://listen.soulradio.uk/uk","h":"https://soulradio.uk/","f":"","c":"AAC+","b":194,"s":"Bristol","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":23,"a":""},{"u":"ad8eab8a-6b18-4833-a13d-dad173aacc08","n":"The Sounds of GTA | NTS","l":"https://stream-mixtape-geo.ntslive.net/mixtape33","h":"https://www.nts.live/infinite-mixtapes/the-sound-of-gta","f":"https://www.nts.live/favicon.ico","c":"MP3","b":0,"s":"London","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":22,"a":""},{"u":"6dde2d92-4f47-46f1-a7c6-3b3abec3806f","n":"Absolute Classic Rock","l":"https://stream-ar.hellorayo.co.uk/absoluteclassicrock.aac?aw_0_1st.skey=1602676850&direct=true&rp_source=1","h":"https://www.hellorayo.co.uk/absolute-classic-rock","f":"","c":"AAC+","b":47,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":21,"a":""},{"u":"e847f0b7-4694-4d96-a56a-3bc9543c5705","n":"Classic FM Essential Classical","l":"https://icecast.thisisdax.com/ClassicFM-M-Essential","h":"https://www.classicfm.com/","f":"https://www.radio.de/images/broadcasts/a1/f8/126083/1/c300.png","c":"AAC","b":48,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":21,"a":""},{"u":"1651c32f-55d8-4429-995d-872ea0dcf520","n":"Worldwide FM","l":"https://worldwide-fm.radiocult.fm/stream","h":"https://www.worldwidefm.net/","f":"https://scontent-fra5-2.xx.fbcdn.net/v/t39.30808-1/450237294_942043604601681_3306132891557988504_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=109&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=Ur-AWGYdJIEQ7kNvwHfsWWi&_nc_oc=Adn31I1juFGVfOprAsE1UsSz-7_H0ISFLok1gNrhmWqzfmlI6AbPJgNZB15dkduTEq4&_nc_zt=24&_nc_ht=scontent-fra5-2.xx&_nc_gid=60spXN55S49um4k8ceAfcA&oh=00_AfrO3IOBFCxwn4Bqxc2mOFTcigubLSqRjTY1N2cfbWsvxg&oe=696ED4DC","c":"MP3","b":320,"s":"London, England","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":20,"a":""},{"u":"68f52212-e3b0-479b-9da6-962a6c5e713d","n":"ROKit Radio Science Fiction","l":"https://streaming05.liveboxstream.uk/proxy/roksta12/stream","h":"https://rokitradio.com/","f":"https://rokitradio.com/images/channels/scifi.jpg","c":"MP3","b":48,"s":"London, England","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":20,"a":""},{"u":"15a7162c-45a3-4bde-b864-aa7731c6dd87","n":"Smooth Relax","l":"https://icecast.thisisdax.com/SmoothRelaxMP3","h":"https://www.smoothradio.com/relax/","f":"","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":20,"a":""},{"u":"9619e894-0601-11e8-ae97-52543be04c81","n":"TMM 2","l":"https://listen-msmn.sharp-stream.com/nme2.mp3","h":"https://www.themusicmachine.co.uk/","f":"https://cdn-profiles.tunein.com/s155539/images/logod.png","c":"MP3","b":128,"s":"Camden","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":20,"a":""},{"u":"add1c37e-717e-4746-8a30-e47f791b1231","n":"BBC Arabic","l":"https://stream.live.vc.bbcmedia.co.uk/bbc_arabic_radio","h":"https://stream.live.vc.bbcmedia.co.uk/","f":"null","c":"MP3","b":56,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":20,"a":""},{"u":"1cedf594-9460-47c9-ad66-1c3bda41901b","n":"Classic FM Video Game Music","l":"https://icecast.thisisdax.com/ClassicFM-M-Gaming","h":"https://www.classicfm.com/","f":"https://www.classicfm.com/assets_v4r/classic/img/favicon-196x196.png","c":"AAC","b":48,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":19,"a":""},{"u":"4d8c78c0-a08d-481b-979a-ec1295af876e","n":"SD Radio","l":"https://mystation.micast.media/radio/8020/radio.mp3","h":"https://sdradiouk.co.uk/","f":"","c":"MP3","b":128,"s":"West Yorkshire","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":19,"a":""},{"u":"ceab5124-608a-4eb1-8149-d65829f9a9d7","n":"Birdsong Radio","l":"https://a1.radio.co/s5c5da6a36/listen","h":"https://www.birdsong.fm/","f":"https://images.radio.co/station_logos/s5c5da6a36.20240717025356.png","c":"MP3","b":0,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":18,"a":""},{"u":"6c747331-3129-4e21-b620-3153f1a360e3","n":"Kerrang! Radio","l":"https://stream-al.hellorayo.co.uk/kerrang.aac?direct=true&aw_0_1st.skey=1602676850&aw_0_awz.listenerid=~LSID~&aw_0_1st.platform=~PLATFORM~&aw_0_1st.playerid=~PLAYER_ID~&aw_0_awz.appVers=~APPVERSION~&aw_0_1st.bauer_preroll=~REQUEST_PREROLL~&aw_0_1st.in_car=~IN_CAR~&lat=~LAT~&lon=~LONG~&aw_0_req.userConsentV2=~TCSTRING~","h":"https://www.hellorayo.co.uk/kerrang","f":"https://media.bauerradio.com/image/upload/c_crop,g_custom/v1679564543/brand_manager/stations/dx4kf5ptwfycmb4fydxa.png","c":"AAC+","b":47,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":18,"a":""},{"u":"9b3a5084-91ba-4d90-ac06-3e0ba8c50d67","n":"Gold Radio UK","l":"https://media-ice.musicradio.com/GoldMP3","h":"https://www.goldradio.com/?page=2","f":"","c":"MP3","b":128,"s":"","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":18,"a":""},{"u":"99f4e5bf-e2a0-4386-b116-3ecd4e4de6b5","n":"ROKit Radio : British Comedy 2","l":"https://streaming05.liveboxstream.uk/proxy/jondreas/stream","h":"https://rokitradio.com/","f":"https://rokitradio.com/favicon.ico","c":"MP3","b":48,"s":"London, England","co":"The United Kingdom Of Great Britain And Northern Ireland","cc":"GB","k":18,"a":""}]}}
+</script>
+
+<script>
+(function(){
+'use strict';
+
+/* =========================================================
+   후니가 듣고 싶은 세계라디오 모음집 — 국가 → 지역 → 방송국
+   첫 화면: 내장 데이터로 네트워크 없이 즉시 표시
+   갱신: 클릭/새로고침 시 Radio Browser 미러에 짧은 타임아웃으로 시도
+   ========================================================= */
+
+var $ = function(s){ return document.querySelector(s); };
+var mainEl = $('#main');
+var crumbsEl = $('#crumbs');
+var netnoteEl = $('#netnote');
+
+var EM = (typeof EMBEDDED_DATA !== 'undefined' && EMBEDDED_DATA) ? EMBEDDED_DATA : { countries:[], stations:{} };
+
+var API_HOSTS = [
+  'https://de1.api.radio-browser.info',
+  'https://de2.api.radio-browser.info'
+];
+var HLS_CDN = [
+  'https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js',
+  'https://unpkg.com/hls.js@1/dist/hls.min.js'
+];
+
+var LS = { favs:'wr.favs.v1', vol:'wr.vol.v1', countries:'wr.countries.v2', recent:'wr.recent.v1', hidden:'wr.hidden.v1' };
+
+var T = { countries:5000, stations:7000, search:6000, servers:3500, playback:16000 };
+
+var S = {
+  countries:null,
+  stations:new Map(),
+  current:null,
+  playing:false,
+  loadingPlay:false,
+  hls:null,
+  vol:0.8,
+  favs:[],
+  recent:[],
+  q:'',
+  gs:{ q:'', state:'idle', items:[], remote:0 },
+  sort:'name',
+  route:{view:'home'},
+  seq:0,
+  offline:false,
+  refreshed:{},
+  refreshReq:{},
+  countriesReq:false,
+  playToken:0,
+  failed:false,
+  failFn:null,
+  hidden:[]
+};
+
+/* ---------- 작은 도구 ---------- */
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function num(n){ try{ return Number(n||0).toLocaleString('ko-KR'); }catch(e){ return String(n||0); } }
+function readJSON(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
+function writeJSON(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function debounce(fn, ms){ var t; return function(){ var a=arguments, self=this; clearTimeout(t); t=setTimeout(function(){ fn.apply(self,a); }, ms); }; }
+function online(){ try{ return navigator.onLine !== false; }catch(e){ return true; } }
+function isHttpsUrl(u){ return String(u||'').indexOf('https://')===0; }
+function isHidden(uuid){ return !!uuid && S.hidden.indexOf(uuid)>=0; }
+function visible(list){ return (list||[]).filter(function(st){ return st && !isHidden(st.uuid); }); }
+function noteHide(uuid){
+  if(!uuid || isHidden(uuid)) return;
+  S.hidden.unshift(uuid);
+  if(S.hidden.length > 400) S.hidden = S.hidden.slice(0,400);
+  writeJSON(LS.hidden, S.hidden);
+  paintHiddenBox();
+}
+function unhide(uuid){
+  var i = S.hidden.indexOf(uuid);
+  if(i < 0) return;
+  S.hidden.splice(i,1);
+  writeJSON(LS.hidden, S.hidden);
+  paintHiddenBox();
+}
+function paintHiddenBox(){
+  var box = $('#hidbox');
+  if(!box) return;
+  box.hidden = !S.hidden.length;
+  var n = $('#hidn');
+  if(n) n.textContent = String(S.hidden.length);
+}
+
+/* ---------- 국기 ---------- */
+function flagOf(code){
+  if(!code || String(code).length!==2) return '🏳️';
+  var A = 0x1F1E6, c = String(code).toUpperCase();
+  return String.fromCodePoint(A + (c.charCodeAt(0)-65)) + String.fromCodePoint(A + (c.charCodeAt(1)-65));
+}
+
+/* ---------- 한국어 국가명 ---------- */
+var KO_COUNTRY = {
+  KR:'대한민국', KP:'북한', US:'미국', JP:'일본', CN:'중국', TW:'대만', HK:'홍콩', GB:'영국', IE:'아일랜드',
+  FR:'프랑스', DE:'독일', IT:'이탈리아', ES:'스페인', PT:'포르투갈', NL:'네덜란드', BE:'벨기에',
+  CH:'스위스', AT:'오스트리아', SE:'스웨덴', NO:'노르웨이', DK:'덴마크', FI:'핀란드', IS:'아이슬란드',
+  PL:'폴란드', CZ:'체코', SK:'슬로바키아', HU:'헝가리', RO:'루마니아', BG:'불가리아', GR:'그리스',
+  RU:'러시아', UA:'우크라이나', TR:'튀르키예', IL:'이스라엘', SA:'사우디아라비아', AE:'아랍에미리트',
+  QA:'카타르', IR:'이란', IQ:'이라크', EG:'이집트', MA:'모로코', ZA:'남아프리카공화국', NG:'나이지리아',
+  KE:'케냐', ET:'에티오피아', GH:'가나', TZ:'탄자니아', UG:'우간다', SN:'세네갈', TN:'튀니지', DZ:'알제리',
+  CA:'캐나다', MX:'멕시코', BR:'브라질', AR:'아르헨티나', CL:'칠레', CO:'콜롬비아', PE:'페루', VE:'베네수엘라',
+  EC:'에콰도르', UY:'우루과이', PY:'파라과이', BO:'볼리비아', CR:'코스타리카', CU:'쿠바', DO:'도미니카공화국',
+  GT:'과테말라', PA:'파나마', JM:'자메이카', PR:'푸에르토리코', TT:'트리니다드토바고', SV:'엘살바도르',
+  HN:'온두라스', NI:'니카라과', AU:'호주', NZ:'뉴질랜드', IN:'인도', PK:'파키스탄', BD:'방글라데시',
+  LK:'스리랑카', NP:'네팔', TH:'태국', VN:'베트남', PH:'필리핀', ID:'인도네시아', MY:'말레이시아',
+  SG:'싱가포르', KH:'캄보디아', LA:'라오스', MM:'미얀마', MN:'몽골', KZ:'카자흐스탄', UZ:'우즈베키스탄',
+  GE:'조지아', AM:'아르메니아', AZ:'아제르바이잔', HR:'크로아티아', RS:'세르비아', SI:'슬로베니아',
+  BA:'보스니아헤르체고비나', MK:'북마케도니아', AL:'알바니아', LT:'리투아니아', LV:'라트비아', EE:'에스토니아',
+  BY:'벨라루스', MD:'몰도바', MT:'몰타', CY:'키프로스', LU:'룩셈부르크', MC:'모나코',
+  FJ:'피지', GU:'괌', MO:'마카오', BN:'브루나이', MV:'몰디브', BT:'부탄', AF:'아프가니스탄',
+  SY:'시리아', JO:'요르단', LB:'레바논', KW:'쿠웨이트', OM:'오만', BH:'바레인', YE:'예멘',
+  SD:'수단', LY:'리비아', CI:'코트디부아르', CM:'카메룬', AO:'앙골라', MZ:'모잠비크', ZW:'짐바브웨',
+  AD:'안도라', AG:'앤티가바부다', AI:'앵귈라', AQ:'남극', AS:'아메리칸사모아', AW:'아루바', BB:'바베이도스',
+  BF:'부르키나파소', BI:'부룬디', BJ:'베냉', BM:'버뮤다', BQ:'보네르', BS:'바하마', BZ:'벨리즈', CC:'코코스제도',
+  CD:'콩고민주공화국', CF:'중앙아프리카공화국', CG:'콩고', CV:'카보베르데', CW:'퀴라소', CX:'크리스마스섬',
+  DM:'도미니카', ER:'에리트레아', FK:'포클랜드제도', FO:'페로제도', GA:'가봉', GD:'그레나다', GF:'프랑스령기아나',
+  GG:'건지', GI:'지브롤터', GL:'그린란드', GN:'기니', GP:'과들루프', GW:'기니비사우', GY:'가이아나', HT:'아이티',
+  IM:'맨섬', IO:'영국령인도양영토', JE:'저지', KG:'키르기스스탄', KI:'키리바시', KM:'코모로', KN:'세인트키츠네비스',
+  KY:'케이맨제도', LC:'세인트루시아', LI:'리히텐슈타인', LR:'라이베리아', LS:'레소토', ME:'몬테네그로',
+  MH:'마셜제도', ML:'말리', MQ:'마르티니크', MS:'몬트세랫', MW:'말라위', NC:'뉴칼레도니아', NE:'니제르',
+  NU:'니우에', PF:'프랑스령폴리네시아', PG:'파푸아뉴기니', PM:'생피에르미클롱', PS:'팔레스타인', PW:'팔라우',
+  RE:'레위니옹', SC:'세이셸', SH:'세인트헬레나', SL:'시에라리온', SM:'산마리노', SO:'소말리아', SR:'수리남',
+  SS:'남수단', SX:'신트마르턴', TD:'차드', TF:'프랑스령남방영토', TG:'토고', TM:'투르크메니스탄', TO:'통가',
+  UM:'미국령군소제도', VA:'바티칸', VC:'세인트빈센트그레나딘', VG:'영국령버진아일랜드', VI:'미국령버진아일랜드',
+  VU:'바누아투', WF:'왈리스푸투나', XK:'코소보', YT:'마요트',
+  ZM:'잠비아', BW:'보츠와나', NA:'나미비아', MU:'모리셔스', MG:'마다가스카르', RW:'르완다'
+};
+/* 긴 공식 명칭은 짧게 */
+var SHORT_EN = {
+  US:'United States', GB:'United Kingdom', TW:'Taiwan', RU:'Russia', KR:'South Korea', KP:'North Korea',
+  IR:'Iran', VE:'Venezuela', SY:'Syria', TZ:'Tanzania', LA:'Laos', MD:'Moldova', MK:'North Macedonia',
+  CZ:'Czechia', TR:'Türkiye', CI:'Côte d’Ivoire', CF:'Central African Republic', CD:'DR Congo', CG:'Congo',
+  PS:'Palestine', VA:'Vatican City', TF:'French Southern Territories', SH:'Saint Helena',
+  UM:'US Minor Outlying Islands', SX:'Sint Maarten', BQ:'Bonaire', FK:'Falkland Islands',
+  VG:'British Virgin Islands', VI:'US Virgin Islands', IO:'British Indian Ocean Territory',
+  CC:'Cocos Islands', KM:'Comoros', KY:'Cayman Islands', MH:'Marshall Islands', FO:'Faroe Islands',
+  PF:'French Polynesia', NC:'New Caledonia', GW:'Guinea-Bissau', TL:'Timor-Leste'
+};
+function countryName(c){
+  var ko = KO_COUNTRY[c.code];
+  var en = SHORT_EN[c.code] || String(c.en||'').replace(/^The\s+/i,'');
+  if(ko) return { main:ko, sub:en };
+  return { main:en, sub:'' };
+}
+
+/* ---------- 주요 지역 한국어명 ---------- */
+var KO_REGION = {
+  'seoul':'서울', 'busan':'부산', 'daegu':'대구', 'incheon':'인천', 'gwangju':'광주', 'daejeon':'대전',
+  'ulsan':'울산', 'jeju':'제주', 'jeonju':'전주', 'cheongju':'청주', 'suwon':'수원', 'seongnam':'성남',
+  'goyang':'고양', 'yongin':'용인', 'bucheon':'부천', 'ansan':'안산', 'anyang':'안양', 'cheonan':'천안',
+  'changwon':'창원', 'pohang':'포항', 'gumi':'구미', 'jeonbuk':'전북', 'gyeongbuk':'경북', 'gyeongnam':'경남',
+  'chungbuk':'충북', 'chungnam':'충남', 'jeonnam':'전남', 'gangwon':'강원', 'gyeonggi':'경기',
+  'gyeonggi-do':'경기', 'chungcheongbuk-do':'충북', 'chungcheongnam-do':'충남',
+  'gyeongsangbuk-do':'경북', 'gyeongsangnam-do':'경남', 'jeollabuk-do':'전북', 'jeollanam-do':'전남',
+  'jeju-do':'제주', 'sejong':'세종',
+  'tokyo':'도쿄', 'osaka':'오사카', 'kyoto':'교토', 'hokkaido':'홋카이도', 'aichi':'아이치',
+  'fukuoka':'후쿠오카', 'kanagawa':'가나가와', 'hyogo':'효고', 'chiba':'지바', 'saitama':'사이타마',
+  'california':'캘리포니아', 'new york':'뉴욕', 'texas':'텍사스', 'florida':'플로리다', 'illinois':'일리노이',
+  'washington':'워싱턴', 'massachusetts':'매사추세츠', 'new jersey':'뉴저지', 'pennsylvania':'펜실베이니아',
+  'ohio':'오하이오', 'georgia':'조지아', 'michigan':'미시간', 'north carolina':'노스캐롤라이나',
+  'england':'잉글랜드', 'london':'런던', 'scotland':'스코틀랜드', 'wales':'웨일스',
+  'northern ireland':'북아일랜드', 'greater london':'런던',
+  'paris':'파리', 'ile-de-france':'일드프랑스', 'île-de-france':'일드프랑스',
+  'berlin':'베를린', 'bayern':'바이에른', 'bavaria':'바이에른', 'nordrhein-westfalen':'노르트라인베스트팔렌',
+  'new south wales':'뉴사우스웨일스', 'victoria':'빅토리아', 'queensland':'퀸즐랜드',
+  'western australia':'웨스턴오스트레일리아', 'south australia':'사우스오스트레일리아',
+  'ontario':'온타리오', 'quebec':'퀘벡', 'québec':'퀘벡', 'british columbia':'브리티시컬럼비아',
+  'alberta':'앨버타', 'lombardia':'롬바르디아', 'lombardy':'롬바르디아', 'lazio':'라치오',
+  'catalunya':'카탈루냐', 'cataluña':'카탈루냐', 'madrid':'마드리드', 'andaluci­a':'안달루시아',
+  /* 미국 주 전체 이름 */
+  'alabama':'알래배마', 'alaska':'알래스카', 'arizona':'애리조나', 'arkansas':'아칸소', 'colorado':'콜로라도',
+  'connecticut':'코네티컷', 'delaware':'델라웨어', 'hawaii':'하와이', 'idaho':'아이다호', 'indiana':'인디에나',
+  'iowa':'아이오와', 'kansas':'캔자스', 'kentucky':'켄터키', 'louisiana':'루이지애나', 'maine':'메인',
+  'maryland':'메릴랜드', 'minnesota':'미네소타', 'mississippi':'미시시피', 'missouri':'미주리',
+  'montana':'몬태나', 'nebraska':'네브래스카', 'nevada':'네바다', 'new hampshire':'뉴햄프셔',
+  'new mexico':'뉴멕시코', 'north dakota':'노스다코타', 'oklahoma':'오클라호마', 'oregon':'오리건',
+  'rhode island':'로드아일랜드', 'south dakota':'사우스다코타', 'tennessee':'테네시', 'utah':'유타',
+  'vermont':'버몬트', 'virginia':'버지니아', 'west virginia':'웨스트버지니아', 'wisconsin':'위스콘신',
+  'wyoming':'와이오밍', 'district of columbia':'워싱턴 DC'
+};
+function prettyRegion(s){
+  var t = String(s||'').trim();
+  if(!t) return '';
+  if(/[A-Z]/.test(t)) return t;
+  return t.replace(/(^|[\s\-\/])([a-zà-ÿ])/g, function(m, p, c){ return p + c.toUpperCase(); });
+}
+/* 미국 주 약어 → 한국어 (CA / California 를 같은 지역으로 묶기) */
+var US_STATE_KO = {
+  AL:'알래배마', AK:'알래스카', AZ:'애리조나', AR:'아칸소', CA:'캘리포니아', CO:'콜로라도', CT:'코네티컷',
+  DE:'델라웨어', DC:'워싱턴 DC', FL:'플로리다', GA:'조지아', HI:'하와이', ID:'아이다호', IL:'일리노이',
+  IN:'인디에나', IA:'아이오와', KS:'캔자스', KY:'켄터키', LA:'루이지애나', ME:'메인', MD:'메릴랜드',
+  MA:'매사추세츠', MI:'미시간', MN:'미네소타', MS:'미시시피', MO:'미수리', MT:'몬타나', NE:'네브래스카',
+  NV:'네바다', NH:'뉴햄프셔', NJ:'뉴저지', NM:'뉴멕시코', NY:'뉴욕', NC:'노스캐롤라이나', ND:'노스다코타',
+  OH:'오하이오', OK:'오클라호마', OR:'오리건', PA:'펜실베이니아', RI:'로드아일랜드', SC:'사우스캐롤라이나',
+  SD:'사우스다코타', TN:'테네시', TX:'텍사스', UT:'유타', VT:'버몬트', VA:'버지니아', WA:'워싱턴',
+  WV:'웨스트버지니아', WI:'위스콘신', WY:'와이오밍'
+};
+function regionKey(raw, cc){
+  var t = String(raw||'').trim();
+  if(!t) return 'none';
+  var low = t.toLowerCase();
+  var ko = KO_REGION[low];
+  if(ko) return 'ko:'+ko;
+  if(cc==='US'){
+    /* "New York NY", "San Francisco CA", "Miami, Florida", "Columbus Ohio" 같은 표기를 주 단위로 묶기 */
+    var cands = [low];
+    t.split(',').forEach(function(pp){ var q2 = pp.trim().toLowerCase(); if(q2) cands.push(q2); });
+    var segs = t.split(/[\s,\/()]+/).filter(Boolean);
+    segs.forEach(function(sg){ cands.push(sg.toLowerCase()); });
+    for(var ci=0; ci<cands.length; ci++){
+      var cd = cands[ci];
+      if(cd.length===2 && US_STATE_KO[cd.toUpperCase()]) return 'ko:'+US_STATE_KO[cd.toUpperCase()];
+      if(KO_REGION[cd]) return 'ko:'+KO_REGION[cd];
+    }
+  }
+  return 'r:'+low;
+}
+function regionLabel(key, rawHint){
+  if(!key || key==='none' || key==='~') return { main:'전국 · 지역 미지정', sub:'' };
+  if(key.indexOf('ko:')===0) return { main:key.slice(3), sub: prettyRegion(rawHint||'') };
+  return { main: prettyRegion(rawHint || key.slice(2)), sub:'' };
+}
+
+/* =========================================================
+   데이터 — 내장 → 즉시 표시, 네트워크는 뒤에서
+   ========================================================= */
+function normCountry(c){
+  return {
+    code:String(c.iso_3166_1||c.code||'').toUpperCase(),
+    en:String(c.name||c.en||'').replace(/^The\s+/i,''),
+    count:Number(c.stationcount!=null?c.stationcount:c.count||0),
+    flag:flagOf(c.iso_3166_1||c.code)
+  };
+}
+function normStation(s){
+  var url = s.url_resolved || s.url || '';
+  var name = String(s.name||'이름 없음').replace(/\s+/g,' ').trim();
+  return {
+    uuid:String(s.stationuuid||''),
+    name:name,
+    url:url,
+    alt:(s.url && s.url!==url) ? s.url : '',
+    homepage:s.homepage||'',
+    favicon:s.favicon||'',
+    codec:String(s.codec||'').toUpperCase(),
+    bitrate:Number(s.bitrate||0),
+    state:String(s.state||''),
+    country:String(s.country||''),
+    countrycode:String(s.countrycode||'').toUpperCase(),
+    clicks:Number(s.clickcount||0),
+    ok:Number(s.lastcheckok==null? 1 : s.lastcheckok),
+    hls:/m3u8/i.test(url),
+    https:url.indexOf('https:')===0
+  };
+}
+function stationsFromEmbed(code){
+  var arr = (EM.stations && EM.stations[code]) || null;
+  if(!arr || !arr.length) return null;
+  arr = arr.filter(function(s){ return isHttpsUrl(s.l); });
+  if(!arr.length) return null;
+  return arr.map(function(s){
+    return {
+      uuid:s.u, name:s.n, url:s.l, alt:s.a||'', homepage:s.h||'', favicon:s.f||'',
+      codec:s.c||'', bitrate:s.b||0, state:s.s||'', country:s.co||'',
+      countrycode:String(s.cc||code||'').toUpperCase(), clicks:s.k||0,
+      hls:/m3u8/i.test(s.l), https:String(s.l).indexOf('https:')===0
+    };
+  });
+}
+function countriesFromEmbed(){
+  return (EM.countries||[]).map(function(c){
+    return { code:String(c.c).toUpperCase(), en:String(c.en||'').replace(/^The\s+/i,''), count:Number(c.n||0), flag:flagOf(c.c) };
+  });
+}
+
+/* ---------- API ---------- */
+var bases = shuffle(API_HOSTS.slice());
+
+function fetchT(url, ms){
+  var ctl = ('AbortController' in window) ? new AbortController() : null;
+  var timer = setTimeout(function(){ if(ctl){ try{ ctl.abort(); }catch(e){} } }, ms||6000);
+  var opt = ctl ? {signal:ctl.signal, cache:'no-store'} : {cache:'no-store'};
+  return fetch(url, opt).then(function(r){ clearTimeout(timer); return r; }, function(e){ clearTimeout(timer); throw e; });
+}
+/* 미러 발견은 첫 화면 뒤에서만. 실패해도 de1/de2로 계속 진행합니다. */
+function discoverHosts(){
+  fetchT('https://all.api.radio-browser.info/json/servers', T.servers)
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(arr){
+      var hosts = [];
+      (arr||[]).forEach(function(s){ if(s && s.name){ var h='https://'+s.name; if(hosts.indexOf(h)<0) hosts.push(h); } });
+      if(hosts.length){
+        shuffle(hosts);
+        bases = hosts.concat(API_HOSTS.filter(function(h){ return hosts.indexOf(h)<0; }));
+      }
+    })
+    .catch(function(){});
+}
+function apiGet(path, ms){
+  var list = bases.slice();
+  var i = 0;
+  function attempt(){
+    if(i >= list.length) return Promise.reject(new Error('모든 서버 접속 실패'));
+    var host = list[i++];
+    return fetchT(host+path, ms||6000).then(function(res){
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return res.json();
+    }).then(function(data){
+      bases = [host].concat(bases.filter(function(h){ return h!==host; }));
+      return data;
+    }).catch(function(){ return attempt(); });
+  }
+  return attempt();
+}
+
+function fetchCountriesApi(){
+  return apiGet('/json/countries', T.countries).then(function(data){
+    var by = {};
+    (data||[]).forEach(function(c){
+      if(!c || !c.iso_3166_1) return;
+      if(Number(c.stationcount)<=0) return;
+      if(!String(c.name||'').trim()) return;
+      var code = String(c.iso_3166_1).toUpperCase();
+      if(code.length!==2) return;
+      var n = normCountry(c);
+      if(by[code]) by[code].count += n.count; else by[code] = n;
+    });
+    var list = Object.keys(by).map(function(k){ return by[k]; });
+    /* 내장 목록에만 있는 나라는 남겨 둡니다 */
+    (S.countries||[]).forEach(function(c){ if(!by[c.code]) list.push(c); });
+    return list;
+  });
+}
+
+function sortStations(list){
+  list.sort(function(a,b){
+    if(a.https!==b.https) return a.https ? -1 : 1;
+    var av = /H\.?264|VIDEO/i.test(a.codec) ? 1 : 0;
+    var bv = /H\.?264|VIDEO/i.test(b.codec) ? 1 : 0;
+    if(av!==bv) return av-bv;
+    return b.clicks-a.clicks;
+  });
+  return list;
+}
+function fetchStationsApi(code){
+  var path = '/json/stations/search?countrycode='+encodeURIComponent(code)+
+             '&limit=800&hidebroken=true&order=clickcount&reverse=true';
+  return apiGet(path, T.stations).then(function(data){
+    /* https 로 접속되는, 검증된(lastcheckok=1) 방송국만 남깁니다 */
+    var list = (data||[]).filter(function(s){
+      var u = String(s && (s.url_resolved||s.url) || '');
+      return s && isHttpsUrl(u) && Number(s.lastcheckok)===1;
+    }).map(normStation);
+    return sortStations(list);
+  });
+}
+
+/* ---------- 상태/표시 ---------- */
+function setOffline(v){
+  S.offline = !!v;
+  if(netnoteEl) netnoteEl.hidden = !S.offline;
+}
+function countries(){
+  if(!S.countries){
+    var cached = readJSON(LS.countries);
+    if(cached && cached.data && cached.data.length>100) S.countries = cached.data;
+    else S.countries = countriesFromEmbed();
+  }
+  return S.countries || [];
+}
+function stationsFor(code){
+  if(S.stations.has(code)) return S.stations.get(code);
+  var emb = stationsFromEmbed(code);
+  if(emb){ S.stations.set(code, emb); return emb; }
+  return null;
+}
+function ensureCountries(){
+  if(S.countriesReq || !online()) return;
+  S.countriesReq = true;
+  fetchCountriesApi().then(function(list){
+    S.countriesReq = false;
+    if(!list || list.length < 100) return;
+    var changed = !S.countries || list.length !== S.countries.length;
+    S.countries = list;
+    writeJSON(LS.countries, {t:Date.now(), data:list});
+    setOffline(false);
+    if(changed && S.route.view==='home' && !S.q) render();
+  }).catch(function(){ S.countriesReq = false; setOffline(true); });
+}
+function ensureStations(code){
+  if(S.refreshed[code] || S.refreshReq[code]) return;
+  /* 내장 목록은 한 곳씩 실제 재생까지 확인한 목록이라 API 결과로 덮어쓰지 않습니다 */
+  if(EM.stations && EM.stations[code] && EM.stations[code].length){ S.refreshed[code] = true; return; }
+  if(!online()){ setOffline(true); return; }
+  S.refreshReq[code] = true;
+  fetchStationsApi(code).then(function(list){
+    S.refreshReq[code] = false;
+    if(!list || !list.length) return;
+    S.stations.set(code, list);
+    S.refreshed[code] = true;
+    setOffline(false);
+    if(S.route.code===code) render();
+  }).catch(function(){ S.refreshReq[code] = false; setOffline(true); });
+}
+
+/* =========================================================
+   재생
+   ========================================================= */
+var audio = new Audio();
+audio.preload = 'none';
+var wd = null;
+
+function setStatus(kind, text){
+  var el = $('#p-status');
+  el.className = 'p-status' + (kind? ' '+kind : '');
+  $('#p-statustx').textContent = text;
+}
+function teardown(){
+  clearTimeout(wd);
+  if(S.hls){ try{ S.hls.destroy(); }catch(e){} S.hls = null; }
+  try{ audio.pause(); }catch(e){}
+  audio.removeAttribute('src');
+  try{ audio.load(); }catch(e){}
+}
+function canNativeHLS(){
+  try{ return !!audio.canPlayType('application/vnd.apple.mpegurl'); }catch(e){ return false; }
+}
+function preferNativeHLS(){
+  var ua = navigator.userAgent || '';
+  if(/iPad|iPhone|iPod/.test(ua)) return true;
+  if(/Macintosh/.test(ua) && /Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua)) return true;
+  return false;
+}
+/* hls.js는 첫 화면을 막지 않도록 뒤에서 불러옵니다. */
+var hlsState = 0; /* 0 없음, 1 불러오는 중, 2 준비됨, 3 실패 */
+function loadHls(){
+  if(window.Hls && window.Hls.isSupported()){ hlsState = 2; return; }
+  if(hlsState===1 || hlsState===3) return;
+  hlsState = 1;
+  (function next(i){
+    if(i >= HLS_CDN.length){ hlsState = 3; return; }
+    var s = document.createElement('script');
+    s.src = HLS_CDN[i];
+    s.async = true;
+    s.onload = function(){ hlsState = (window.Hls && window.Hls.isSupported()) ? 2 : 3; };
+    s.onerror = function(){ s.remove(); next(i+1); };
+    document.head.appendChild(s);
+  })(0);
+}
+
+function playStation(st){
+  if(!st || !st.url) return;
+  teardown();
+  S.current = st;
+  S.playing = false;
+  S.loadingPlay = true;
+  S.failed = false;
+  var token = ++S.playToken;
+  S.failFn = function(msg){ failPlay(token, st, msg); };
+  updatePlayer();
+  setStatus('loading','연결 중…');
+  $('#p-play').textContent = '⏸';
+  markPlaying();
+
+  var url = st.url;
+  audio.volume = S.vol;
+
+  clearTimeout(wd);
+  wd = setTimeout(function(){
+    if(token!==S.playToken || S.playing || S.failed) return;
+    if(audio.readyState < 2) S.failFn('스트림 응답이 없습니다(시간 초과)');
+  }, T.playback);
+
+  var isHLS = st.hls;
+  try{
+    if(isHLS && !preferNativeHLS()){
+      if(!(window.Hls && window.Hls.isSupported()) && canNativeHLS()){
+        audio.src = url;
+      }else if(!(window.Hls && window.Hls.isSupported())){
+        /* 아직 준비 전이면 한 번 불러보고 몇 초만 기다립니다 */
+        loadHls();
+        var waited = 0;
+        var tick = setInterval(function(){
+          if(token!==S.playToken) { clearInterval(tick); return; }
+          waited += 250;
+          if(window.Hls && window.Hls.isSupported()){
+            clearInterval(tick); startHls(url, token);
+          }else if(waited >= 6000){
+            clearInterval(tick);
+            if(canNativeHLS()){ audio.src = url; tryPlay(token); }
+            else S.failFn('이 브라우저에서는 HLS 스트림을 재생할 수 없습니다');
+          }
+        }, 250);
+        return;
+      }else{
+        startHls(url, token);
+      }
+    }else{
+      audio.src = url;
+    }
+    tryPlay(token);
+  }catch(e){
+    S.failFn('재생 준비 중 오류');
+  }
+}
+function startHls(url, token){
+  if(token!==S.playToken) return;
+  try{
+    var hls = new window.Hls({ enableWorker:true, manifestLoadingTimeOut:12000, manifestLoadingMaxRetry:2, levelLoadingMaxRetry:2 });
+    S.hls = hls;
+    hls.on(window.Hls.Events.ERROR, function(ev, data){
+      if(token!==S.playToken) return;
+      if(data && data.fatal){
+        var why = data.type==='networkError' ? 'HLS 네트워크 오류'
+                : data.type==='mediaError' ? 'HLS 미디어 오류' : 'HLS 오류';
+        S.failFn(why + (data.details? ' ('+data.details+')' : ''));
+      }
+    });
+    hls.loadSource(url);
+    hls.attachMedia(audio);
+    tryPlay(token);
+  }catch(e){
+    S.failFn('HLS 준비 중 오류');
+  }
+}
+function tryPlay(token){
+  if(token!==S.playToken) return;
+  var p = audio.play();
+  if(p && p.catch){
+    p.catch(function(e){
+      if(token!==S.playToken) return;
+      if(e && e.name==='AbortError') return;
+      if(e && e.name==='NotAllowedError') { setStatus('', '재생 버튼을 눌러 주세요'); $('#p-play').textContent='▶'; S.loadingPlay=false; markPlaying(); return; }
+      S.failFn('재생이 차단되었습니다' + (e && e.name? ' ('+e.name+')' : ''));
+    });
+  }
+}
+
+function failPlay(token, st, msg){
+  if(token!==S.playToken || S.failed) return;
+  /* 재생되지 않은 방송국은 목록에서 자동으로 숨깁니다(아래 숨긴 방송국 되돌리기로 복구)
+     오프라인일 때는 일시적인 실패일 수 있으므로 숨기지 않습니다. */
+  var hidNow = false;
+  if(st && online()){ noteHide(st.uuid); hidNow = true; }
+  S.failed = true;
+  S.loadingPlay = false;
+  S.playing = false;
+  clearTimeout(wd);
+  setStatus('error', '재생할 수 없습니다');
+  $('#p-play').textContent = '▶';
+  markPlaying();
+  if(hidNow){ try{ render(); }catch(e){} }
+  showFailModal(st, msg);
+}
+
+audio.addEventListener('playing', function(){
+  if(!S.current || S.failed) return;
+  S.playing = true;
+  S.loadingPlay = false;
+  if(S.current) unhide(S.current.uuid);
+  clearTimeout(wd);
+  setStatus('playing','재생 중 · LIVE');
+  $('#p-play').textContent = '⏸';
+  markPlaying();
+  updateMediaSession(S.current);
+  pushRecent(S.current);
+});
+audio.addEventListener('waiting', function(){
+  if(!S.current || S.failed || !S.playing) return;
+  setStatus('loading','버퍼링…');
+});
+audio.addEventListener('pause', function(){
+  if(!S.current || S.loadingPlay || S.failed) return;
+  S.playing = false;
+  setStatus('', '일시정지');
+  $('#p-play').textContent = '▶';
+  markPlaying();
+});
+audio.addEventListener('error', function(){
+  if(!S.current || !S.failFn) return;
+  if(!audio.currentSrc && !audio.getAttribute('src')) return;
+  S.failFn(audio.error ? ('미디어 오류 (code '+(audio.error.code||0)+')') : '스트림 오류');
+});
+
+function togglePlay(){
+  if(!S.current) return;
+  if(S.playing || S.loadingPlay){
+    audio.pause();
+    S.playing = false;
+    S.loadingPlay = false;
+    setStatus('', '일시정지');
+    $('#p-play').textContent = '▶';
+    markPlaying();
+  }else{
+    playStation(S.current);
+  }
+}
+
+function showFailModal(st, reason){
+  var cname = countryName({code:st.countrycode, en:st.country});
+  var body = '<p><b>'+esc(st.name)+'</b> <span style="color:#6d7f9c">('+esc(cname.main || st.country || st.countrycode)+')</span></p>'+
+    '<p>연결하지 못한 이유: '+esc(reason)+'</p>'+
+    '<p>이 방송국은 목록에서 자동으로 숨겼습니다. 화면 맨 아래 <b>숨긴 방송국 되돌리기</b>로 다시 볼 수 있습니다.</p>'+
+    '<p>방송사 서버가 브라우저의 직접 접속(CORS)이나 해외 접속을 막는 경우(403), HTTPS가 아닌 http 주소만 쓰는 경우, 주소가 바뀐 경우 등이 원인입니다. '+
+    '아이폰 사파리에서는 되지만 PC 브라우저에서만 안 되는 방송국도 있습니다.</p>';
+  var acts = [];
+  if(st.homepage) acts.push({t:'방송국 홈페이지 열기 ↗', href:st.homepage, cls:'primary'});
+  if(st.alt) acts.push({t:'다른 주소로 다시 시도', act:function(){ closeModal(); var s2 = Object.assign({}, st); s2.url = st.alt; s2.alt = ''; playStation(s2); }, cls:st.homepage?'':'primary'});
+  acts.push({t:'닫기', act:closeModal, cls:'ghost'});
+  openModal('재생할 수 없습니다', body, acts);
+}
+
+/* ---------- 플레이어 UI ---------- */
+function stationSub(st){
+  if(!st) return '';
+  var cn = countryName({code:st.countrycode, en:st.country||''});
+  var rl = st.state ? regionLabel(regionKey(st.state, st.countrycode), st.state).main : '';
+  var parts = [cn.main || st.countrycode];
+  if(rl && rl!=='전국 · 지역 미지정') parts.push(rl);
+  return parts.filter(Boolean).join(' · ');
+}
+function artInner(st, size){
+  var g = gradFor(st.name);
+  var img = st.favicon ? '<img src="'+esc(st.favicon)+'" alt="" loading="lazy" onerror="this.remove()">' : '';
+  return '<span style="position:absolute;inset:0;background:'+g+';opacity:.9"></span>'+img+'<span style="position:relative;z-index:1;font-size:'+Math.round(size*0.42)+'px">🎙</span>';
+}
+function gradFor(seed){
+  var h = 0, s = String(seed||'');
+  for(var i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) % 360;
+  return 'linear-gradient(140deg, hsl('+h+',55%,32%), hsl('+((h+40)%360)+',45%,18%))';
+}
+function updatePlayer(){
+  var st = S.current;
+  if(!st){
+    $('#p-name').textContent = '방송국을 선택하세요';
+    $('#p-sub').textContent = '국가 → 지역 → 방송국';
+    $('#p-art').innerHTML = '📻';
+    $('#p-play').disabled = true;
+    $('#p-fav').style.display = 'none';
+    return;
+  }
+  $('#p-name').textContent = st.name;
+  $('#p-sub').textContent = stationSub(st);
+  $('#p-art').innerHTML = artInner(st, 44);
+  $('#p-play').disabled = false;
+  var f = $('#p-fav');
+  f.style.display = 'grid';
+  var on = isFav(st.uuid);
+  f.textContent = on ? '★' : '☆';
+  f.className = 'p-btn fav' + (on ? ' on' : '');
+}
+function updateMediaSession(st){
+  if(!('mediaSession' in navigator)) return;
+  try{
+    navigator.mediaSession.metadata = new window.MediaMetadata({
+      title: st.name, artist: stationSub(st), album: '후니의 세계라디오'
+    });
+    navigator.mediaSession.setActionHandler('play', function(){ togglePlay(); });
+    navigator.mediaSession.setActionHandler('pause', function(){ togglePlay(); });
+  }catch(e){}
+}
+
+/* ---------- 즐겨찾기 / 최근 ---------- */
+function isFav(uuid){ return S.favs.some(function(f){ return f.uuid===uuid; }); }
+function minify(st){
+  return { uuid:st.uuid, name:st.name, url:st.url, alt:st.alt, homepage:st.homepage, favicon:st.favicon,
+           codec:st.codec, bitrate:st.bitrate, state:st.state, country:st.country,
+           countrycode:st.countrycode, clicks:st.clicks, hls:st.hls, https:st.https };
+}
+function toggleFav(st){
+  if(!st) return;
+  var i = -1;
+  for(var k=0;k<S.favs.length;k++){ if(S.favs[k].uuid===st.uuid){ i=k; break; } }
+  if(i>=0) S.favs.splice(i,1);
+  else S.favs.unshift(minify(st));
+  writeJSON(LS.favs, S.favs);
+  updatePlayer();
+  markFavs();
+  if(S.route.view==='favs' || S.route.view==='home') render();
+}
+function pushRecent(st){
+  S.recent = S.recent.filter(function(r){ return r.uuid!==st.uuid; });
+  S.recent.unshift(minify(st));
+  if(S.recent.length>12) S.recent = S.recent.slice(0,12);
+  writeJSON(LS.recent, S.recent);
+  if(S.route.view==='home' && !S.q) render();
+}
+function markPlaying(){
+  var uuid = S.current && S.playing ? S.current.uuid : null;
+  var nodes = document.querySelectorAll('[data-uuid]');
+  for(var i=0;i<nodes.length;i++){
+    var n = nodes[i];
+    if(uuid && n.getAttribute('data-uuid')===uuid) n.classList.add('is-playing');
+    else n.classList.remove('is-playing');
+  }
+}
+function markFavs(){
+  var nodes = document.querySelectorAll('[data-uuid]');
+  for(var i=0;i<nodes.length;i++){
+    var n = nodes[i];
+    var on = isFav(n.getAttribute('data-uuid'));
+    if(on) n.classList.add('is-fav'); else n.classList.remove('is-fav');
+    var star = n.querySelector && n.querySelector('.fav');
+    if(star) star.textContent = on ? '★' : '☆';
+  }
+}
+
+/* =========================================================
+   라우팅
+   ========================================================= */
+function parseHash(){
+  var h = (location.hash||'').replace(/^#/,'');
+  var parts = h.split('?')[0].split('/').filter(Boolean).map(function(p){
+    try{ return decodeURIComponent(p); }catch(e){ return p; }
+  });
+  if(parts[0]==='f') return {view:'favs'};
+  if(parts[0]==='c' && parts[1]){
+    var code = parts[1].toUpperCase();
+    if(parts[2]) return {view:'stations', code:code, region:parts[2]};
+    return {view:'regions', code:code};
+  }
+  return {view:'home'};
+}
+function go(hash){
+  if(location.hash===hash){ render(); }
+  else location.hash = hash;
+}
+window.addEventListener('hashchange', function(){
+  /* 새 화면으로 갈 때는 맨 위부터 */
+  try{ window.scrollTo(0,0); }catch(e){}
+  render();
+});
+
+/* =========================================================
+   렌더
+   ========================================================= */
+var FEATURED = ['KR','US','JP','GB','FR','DE','CA','AU','IT','ES','BR','IN','TW','CN','TH','VN'];
+
+function paintIfHome(){ if(S.route.view==='home') render(); }
+
+function renderCrumbs(r){
+  var out = '';
+  if(r.view==='home'){
+    out = '<span class="cur">🌍 모든 국가</span>';
+  }else if(r.view==='favs'){
+    out = '<button class="cb" data-go="#/">← 모든 국가</button><span class="sep">›</span><span class="cur">⭐ 즐겨찾기</span>';
+  }else if(r.view==='regions'){
+    var c = countries().filter(function(x){ return x.code===r.code; })[0];
+    var nm = c ? countryName(c).main : r.code;
+    out = '<button class="cb" data-go="#/">← 모든 국가</button><span class="sep">›</span>'+
+          '<span class="cur">'+esc(c? c.flag:'') + ' ' + esc(nm)+'</span>';
+  }else if(r.view==='stations'){
+    var c2 = countries().filter(function(x){ return x.code===r.code; })[0];
+    var nm2 = c2 ? countryName(c2).main : r.code;
+    out = '<button class="cb" data-go="#/">🌍</button><span class="sep">›</span>'+
+          '<button class="cb" data-go="#/c/'+encodeURIComponent(r.code)+'">'+esc(c2? c2.flag:'')+' '+esc(nm2)+'</button>'+
+          '<span class="sep">›</span><span class="cur">'+esc(regionLabel(r.region==='~'?'none':r.region).main)+'</span>';
+  }
+  crumbsEl.innerHTML = out;
+}
+
+function render(){
+  var r = parseHash();
+  S.route = r;
+  var seq = ++S.seq;
+  try{
+    renderCrumbs(r);
+    if(r.view==='home') return renderHome(seq);
+    if(r.view==='favs') return renderFavs(seq);
+    if(r.view==='regions') return renderRegions(seq, r.code);
+    if(r.view==='stations') return renderStations(seq, r.code, r.region);
+  }catch(e){
+    safeFallback();
+  }
+}
+
+function safeFallback(){
+  if(mainEl.querySelector('.ct')) return;
+  var list = countriesFromEmbed();
+  mainEl.innerHTML = '<section class="sec"><div class="sec-h"><h2>전체 국가 <span class="side">'+list.length+'개국</span></h2></div>'+
+    '<div class="countries">'+list.map(function(c){ return countryTile(c,false); }).join('')+'</div></section>';
+}
+
+/* ---------- 타일 ---------- */
+function displayCount(c){
+  var list = S.stations.get(c.code);
+  if(list && list.length) return visible(list).length;
+  return Number(c.count||0);
+}
+function countryTile(c, pin){
+  var n = countryName(c);
+  return '<button class="ct'+(pin?' pin':'')+'" data-country="'+esc(c.code)+'">'+
+    '<span class="flag">'+c.flag+'</span>'+
+    '<span class="nm"><b>'+esc(n.main)+'</b>'+(n.sub? '<span>'+esc(n.sub)+'</span>':'<span>'+(pin?'추천':'&nbsp;')+'</span>')+'</span>'+
+    '<span class="cnt">'+num(displayCount(c))+'</span>'+
+  '</button>';
+}
+function stationTileFull(st){
+  var sub = [];
+  if(st.codec && st.codec!=='UNKNOWN') sub.push(st.codec);
+  if(st.bitrate) sub.push(st.bitrate+'k');
+  if(st.hls) sub.push('HLS');
+  return '<div class="st" data-uuid="'+esc(st.uuid)+'" role="button" tabindex="0" data-station="'+esc(st.uuid)+'" title="'+esc(st.name)+'">'+
+    '<button class="fav" data-fav="'+esc(st.uuid)+'" aria-label="즐겨찾기">'+(isFav(st.uuid)?'★':'☆')+'</button>'+
+    '<div class="ico"><span class="ph">🎵</span>'+
+      (st.favicon? '<img src="'+esc(st.favicon)+'" alt="" loading="lazy" onerror="this.remove()">':'')+
+      '<span class="eq"><i></i><i></i><i></i><i></i></span>'+
+    '</div>'+
+    '<div class="nm">'+esc(st.name)+'</div>'+
+    '<div class="mt">'+esc(sub.join(' · ')||'LIVE')+'</div>'+
+  '</div>';
+}
+function rowItem(st, showPlace){
+  var sub = showPlace ? stationSub(st) : metaLine(st);
+  return '<div class="rw" data-uuid="'+esc(st.uuid)+'" role="button" tabindex="0" data-station="'+esc(st.uuid)+'">'+
+    '<span class="ico"><span class="ph">🎵</span>'+
+      (st.favicon? '<img src="'+esc(st.favicon)+'" alt="" loading="lazy" onerror="this.remove()">':'')+
+    '</span>'+
+    '<span class="tx"><b>'+esc(st.name)+'</b><span>'+esc(sub)+'</span></span>'+
+    '<span class="play">▶</span>'+
+  '</div>';
+}
+function metaLine(st){
+  var bits = [];
+  if(st.codec && st.codec!=='UNKNOWN') bits.push(st.codec);
+  if(st.bitrate) bits.push(st.bitrate+'k');
+  if(st.hls) bits.push('HLS');
+  return bits.join(' · ') || 'LIVE';
+}
+
+/* ---------- home ---------- */
+function renderHome(seq){
+  var list = countries();
+  if(!list.length){
+    mainEl.innerHTML = '<div class="err"><b>국가 목록이 없습니다.</b><br>페이지를 다시 열어 주세요.</div>';
+    return;
+  }
+  var q = S.q.trim();
+  var html = '';
+
+  if(!q){
+    var favList = visible(S.favs);
+    if(favList.length){
+      html += '<section class="sec"><div class="sec-h"><h2>⭐ 즐겨찾기 <span class="side">'+S.favs.length+'</span></h2>'+
+              '<button class="cb" style="font-size:12px;color:var(--ink3);padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line)" data-go="#/f">전체 보기 ›</button></div>'+
+              '<div class="rows">'+favList.slice(0,4).map(function(s){ return rowItem(s,true); }).join('')+'</div></section>';
+    }
+    var recents = visible(S.recent).filter(function(k){ return !isFav(k.uuid); }).slice(0,3);
+    if(recents.length){
+      html += '<section class="sec"><div class="sec-h"><h2>🕘 최근 들은 방송국</h2></div>'+
+              '<div class="rows">'+recents.map(function(s){ return rowItem(s,true); }).join('')+'</div></section>';
+    }
+    var feat = FEATURED.map(function(code){ return list.filter(function(c){ return c.code===code; })[0]; }).filter(Boolean);
+    feat.sort(function(a,b){ return (a.code==='KR'?-1:0) - (b.code==='KR'?-1:0); });
+    if(feat.length){
+      html += '<section class="sec"><div class="sec-h"><h2>추천 국가 <span class="side">한국은 맨 위에</span></h2></div>'+
+              '<div class="countries">'+feat.map(function(c){ return countryTile(c, c.code==='KR'); }).join('')+'</div></section>';
+    }
+
+    var all = list.slice();
+    if(S.sort==='count') all.sort(function(a,b){ return b.count-a.count; });
+    else all.sort(function(a,b){ return countryName(a).main.localeCompare(countryName(b).main,'ko'); });
+
+    html += '<section class="sec"><div class="sec-h"><h2>전체 국가 <span class="side">'+all.length+'개국</span></h2>'+
+            '<div class="chips"><button data-sort="name" class="'+(S.sort==='name'?'on':'')+'">가나다순</button>'+
+            '<button data-sort="count" class="'+(S.sort==='count'?'on':'')+'">방송국 많은 순</button></div></div>'+
+            '<div class="countries">'+all.map(function(c){ return countryTile(c,false); }).join('')+'</div>'+
+            '<p class="note">국가를 누르면 지역 목록 → 방송국 순서로 들어갑니다. 대한민국·미국·일본·영국은 직접 재생을 확인한 방송국 수입니다.</p></section>';
+    mainEl.innerHTML = html;
+  }else{
+    var ql = q.toLowerCase();
+    var hitCountries = list.filter(function(c){
+      var n = countryName(c);
+      return c.code.toLowerCase()===ql || n.main.toLowerCase().indexOf(ql)>=0 || n.sub.toLowerCase().indexOf(ql)>=0;
+    }).slice(0,12);
+
+    html += '<section class="sec"><div class="sec-h"><h2>국가 검색 <span class="side">'+hitCountries.length+'건</span></h2></div>';
+    html += hitCountries.length
+      ? '<div class="countries">'+hitCountries.map(function(c){ return countryTile(c, c.code==='KR'); }).join('')+'</div>'
+      : '<div class="empty"><div class="big">🔎</div><p>“'+esc(q)+'”와 맞는 국가가 없습니다.</p></div>';
+    html += '</section>';
+
+    var gs = S.gs;
+    var items = (gs.q===q) ? gs.items : [];
+
+    html += '<section class="sec"><div class="sec-h"><h2>방송국 검색 <span class="side">'+(items.length? items.length+'개':'전 세계')+'</span></h2></div>';
+    if(!items.length){
+      if(gs.q!==q || gs.state==='loading') html += '<div class="loading"><span class="spin"></span> 방송국을 찾는 중…</div>';
+      else if(gs.state==='offline') html += '<div class="empty"><div class="big">📴</div><p>오프라인 상태입니다.</p><p>저장된 방송국(한국·미국·일본·영국)에서 찾았지만 일치하는 이름이 없습니다.</p></div>';
+      else if(gs.state==='error') html += '<div class="err">방송국 검색에 실패했습니다. 잠시 후 다시 검색해 주세요.<br><button data-retry="1">다시 시도</button></div>';
+      else html += '<div class="empty"><div class="big">📻</div><p>“'+esc(q)+'” 이름의 방송국을 찾지 못했습니다.</p><p>영문 이름으로도 검색해 보세요.</p></div>';
+    }else{
+      html += '<div class="stations">'+items.map(stationTileFull).join('')+'</div>';
+      if(gs.state==='loading') html += '<div class="slim"><span class="spin"></span> 전 세계 방송국도 찾는 중…</div>';
+      if(gs.state==='offline') html += '<p class="note">오프라인 · 저장된 방송국에서 찾은 결과만 표시합니다.</p>';
+    }
+    html += '</section>';
+    mainEl.innerHTML = html;
+
+    if(gs.q!==q || gs.state==='idle') globalSearchDebounced(q);
+  }
+  markPlaying(); markFavs();
+}
+
+function filterNote(q){
+  return '<div class="filt">검색어 ‘'+esc(q)+'’ 로 거른 목록입니다 <button data-clear="1">검색어 지우기</button></div>';
+}
+
+/* ---------- 검색 ---------- */
+function localStationSearch(q){
+  var seen = {}, out = [];
+  S.stations.forEach(function(list){
+    (list||[]).forEach(function(st){
+      if(seen[st.uuid] || isHidden(st.uuid)) return;
+      if(String(st.name||'').toLowerCase().indexOf(q)>=0){
+        seen[st.uuid] = 1; out.push(st);
+      }
+    });
+  });
+  out.sort(function(a,b){ return (b.https?1:0)-(a.https?1:0) || b.clicks-a.clicks; });
+  return out.slice(0,40);
+}
+function globalSearch(q){
+  var qq = String(q||'').trim();
+  if(!qq){ S.gs = { q:'', state:'idle', items:[], remote:0 }; paintIfHome(); return; }
+  var low = qq.toLowerCase();
+  var local = localStationSearch(low);
+  S.gs = { q:qq, state: online() ? 'loading' : 'offline', items: local, remote:0 };
+  paintIfHome();
+  if(!online()) return;
+  apiGet('/json/stations/search?name='+encodeURIComponent(qq)+'&limit=40&hidebroken=true&order=clickcount&reverse=true', T.search)
+    .then(function(data){
+      if(S.gs.q!==qq) return;
+      var items = (data||[]).filter(function(s){
+        var u = String(s && (s.url_resolved||s.url) || '');
+        return s && isHttpsUrl(u) && Number(s.lastcheckok)===1;
+      }).map(normStation);
+      items = items.filter(function(s){ return !isHidden(s.uuid); });
+      var seen = {}; var merged = [];
+      items.forEach(function(s){ if(!seen[s.uuid]){ seen[s.uuid]=1; merged.push(s); } });
+      S.gs.items.forEach(function(s){ if(!seen[s.uuid]){ seen[s.uuid]=1; merged.push(s); } });
+      S.gs = { q:qq, state:'done', items: merged, remote: items.length };
+      setOffline(false);
+      paintIfHome();
+    })
+    .catch(function(){
+      if(S.gs.q!==qq) return;
+      S.gs = { q:qq, state: S.gs.items.length ? 'offline' : 'offline', items: S.gs.items, remote:0 };
+      setOffline(true);
+      paintIfHome();
+    });
+}
+var globalSearchDebounced = debounce(function(q){ globalSearch(q); }, 450);
+
+/* ---------- 즐겨찾기 ---------- */
+function renderFavs(seq){
+  var q = S.q.trim().toLowerCase();
+  var items = visible(S.favs).filter(function(s){
+    return !q || s.name.toLowerCase().indexOf(q)>=0 || stationSub(s).toLowerCase().indexOf(q)>=0;
+  });
+  var html = '<section class="sec"><div class="sec-h"><h2>⭐ 즐겨찾기 <span class="side">'+items.length+'</span></h2></div>';
+  html += items.length
+    ? '<div class="rows">'+items.map(function(s){ return rowItem(s,true); }).join('')+'</div>'
+    : '<div class="empty"><div class="big">⭐</div><p>아직 즐겨찾기가 없습니다.</p><p>방송국 타일 왼쪽 위 ☆ 를 눌러 저장하세요.</p></div>';
+  html += '</section>';
+  mainEl.innerHTML = html;
+  markPlaying(); markFavs();
+}
+
+/* ---------- 지역 ---------- */
+function renderRegions(seq, code){
+  var c = countries().filter(function(x){ return x.code===code; })[0];
+  var head = c ? (c.flag+' '+esc(countryName(c).main)+' <span class="side">'+num(displayCount(c))+'개 방송국</span>') : esc(code);
+  var list = stationsFor(code);
+
+  if(!list){
+    mainEl.innerHTML = '<section class="sec"><div class="sec-h"><h2>'+head+'</h2></div>'+
+      '<div class="loading"><span class="spin"></span> 지역을 정리하는 중…</div></section>';
+    fetchStationsApi(code).then(function(l){
+      if(seq!==S.seq) return;
+      S.stations.set(code, l); S.refreshed[code]=true; setOffline(false);
+      render();
+    }).catch(function(){
+      if(seq!==S.seq) return;
+      setOffline(true);
+      mainEl.innerHTML = '<section class="sec"><div class="sec-h"><h2>'+head+'</h2></div>'+
+        '<div class="err"><b>이 국가의 방송국 목록을 불러오지 못했습니다.</b><br>'+
+        (online()? '잠시 후 다시 시도해 주세요.' : '오프라인입니다. 저장된 국가(한국·미국·일본·영국)는 인터넷 없이도 열립니다.')+
+        '<br><button data-retry="1">다시 시도</button></div></section>';
+    });
+    return;
+  }
+
+  paintRegions(seq, code, head, list);
+  ensureStations(code);
+}
+function paintRegions(seq, code, head, list){
+  var q = S.q.trim().toLowerCase();
+  list = visible(list);
+  var groups = new Map();
+  list.forEach(function(st){
+    var key = regionKey(st.state, code);
+    if(!groups.has(key)) groups.set(key, { key:key, raw:(st.state||'').trim(), items:[] });
+    groups.get(key).items.push(st);
+  });
+  var arr = [];
+  groups.forEach(function(g){ arr.push(g); });
+  arr.sort(function(a,b){
+    if(a.key==='none') return 1;
+    if(b.key==='none') return -1;
+    if(b.items.length!==a.items.length) return b.items.length-a.items.length;
+    return regionLabel(a.key, a.raw).main.localeCompare(regionLabel(b.key, b.raw).main,'ko');
+  });
+  if(q){
+    arr = arr.filter(function(g){
+      var lb = regionLabel(g.key, g.raw);
+      return lb.main.toLowerCase().indexOf(q)>=0 || lb.sub.toLowerCase().indexOf(q)>=0;
+    });
+  }
+
+  var html = '<section class="sec"><div class="sec-h"><h2>지역 선택 <span class="side">'+arr.length+'개 지역</span></h2></div>';
+  if(q) html += filterNote(S.q.trim());
+  if(!arr.length){
+    html += '<div class="empty"><div class="big">🗺️</div><p>해당하는 지역이 없습니다.</p></div>';
+  }else{
+    html += '<div class="regions">'+arr.map(function(g){
+      var rl = regionLabel(g.key, g.raw);
+      return '<button class="rt" data-region="'+esc(g.key)+'">'+
+        '<span class="nm">'+esc(rl.main)+(rl.sub? '<small>'+esc(rl.sub)+'</small>':'')+'</span>'+
+        '<span class="cnt">'+g.items.length+'</span></button>';
+    }).join('')+'</div>';
+  }
+  html += '<p class="note">지역 정보는 방송국 등록 자료 기준이라 비어 있는 경우가 있습니다. “전국 · 지역 미지정”에는 여러 지역을 함께 방송하는 방송국이 모여 있습니다.'+
+          (list.length>=800? '<br>방송국이 많은 나라라 인기순 상위 800개만 가져와 지역을 정리했습니다.' : '')+'</p></section>';
+  mainEl.innerHTML = html;
+  markFavs();
+}
+
+/* ---------- 방송국 그리드 ---------- */
+function regionStations(list, code, region){
+  return list.filter(function(st){ return regionKey(st.state, code)===region; });
+}
+function renderStations(seq, code, region){
+  if(region==='~') region = 'none';
+  var list = stationsFor(code);
+  if(list){
+    paintStations(seq, code, region, list);
+    ensureStations(code);
+    return;
+  }
+  mainEl.innerHTML = '<div class="loading"><span class="spin"></span> 방송국을 불러오는 중…</div>';
+  fetchStationsApi(code).then(function(l){
+    if(seq!==S.seq) return;
+    S.stations.set(code, l); S.refreshed[code]=true; setOffline(false);
+    render();
+  }).catch(function(){
+    if(seq!==S.seq) return;
+    setOffline(true);
+    mainEl.innerHTML = '<div class="err"><b>방송국 목록을 불러오지 못했습니다.</b><br>'+
+      (online()? '잠시 후 다시 시도해 주세요.' : '오프라인입니다. 저장된 국가(한국·미국·일본·영국)는 인터넷 없이도 열립니다.')+
+      '<br><button data-retry="1">다시 시도</button></div>';
+  });
+}
+function paintStations(seq, code, region, list){
+  var q = S.q.trim().toLowerCase();
+  var items = visible(regionStations(list, code, region));
+  if(q){
+    items = items.filter(function(st){ return st.name.toLowerCase().indexOf(q)>=0 || metaLine(st).toLowerCase().indexOf(q)>=0; });
+  }
+  var rl = regionLabel(region);
+
+  var html = '<section class="sec"><div class="sec-h"><h2>'+esc(rl.main)+' <span class="side">'+items.length+'개 방송국</span></h2></div>';
+  if(q) html += filterNote(S.q.trim());
+  if(!items.length){
+    html += '<div class="empty"><div class="big">📻</div><p>이 지역에 표시할 방송국이 없습니다.</p></div>';
+  }else{
+    html += '<div class="stations">'+items.map(stationTileFull).join('')+'</div>';
+    html += '<p class="note">아이콘을 누르면 바로 재생됩니다. 재생되지 않는 방송국은 목록에서 자동으로 숨겨집니다. 왼쪽 위 ☆ 는 즐겨찾기입니다.'+
+            (list.length>=800? '<br>방송국이 많은 나라라 인기순 상위 800개만 표시합니다.' : '')+'</p>';
+  }
+  html += '</section>';
+  mainEl.innerHTML = html;
+  markPlaying(); markFavs();
+}
+
+/* =========================================================
+   모달
+   ========================================================= */
+function openModal(title, bodyHtml, actions){
+  $('#m-title').textContent = title;
+  $('#m-body').innerHTML = bodyHtml;
+  var box = $('#m-acts');
+  box.innerHTML = '';
+  (actions||[]).forEach(function(a){
+    var el;
+    if(a.href){
+      el = document.createElement('a');
+      el.href = a.href; el.target = '_blank'; el.rel = 'noopener';
+      el.textContent = a.t;
+    }else{
+      el = document.createElement('button');
+      el.textContent = a.t;
+      el.addEventListener('click', a.act || closeModal);
+    }
+    if(a.cls) el.className = a.cls;
+    box.appendChild(el);
+  });
+  $('#modal').hidden = false;
+}
+function closeModal(){ $('#modal').hidden = true; }
+$('#modal').addEventListener('click', function(e){ if(e.target.id==='modal') closeModal(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !$('#modal').hidden) closeModal(); });
+
+/* =========================================================
+   이벤트
+   ========================================================= */
+function findStation(uuid){
+  var all = [];
+  S.stations.forEach(function(list){ all = all.concat(list); });
+  all = all.concat(S.favs, S.recent, (S.gs.items||[]));
+  if(S.current && S.current.uuid===uuid) all.unshift(S.current);
+  for(var i=0;i<all.length;i++){ if(all[i] && all[i].uuid===uuid) return all[i]; }
+  return null;
+}
+
+document.addEventListener('click', function(e){
+  var t = e.target;
+
+  var favBtn = t.closest && t.closest('[data-fav]');
+  if(favBtn){
+    e.preventDefault(); e.stopPropagation();
+    var st0 = findStation(favBtn.getAttribute('data-fav'));
+    if(st0) toggleFav(st0);
+    return;
+  }
+  var retry = t.closest && t.closest('[data-retry]');
+  if(retry){ S.refreshed={}; S.refreshReq={}; S.stations = new Map(); S.countriesReq=false; render(); return; }
+
+  var clr2 = t.closest && t.closest('[data-clear]');
+  if(clr2){ qEl.value=''; S.q=''; S.gs.q=''; $('#qclr').hidden = true; render(); return; }
+
+  var sortBtn = t.closest && t.closest('[data-sort]');
+  if(sortBtn){ S.sort = sortBtn.getAttribute('data-sort'); render(); return; }
+
+  if(t.closest && t.closest('#hidreset')){
+    S.hidden = []; writeJSON(LS.hidden, S.hidden); paintHiddenBox();
+    S.refreshed = {}; S.refreshReq = {}; render();
+    return;
+  }
+
+  var goBtn = t.closest && t.closest('[data-go]');
+  if(goBtn){ go(goBtn.getAttribute('data-go')); return; }
+
+  var cBtn = t.closest && t.closest('[data-country]');
+  if(cBtn){ go('#/c/'+encodeURIComponent(cBtn.getAttribute('data-country'))); return; }
+
+  var rBtn = t.closest && t.closest('[data-region]');
+  if(rBtn){
+    var code = S.route.code;
+    go('#/c/'+encodeURIComponent(code)+'/'+encodeURIComponent(rBtn.getAttribute('data-region')));
+    return;
+  }
+
+  var sBtn = t.closest && t.closest('[data-station]');
+  if(sBtn){
+    var st = findStation(sBtn.getAttribute('data-station'));
+    if(st) playStation(st);
+    return;
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter' && e.key!==' ') return;
+  var el = e.target;
+  if(el && el.getAttribute && el.getAttribute('data-station')){
+    e.preventDefault();
+    var st = findStation(el.getAttribute('data-station'));
+    if(st) playStation(st);
+  }
+});
+
+$('#p-play').addEventListener('click', togglePlay);
+$('#p-fav').addEventListener('click', function(){ if(S.current) toggleFav(S.current); });
+
+var volEl = $('#vol');
+volEl.value = String(Math.round(S.vol*100));
+volEl.addEventListener('input', function(){
+  S.vol = Math.max(0, Math.min(1, Number(volEl.value)/100));
+  audio.volume = S.vol;
+  writeJSON(LS.vol, S.vol);
+});
+
+var qEl = $('#q');
+qEl.addEventListener('input', function(){
+  S.q = qEl.value;
+  $('#qclr').hidden = !S.q;
+  render();
+});
+$('#qclr').addEventListener('click', function(){
+  qEl.value=''; S.q=''; S.gs.q=''; $('#qclr').hidden=true; render();
+});
+
+window.addEventListener('online', function(){ setOffline(false); ensureCountries(); });
+window.addEventListener('offline', function(){ setOffline(true); });
+
+/* =========================================================
+   시작 — 네트워크를 기다리지 않고 바로 그립니다
+   ========================================================= */
+(function boot(){
+  var v = readJSON(LS.vol);
+  if(typeof v==='number' && v>=0 && v<=1){ S.vol = v; volEl.value = String(Math.round(v*100)); }
+  var f = readJSON(LS.favs); if(Array.isArray(f)) S.favs = f.filter(function(x){ return x && x.uuid && x.url; });
+  var rc = readJSON(LS.recent); if(Array.isArray(rc)) S.recent = rc.filter(function(x){ return x && x.uuid && x.url; });
+  var hd = readJSON(LS.hidden); if(Array.isArray(hd)) S.hidden = hd.filter(function(x){ return typeof x==='string' && x; });
+  audio.volume = S.vol;
+
+  /* 내장 데이터 준비 */
+  S.countries = countries();
+  Object.keys(EM.stations||{}).forEach(function(code){ stationsFor(code); });
+
+  if(!online()) setOffline(true);
+
+  render();                       /* ← 여기서 즉시 첫 화면 */
+  updatePlayer();
+  paintHiddenBox();
+
+  /* 첫 화면 뒤에서만 네트워크 시도 */
+  setTimeout(function(){ try{ loadHls(); }catch(e){} }, 700);
+  setTimeout(function(){ try{ discoverHosts(); }catch(e){} }, 1200);
+  setTimeout(function(){ try{ ensureCountries(); }catch(e){} }, 400);
+})();
+
+})();
+</script>
+
+<script>
+/* PWA: 홈 화면 앱 + 오프라인 캐시 */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+</script>
+</body>
+</html>

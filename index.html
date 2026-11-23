@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="후니앱">
+<meta name="application-name" content="후니앱">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<title>후니의 웹 앱 모음</title>
+<style>
+  :root{
+    --bg:#0b1120;
+    --card:#161f34;
+    --card-2:#1c2740;
+    --line:rgba(255,255,255,.09);
+    --text:#f1f5f9;
+    --muted:#94a3b8;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #1d2a4a 0%, transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",system-ui,sans-serif;
+    padding:calc(env(safe-area-inset-top) + 28px) 18px calc(env(safe-area-inset-bottom) + 28px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .wrap{width:100%;max-width:520px}
+  header{margin:6px 0 22px;text-align:center}
+  h1{
+    font-size:26px;
+    line-height:1.25;
+    letter-spacing:-.5px;
+    margin:0 0 8px;
+    font-weight:800;
+  }
+  .sub{color:var(--muted);font-size:14px;margin:0}
+  .cards{display:flex;flex-direction:column;gap:14px}
+  a.card{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:22px 20px;
+    background:linear-gradient(160deg var(--card));
+    background:linear-gradient(160deg,#18233c,#141c2e);
+    border:1px solid var(--line);
+    border-radius:22px;
+    text-decoration:none;
+    color:var(--text);
+    box-shadow:0 10px 26px rgba(0,0,0,.35);
+    transition:transform .14s ease, border-color .14s ease, background .14s ease;
+  }
+  a.card:active{transform:scale(.985);border-color:rgba(255,255,255,.22);background:#1b2540}
+  .ico{
+    flex:0 0 62px;
+    width:62px;height:62px;
+    display:grid;place-items:center;
+    font-size:32px;
+    border-radius:18px;
+    background:rgba(255,255,255,.06);
+    border:1px solid var(--line);
+  }
+  .body{flex:1 1 auto;min-width:0}
+  .title{font-size:19px;font-weight:800;letter-spacing:-.3px;margin:0 0 4px}
+  .desc{font-size:13.5px;color:var(--muted);margin:0;line-height:1.45}
+  .arrow{flex:0 0 auto;color:#64748b;font-size:20px;padding-left:4px}
+  footer{margin:26px 0 0;text-align:center;color:#5b6b85;font-size:12px;line-height:1.6}
+  @media (min-width:560px){
+    a.card{padding:24px 22px}
+    h1{font-size:30px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>후니의 웹 앱 모음</h1>
+    <p class="sub">아이폰에서 바로 열리는 여덟 가지 앱</p>
+  </header>
+
+  <main class="cards">
+    <a class="card" href="tv.html">
+      <div class="ico" aria-hidden="true">📺</div>
+      <div class="body">
+        <p class="title">실시간 TV</p>
+        <p class="desc">보고 싶은 채널을 골라 바로 시청</p>
+      </div>
+      <div class="arrow" aria-hidden="true">›</div>
+    </a>
+
+    <a class="card" href="radio.html">
+      <div class="ico" aria-hidden="true">📻</div>
+      <div class="body">
+        <p class="title">세계라디오</p>
+        <p class="desc">세계 각국의 라디오 방송을 골라 듣기</p>
+      </div>
+      <div class="arrow" aria-hidden="true">›</div>
+    </a>
+
+    <a class="card" href="realestate.html">
+      <div class="ico" aria-hidden="true">🏠</div>
+      <div class="body">
+        <p class="title">부동산 검색기</p>
+        <p class="desc">기본 매물 · 급매물 분리 · 관심지역 맞춤 검색</p>
+      </div>
+      <div class="arrow" aria-hidden="true">›</div>
+    </a>
+
+    <a class="card" href="auction.html">
+      <div class="ico" aria-hidden="true">🏛️</div>
+      <div class="body">
+        <p class="title">경·공매 검색기</p>
+        <p class="desc">법원경매·온비드 물건 — 보증금·지역·종류별 검색</p>
+      </div>
+      <div class="arrow" aria-hidden="true">›</div>
+    </a>
+
+    <a class="card" href="rental.html">
+      <div class="ico" aria-hidden="true">🏢</div>
+      <div class="body">
+        <p class="title">원룸 관리</p>
+        <p class="desc">호실·임차인·월세 납부 관리 (이 브라우저에 저장)</p>
+      </div>
+      <div class="arrow" aria-hidden="true">›</div>
+    </a>
+
+    <a class="card" href="math.html">
+      <div class="ico" aria-hidden="true">🧸</div>
+      <div class="body">
+        <p class="title">숫자랑 놀자</p>
+        <p class="desc">영유아 수학 놀이 — 숫자 세기와 비교</p>
+      </div>
+      <div class="arrow" aria-hidden="true">›</div>
+    </a>
+
+    <a class="card" href="english.html">
+      <div class="ico" aria-hidden="true">🐣</div>
+      <div class="body">
+        <p class="title">영어 놀이터</p>
+        <p class="desc">유아·초등·중학 영어 — 단어·회화·듣기</p>
+      </div>
+      <div class="arrow" aria-hidden="true">›</div>
+    </a>
+
+    <a class="card" href="play.html">
+      <div class="ico" aria-hidden="true">🎨</div>
+      <div class="body">
+        <p class="title">한글·색칠 놀이</p>
+        <p class="desc">한글 따라쓰기와 색칠 놀이 — 손가락으로 쓱쓱</p>
+      </div>
+      <div class="arrow" aria-hidden="true">›</div>
+    </a>
+  </main>
+
+  <footer>
+    leechardhun-hash.github.io<br>
+    홈 화면에 추가하면 앱처럼 열립니다 (Safari → 공유 → 홈 화면에 추가)
+  </footer>
+</div>
+
+<script>
+/* PWA: 홈 화면 앱 + 오프라인 캐시 */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+</script>
+</body>
+</html>

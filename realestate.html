@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="후니 부동산">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="독산동·지행동 등 내 관심지역의 실제 매물과 급매물을 한 화면에서 골라 보는 후니의 부동산 검색기">
+<title>후니의 부동산 검색기</title>
+<style>
+  :root{
+    --bg:#0b1220;
+    --bg2:#070c16;
+    --card:#121c2e;
+    --card2:#182640;
+    --line:#22314c;
+    --ink:#e9f0ff;
+    --ink2:#9fb0cc;
+    --ink3:#6d7f9c;
+    --accent:#4f8dff;
+    --accent2:#7bd1ff;
+    --gold:#ffcf5c;
+    --fire:#ff7a45;
+    --ok:#3ddc97;
+    --r:16px;
+    --safe-t:env(safe-area-inset-top,0px);
+    --safe-b:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;width:100%;overflow-x:hidden}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{
+    background:
+      radial-gradient(1100px 560px at 84% -12%, rgba(79,141,255,.20), transparent 60%),
+      radial-gradient(820px 460px at 2% 0%, rgba(255,122,69,.10), transparent 55%),
+      var(--bg2);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+    font-size:15px;line-height:1.45;
+    min-height:100vh;min-height:100dvh;
+    padding-bottom:calc(30px + var(--safe-b));
+  }
+  button,input,select{font:inherit;color:inherit}
+  button{cursor:pointer;border:0;background:none;touch-action:manipulation}
+  a{color:var(--accent2)}
+  .wrap{max-width:640px;margin:0 auto;padding-left:14px;padding-right:14px}
+
+  /* header */
+  .app-header{position:sticky;top:0;z-index:30;background:rgba(7,12,22,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(34,49,76,.7);padding-top:var(--safe-t)}
+  .hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:10px;padding-bottom:8px}
+  .brand{display:flex;align-items:center;gap:8px;min-width:0}
+  .brand .ico{font-size:19px;line-height:1;flex:none}
+  .brand h1{margin:0;font-size:16px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand h1 small{display:block;font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:0}
+  .home-pill{flex:none;display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 12px;border-radius:999px;
+    background:rgba(79,141,255,.16);border:1px solid rgba(79,141,255,.42);color:#cfe1ff;font-size:12.5px;font-weight:700;text-decoration:none}
+  .home-pill:active{background:rgba(79,141,255,.3)}
+
+  /* hero tabs */
+  .hero{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 0 4px}
+  .hero button{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:12px 11px;border-radius:14px;
+    background:var(--card);border:1px solid var(--line);color:var(--ink2);text-align:left;min-width:0}
+  .hero button .h-t{font-size:13.5px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:5px}
+  .hero button .h-s{font-size:11px;color:var(--ink3);font-weight:600}
+  .hero button.on{background:linear-gradient(160deg,#1c2f52,#152340);border-color:rgba(79,141,255,.75);box-shadow:0 8px 20px rgba(79,141,255,.18)}
+  .hero button.fire.on{background:linear-gradient(160deg,#3a1f1a,#2a1713);border-color:rgba(255,122,69,.8);box-shadow:0 8px 20px rgba(255,122,69,.2)}
+  .hero .cnt{display:inline-block;min-width:20px;padding:1px 6px;border-radius:999px;background:rgba(255,255,255,.1);font-size:11px;font-weight:800;color:#fff}
+  .hero button.fire .cnt{background:rgba(255,122,69,.9);color:#1b0d08}
+
+  /* interest bar */
+  .ibox{margin:10px 0 0;padding:10px;border-radius:14px;background:rgba(18,28,46,.85);border:1px solid var(--line)}
+  .irow{display:flex;align-items:center;gap:8px}
+  .itoggle{display:flex;align-items:center;gap:7px;flex:1;min-width:0;padding:8px 10px;border-radius:11px;background:var(--card2);border:1px solid var(--line);font-size:12.5px;font-weight:800;color:var(--ink2)}
+  .itoggle.on{background:rgba(255,207,92,.14);border-color:rgba(255,207,92,.6);color:#ffe6a6}
+  .itoggle .dot{width:9px;height:9px;border-radius:50%;background:#41506b;flex:none}
+  .itoggle.on .dot{background:var(--gold);box-shadow:0 0 8px rgba(255,207,92,.8)}
+  .iset{flex:none;height:36px;padding:0 12px;border-radius:11px;background:rgba(79,141,255,.16);border:1px solid rgba(79,141,255,.45);color:#cfe1ff;font-size:12.5px;font-weight:800}
+  .chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none;-ms-overflow-style:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink2);font-size:12px;font-weight:700;white-space:nowrap}
+  .chip.on{background:rgba(79,141,255,.22);border-color:rgba(79,141,255,.6);color:#e8f1ff}
+  .chip .x{margin-left:5px;color:#9fb0cc}
+  .ihint{font-size:11px;color:var(--ink3);margin:6px 2px 0}
+
+  /* quick external search */
+  .quick{margin:10px 0 0;padding:11px;border-radius:14px;background:linear-gradient(160deg,#16223a,#111a2b);border:1px solid var(--line)}
+  .quick .q-head{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ink2);margin-bottom:8px}
+  .qbar{display:flex;gap:6px;align-items:center}
+  .qbar input{flex:1;min-width:0;height:38px;padding:0 11px;border-radius:11px;background:#0d1524;border:1px solid var(--line);color:var(--ink);font-size:13px}
+  .qbar input::placeholder{color:#5c6d88}
+  .qgold{flex:none;display:flex;align-items:center;gap:5px;height:38px;padding:0 10px;border-radius:11px;background:#0d1524;border:1px solid var(--line);font-size:12px;font-weight:800;color:var(--ink2)}
+  .qgold.on{background:rgba(255,122,69,.18);border-color:rgba(255,122,69,.65);color:#ffc0a6}
+  .providers{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+  .providers button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 2px;border-radius:11px;background:#0f1a2c;border:1px solid var(--line);color:var(--ink);font-size:11.5px;font-weight:800;line-height:1.2}
+  .providers button span{font-size:9.5px;font-weight:600;color:var(--ink3)}
+  .providers button:active{background:#17243c}
+  .providers .p1{border-color:rgba(3,199,90,.45)} .providers .p2{border-color:rgba(255,122,69,.45)}
+  .providers .p3{border-color:rgba(255,207,92,.45)} .providers .p4{border-color:rgba(123,209,255,.45)}
+
+  /* filters */
+  .filters{margin-top:10px}
+  .fg{margin-top:9px}
+  .fg .fl{font-size:11px;font-weight:800;color:var(--ink3);letter-spacing:.2px;margin:0 2px 5px;display:flex;justify-content:space-between;align-items:center}
+  .fg .frow{display:flex;flex-wrap:wrap;gap:6px}
+  .fbtn{padding:7px 11px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink2);font-size:12px;font-weight:700}
+  .fbtn.on{background:rgba(79,141,255,.22);border-color:rgba(79,141,255,.62);color:#eaf2ff}
+  .srow{display:flex;gap:6px;margin-top:9px}
+  .sbox{flex:1;min-width:0;position:relative;display:flex;align-items:center}
+  .sbox .sq{position:absolute;left:10px;font-size:13px;color:var(--ink3)}
+  .sbox input{width:100%;height:38px;padding:0 32px 0 30px;border-radius:11px;background:#0d1524;border:1px solid var(--line);font-size:13px}
+  .sbox .clr{position:absolute;right:4px;width:28px;height:28px;border-radius:8px;color:var(--ink3);font-size:13px}
+  .sort{flex:none;height:38px;padding:0 8px;border-radius:11px;background:#0d1524;border:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--ink)}
+  .favbtn{flex:none;display:flex;align-items:center;gap:4px;height:38px;padding:0 11px;border-radius:11px;background:#0d1524;border:1px solid var(--line);font-size:12.5px;font-weight:800;color:var(--ink2)}
+  .favbtn.on{background:rgba(255,207,92,.16);border-color:rgba(255,207,92,.6);color:#ffe6a6}
+
+  /* list */
+  .summary{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:14px 2px 8px}
+  .summary .c{font-size:13px;font-weight:800}
+  .summary .c b{color:var(--accent2);font-size:17px}
+  .summary .t{font-size:11px;color:var(--ink3);text-align:right}
+  .cards{display:flex;flex-direction:column;gap:10px}
+  .card{position:relative;padding:13px 13px 11px;border-radius:var(--r);background:linear-gradient(160deg,#142036,#101a2b);border:1px solid var(--line);overflow:hidden}
+  .card.urgent{border-color:rgba(255,122,69,.55);background:linear-gradient(160deg,#241a22,#16131a)}
+  .card .top{display:flex;align-items:flex-start;gap:8px}
+  .badges{display:flex;gap:4px;flex-wrap:wrap;min-width:0}
+  .bg{padding:2px 7px;border-radius:6px;font-size:10.5px;font-weight:800;letter-spacing:-.1px;white-space:nowrap}
+  .bg.fire{background:rgba(255,122,69,.2);color:#ffb59a;border:1px solid rgba(255,122,69,.55)}
+  .bg.deal{background:rgba(79,141,255,.16);color:#bcd6ff;border:1px solid rgba(79,141,255,.4)}
+  .bg.cat{background:rgba(255,255,255,.07);color:#c3d2e8;border:1px solid rgba(255,255,255,.1)}
+  .bg.reg{background:rgba(61,220,151,.14);color:#a8f0cd;border:1px solid rgba(61,220,151,.35)}
+  .star{flex:none;width:30px;height:30px;margin:-4px -4px 0 0;border-radius:9px;font-size:16px;line-height:1;color:#4b5c78;display:flex;align-items:center;justify-content:center}
+  .star.on{color:var(--gold);text-shadow:0 0 10px rgba(255,207,92,.55)}
+  .card h3{margin:8px 0 2px;font-size:14.5px;font-weight:800;letter-spacing:-.2px;line-height:1.3;word-break:keep-all}
+  .price{margin:3px 0 2px;font-size:18px;font-weight:900;letter-spacing:-.4px;color:#eaf2ff}
+  .card.urgent .price{color:#ffd0bd}
+  .meta{font-size:11.5px;color:var(--ink2);display:flex;flex-wrap:wrap;gap:3px 8px;margin-bottom:6px}
+  .meta .sep{color:#33425e}
+  .note{margin:0 0 9px;font-size:12px;line-height:1.5;color:#a9b9d2;word-break:keep-all}
+  .addr{font-size:11px;color:var(--ink3);margin:0 0 9px;word-break:keep-all}
+  .acts{display:flex;gap:6px;flex-wrap:wrap}
+  .acts a,.acts button{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;height:34px;border-radius:10px;
+    background:rgba(79,141,255,.14);border:1px solid rgba(79,141,255,.38);color:#d3e4ff;font-size:12px;font-weight:800;text-decoration:none;white-space:nowrap}
+  .acts a.src{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#cfdcee}
+  .acts a:active,.acts button:active{filter:brightness(1.2)}
+  .empty{padding:34px 18px;text-align:center;color:var(--ink3);font-size:13px;border:1px dashed var(--line);border-radius:var(--r)}
+  .empty b{display:block;color:var(--ink2);font-size:14px;margin-bottom:6px}
+
+  /* modal */
+  .mask{position:fixed;inset:0;z-index:60;background:rgba(3,6,12,.72);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center;padding:0}
+  .mask.on{display:flex}
+  .sheet{width:100%;max-width:640px;max-height:86vh;overflow-y:auto;background:#0f1828;border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;padding:16px 14px calc(20px + var(--safe-b))}
+  .sheet h2{margin:0 0 4px;font-size:16px;font-weight:900}
+  .sheet p.h{margin:0 0 12px;font-size:12px;color:var(--ink3)}
+  .opt{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);margin-bottom:7px}
+  .opt .cb{width:21px;height:21px;flex:none;border-radius:6px;border:1.5px solid #3b4c6c;display:flex;align-items:center;justify-content:center;font-size:13px;color:#0b1220}
+  .opt.on{border-color:rgba(79,141,255,.65);background:rgba(79,141,255,.12)}
+  .opt.on .cb{background:var(--accent);border-color:var(--accent);color:#03101f}
+  .opt .ol{flex:1;min-width:0}
+  .opt .ol b{display:block;font-size:13.5px}
+  .opt .ol small{display:block;font-size:11px;color:var(--ink3)}
+  .opt .oc{font-size:11.5px;font-weight:800;color:var(--accent2);flex:none}
+  .addrow{display:flex;gap:6px;margin:10px 0 12px}
+  .addrow input{flex:1;min-width:0;height:40px;padding:0 12px;border-radius:11px;background:#0d1524;border:1px solid var(--line);font-size:13px}
+  .addrow button{flex:none;height:40px;padding:0 14px;border-radius:11px;background:var(--accent);color:#04101f;font-weight:900;font-size:13px}
+  .sheet .done{width:100%;height:46px;border-radius:13px;background:linear-gradient(160deg,#2a4f8f,#1e3a6b);color:#fff;font-weight:900;font-size:14.5px;margin-top:4px}
+  .custwrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .cust{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-size:12px;font-weight:700}
+  .cust button{color:#8fa3c0;font-size:12px}
+  /* detail sheet */
+  .card{cursor:pointer}
+  .card .note{-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+  .more{margin:-4px 0 9px;font-size:11px;font-weight:700;color:#6f9bdd}
+  .d-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+  .d-head h2{margin:0;font-size:15px;font-weight:900;color:var(--ink2)}
+  .d-close{flex:none;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--ink2);font-size:14px}
+  .d-title{margin:9px 0 3px;font-size:19px;font-weight:900;letter-spacing:-.4px;line-height:1.3;word-break:keep-all}
+  .d-price{margin:8px 0 10px;font-size:24px;font-weight:900;letter-spacing:-.6px;color:#eaf2ff}
+  .d-price.fire{color:#ffd0bd}
+  .d-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 0 12px}
+  .d-grid div{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.045);border:1px solid var(--line);min-width:0}
+  .d-grid span{display:block;font-size:10.5px;font-weight:800;color:var(--ink3);margin-bottom:2px}
+  .d-grid b{display:block;font-size:12.5px;font-weight:700;color:#dbe6f7;word-break:keep-all}
+  .d-cap{margin:0 0 4px;font-size:11px;font-weight:800;color:var(--ink3)}
+  .d-note{margin:0 0 13px;padding:11px 12px;border-radius:11px;background:rgba(79,141,255,.07);border:1px solid rgba(79,141,255,.22);font-size:12.5px;line-height:1.6;color:#c3d3ea;word-break:keep-all}
+  .d-acts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .d-acts a,.d-acts button{display:flex;align-items:center;justify-content:center;gap:4px;height:44px;border-radius:12px;
+    background:rgba(79,141,255,.16);border:1px solid rgba(79,141,255,.45);color:#d9e7ff;font-size:12px;font-weight:800;text-decoration:none;text-align:center;line-height:1.15;padding:0 4px}
+  .d-acts .fav{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:#cfdcee}
+  .d-acts .fav.on{background:rgba(255,207,92,.18);border-color:rgba(255,207,92,.62);color:#ffe6a6}
+  .d-acts .src{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:#cfdcee}
+
+  .toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translateX(-50%) translateY(20px);opacity:0;z-index:80;
+    max-width:88vw;padding:10px 15px;border-radius:12px;background:rgba(20,32,52,.98);border:1px solid rgba(79,141,255,.45);
+    color:#e6eeff;font-size:12.5px;font-weight:700;text-align:center;transition:.22s;pointer-events:none}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  footer{margin:18px 2px 4px;font-size:10.5px;line-height:1.6;color:#5c6d88}
+  footer b{color:#7f90ab}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="wrap hdr">
+    <div class="brand">
+      <span class="ico">🏠</span>
+      <h1>후니의 부동산 검색기<small>실제 매물 · 급매물 모아보기</small></h1>
+    </div>
+    <a class="home-pill" href="/" aria-label="전체 앱 목록으로 이동">🏠 앱 목록</a>
+  </div>
+
+</header>
+
+<main class="wrap">
+    <div class="hero" role="tablist" aria-label="보기 선택">
+      <button id="tabAll" class="on" role="tab" aria-selected="true">
+        <span class="h-t">📋 기본 부동산 검색</span>
+        <span class="h-s">전체 매물 <span class="cnt" id="cntAll">0</span></span>
+      </button>
+      <button id="tabFire" class="fire" role="tab" aria-selected="false">
+        <span class="h-t">🔥 급매물 모아보기</span>
+        <span class="h-s">급매·시세 이하 <span class="cnt" id="cntFire">0</span></span>
+      </button>
+    </div>
+
+    <div class="ibox">
+      <div class="irow">
+        <button id="interestOnly" class="itoggle" aria-pressed="false">
+          <span class="dot"></span><span>⭐ 내 관심지역만 보기</span>
+        </button>
+        <button id="openInterest" class="iset">관심지역 설정</button>
+      </div>
+      <div class="chips" id="interestChips"></div>
+      <p class="ihint" id="interestHint">관심지역을 고르면 그 동네 매물만 모아 볼 수 있어요. 칩을 누르면 아래 실시간 검색어로 바로 들어갑니다.</p>
+    </div>
+
+    <div class="quick">
+      <div class="q-head">⚡ 실시간 외부 검색 <span style="color:#5c6d88;font-weight:600">— 이 앱은 11-23 기준 스냅샷, 최신 매물은 여기서</span></div>
+      <div class="qbar">
+        <input id="q" type="text" enterkeyhint="search" autocomplete="off" placeholder="지역·키워드 (예: 독산동)" aria-label="실시간 검색어">
+        <button id="qFire" class="qgold" aria-pressed="false">🔥 급매</button>
+      </div>
+      <div class="providers">
+        <button class="p1" data-prov="naver">네이버<br><span>부동산</span></button>
+        <button class="p2" data-prov="daangn">당근<br><span>부동산</span></button>
+        <button class="p3" data-prov="kb">KB<br><span>부동산</span></button>
+        <button class="p4" data-prov="hogangnono">호갱<br><span>노노</span></button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="fg">
+        <div class="fl"><span>거래형태</span></div>
+        <div class="frow" id="fDeal"></div>
+      </div>
+      <div class="fg">
+        <div class="fl"><span>매물종류</span></div>
+        <div class="frow" id="fCat"></div>
+      </div>
+      <div class="fg">
+        <div class="fl"><span>지역</span></div>
+        <div class="frow" id="fRegion"></div>
+      </div>
+      <div class="fg">
+        <div class="fl"><span>금액대</span></div>
+        <div class="frow" id="fMoney"></div>
+      </div>
+      <div class="srow">
+        <div class="sbox">
+          <span class="sq">🔍</span>
+          <input id="kw" type="text" autocomplete="off" placeholder="단지명·주소·특징 검색" aria-label="매물 검색">
+          <button id="kwClr" class="clr" hidden aria-label="검색어 지우기">✕</button>
+        </div>
+        <select id="sort" class="sort" aria-label="정렬">
+          <option value="price">최저가순</option>
+          <option value="new">최신순</option>
+          <option value="fire">급매 우선</option>
+        </select>
+        <button id="favOnly" class="favbtn" aria-pressed="false">★ 관심</button>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="c"><b id="resCnt">0</b>건</div>
+      <div class="t" id="resNote"></div>
+    </div>
+    <div class="cards" id="cards"></div>
+
+    <footer>
+      <b>자료 안내</b> · 매물은 2026-11-23 15시경 당근부동산(개별 매물·단지 페이지)과 위시스·자리톡에서 확인한 실제 게시물이며, 값은 임대인·중개사가 부르는 호가입니다. 계약 전 현장 확인과 등기·건축물대장 확인이 필요합니다.<br>
+      급매(🔥)는 ①매물 설명에 급매·급처분·무보증 특가로 적힌 건, ②같은 동네·같은 종류 시세보다 낮다고 근거와 함께 적은 건만 표시했습니다. 표시가 없어도 시세보다 쌀 수 있으니 금액은 직접 견줘 보세요.
+    </footer>
+</main>
+
+<!-- 관심지역 설정 -->
+<div class="mask" id="mask">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle">⭐ 관심지역 설정</h2>
+    <p class="h">고른 지역은 이 기기에 저장되고, ⭐ 필터와 실시간 검색에 함께 쓰입니다.</p>
+    <div id="optList"></div>
+    <p class="h" style="margin:14px 0 6px">직접 추가 — 시·구·동 이름을 적어 넣으세요</p>
+    <div class="addrow">
+      <input id="custInput" type="text" autocomplete="off" placeholder="예: 독산동, 봉천동, 시흥동">
+      <button id="custAdd">추가</button>
+    </div>
+    <div class="custwrap" id="custList"></div>
+    <button class="done" id="sheetDone">저장하고 닫기</button>
+  </div>
+</div>
+
+<div class="mask" id="dmask">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dHeadTitle">
+    <div class="d-head">
+      <h2 id="dHeadTitle">매물 상세</h2>
+      <button class="d-close" id="dClose" aria-label="상세 닫기">✕</button>
+    </div>
+    <div id="dBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script id="data">
+/* 2026-11-23 수집. 모든 항목은 실제 게시 매물(당근부동산 개별/단지 페이지, 위시스, 자리톡)입니다.
+   priceNum(만원): 매매가 / 전세보증금 / 월세는 보증금 + (월세×100) 환산값 — 최저가 정렬·금액대 필터용 */
+const DATA = [
+/* ── 서울 금천구 · 독산동 ───────────────────────────── */
+{id:'ds01',urgent:true,deal:'매매',cat:'아파트',region:'geumcheon',title:'명도힐스티지',price:'매매 2억 7,000만',priceNum:27000,monthly:0,
+ area:'전용 29.63㎡ (8.9평)',floor:'6층/15층',source:'당근부동산',date:'2026-11-12',
+ note:'매물 설명에 "급매 2억 7천"으로 직접 표기. 구로디지털단지역 10분 이내(정류장 도보 2분+2정거장), 방2+거실. 토지거래허가구역이라 실거주 2년 조건, 현 세입자 11월 만료. 2019년 준공.',
+ addr:'서울 금천구 독산로 337 (독산동, 명도힐스티지)',mapQuery:'서울 금천구 독산로 337',url:'https://realty.daangn.com/articles/4239171'},
+
+{id:'ds02',urgent:false,deal:'매매',cat:'아파트',region:'geumcheon',title:'독산현대 102동',price:'매매 6억 3,600만',priceNum:63600,monthly:0,
+ area:'전용 58.72㎡ (17.7평)',floor:'6층/20층',source:'당근부동산',date:'2026-11-08',
+ note:'신독산역(예정) 도보 2분·독산역 도보 10분, 한샘 올수리. 직거래 매물이고 같은 단지 3건이 모두 같은 호가. 1999년 준공 214세대.',
+ addr:'서울 금천구 범안로17길 12 (독산동, 독산현대아파트) 102동',mapQuery:'서울 금천구 범안로17길 12',url:'https://realty.daangn.com/articles/4441018'},
+
+{id:'ds03',urgent:false,deal:'매매',cat:'아파트',region:'geumcheon',title:'계룡아파트 102동',price:'매매 5억 8,000만',priceNum:58000,monthly:0,
+ area:'전용 59.34㎡ (17.9평)',floor:'6층/20층',source:'당근부동산',date:'2026-11-16',
+ note:'독산역 도보 3분·신독산역(2027 개통 예정) 도보 4분. 정남향·부분 수리, 즉시 입주. 1998년 준공 28년차.',
+ addr:'서울 금천구 범안로15길 7 (독산동, 계룡아파트) 102동',mapQuery:'서울 금천구 범안로15길 7',url:'https://realty.daangn.com/articles/4331994'},
+
+{id:'ds04',urgent:false,deal:'매매',cat:'아파트',region:'geumcheon',title:'라이프 (84㎡)',price:'매매 5억 8,000만',priceNum:58000,monthly:0,
+ area:'전용 84㎡ (25평)',floor:'저층',source:'당근부동산(단지 페이지)',date:'',
+ note:'올리모델링·관리 잘 된 집. 다만 단지 최근 실거래 매매가 4억 7,000만원(당근 단지 FAQ)이라 호가가 1억 높음 — 가격 협의 여지부터 확인. 독산역 도보 10분, 109세대.',
+ addr:'서울 금천구 벚꽃로 60 (독산동, 라이프)',mapQuery:'서울 금천구 벚꽃로 60',url:'https://realty.daangn.com/complexes/10808529'},
+
+{id:'ds05',urgent:true,deal:'매매',cat:'아파트',region:'geumcheon',title:'금천롯데캐슬골드파크1차',price:'매매 13억 5,000만',priceNum:135000,monthly:0,
+ area:'전용 84㎡ (25평)',floor:'중층',source:'당근부동산(단지 페이지)',date:'',
+ note:'매물 문구에 "급매" 표기. 같은 34평 매물 24건의 중간 호가 13억 9,000만원(리치고 11-22 기준)보다 낮고, 최근 실거래는 13억 5,000만원(11-13, 28층). 전실 시스템에어컨·실입주 가능. 금천구청역 도보 7분.',
+ addr:'서울 금천구 벚꽃로 40 (독산동, 금천롯데캐슬골드파크1차)',mapQuery:'서울 금천구 벚꽃로 40',url:'https://realty.daangn.com/complexes/10808530'},
+
+{id:'ds06',urgent:false,deal:'매매',cat:'빌라·다세대',region:'geumcheon',title:'행복마을 (신통 4구역)',price:'매매 2억 5,000만',priceNum:25000,monthly:0,
+ area:'전용 29.54㎡ (8.9평)',floor:'저층/5층',source:'당근부동산',date:'2026-11-20',
+ note:'신속통합기획 4구역 대상지 선정 구역. 현 세입자 보증금 1억 4,000만원(2028-04 만료)이라 갭투자용 — 실투자금 약 1억 1,000만원. 방2·욕실1, 2016년 준공.',
+ addr:'서울 금천구 독산로70라길 38 (독산동, 행복마을)',mapQuery:'서울 금천구 독산로70라길 38',url:'https://realty.daangn.com/articles/5058567'},
+
+{id:'ds07',urgent:false,deal:'매매',cat:'빌라·다세대',region:'geumcheon',title:'삼성하이츠빌',price:'매매 2억 8,000만',priceNum:28000,monthly:0,
+ area:'전용 29.33㎡ (8.8평)',floor:'2층/5층',source:'당근부동산',date:'2026-11-14',
+ note:'신속통합 재개발지·신독산역(예정) 도보권, 현재 공실이라 즉시 입주. 전세 세입자를 맞추면 실투자금 약 1억. 2017년 준공, 엘리베이터·주차 11대.',
+ addr:'서울 금천구 독산로76길 48 (독산동, 삼성하이츠빌)',mapQuery:'서울 금천구 독산로76길 48',url:'https://realty.daangn.com/articles/5027909'},
+
+{id:'ds08',urgent:false,deal:'매매',cat:'빌라·다세대',region:'geumcheon',title:'힐사이드 (도시형)',price:'매매 2억 6,000만',priceNum:26000,monthly:0,
+ area:'전용 27.09㎡ (8.1평)',floor:'2층/5층',source:'당근부동산',date:'2026-11-04',
+ note:'현재 반전세 1억 5,400만원/월 5만원 임차인이 있는 상태로 매매. 시스템에어컨·냉장고 옵션, 재개발 호재. 입주는 2027-03 이후 협의.',
+ addr:'서울 금천구 독산로70길 96-11 (독산동, 힐사이드)',mapQuery:'서울 금천구 독산로70길 96-11',url:'https://realty.daangn.com/articles/4726596'},
+
+{id:'ds09',urgent:false,deal:'매매',cat:'아파트',region:'geumcheon',title:'독산주공14단지',price:'매매 6억',priceNum:60000,monthly:0,
+ area:'전용 44㎡ (13.3평)',floor:'15층',source:'당근부동산(단지 페이지)',date:'',
+ note:'올리모델링·채광 좋은 15층. 단지 최근 실거래 매매 5억 2,500만원(당근 단지 FAQ)이라 호가가 높은 편 — 시세 대비 확인 필요. 안천초 도보 3분, 840세대·주차 경쟁 심함.',
+ addr:'서울 금천구 한내로 69-54 (독산동, 주공14단지)',mapQuery:'서울 금천구 한내로 69-54',url:'https://realty.daangn.com/complexes/15028055'},
+
+{id:'ds10',urgent:false,deal:'전세',cat:'아파트',region:'geumcheon',title:'e편한세상독산더타워 101동',price:'전세 6억',priceNum:60000,monthly:0,
+ area:'전용 59.96㎡ (18.1평)',floor:'고층/39층',source:'당근부동산',date:'2026-11-13',
+ note:'여의도가 보이는 고층·펜트리 넓은 집. 방3·욕2, 관리비 15만원. 입주는 2027-02-01 이후 협의. 2019년 준공 주상복합.',
+ addr:'서울 금천구 범안로 1212 (독산동, e편한세상독산더타워)',mapQuery:'서울 금천구 범안로 1212',url:'https://realty.daangn.com/articles/5027331'},
+
+{id:'ds11',urgent:false,deal:'전세',cat:'아파트',region:'geumcheon',title:'독산솔리힐 101동',price:'전세 4억 7,000만',priceNum:47000,monthly:0,
+ area:'전용 68.74㎡ (20.7평)',floor:'4층/7층',source:'당근부동산',date:'2026-11-13',
+ note:'2022년 준공 신축급 쓰리룸, 융자 없음·HUG 전세대출·보증보험 가능. 주차 여유. 입주 2027-01 초~하순 협의.',
+ addr:'서울 금천구 독산로54길 303 (독산동, 독산솔리힐) 101동',mapQuery:'서울 금천구 독산로54길 303',url:'https://realty.daangn.com/articles/5025509'},
+
+{id:'ds12',urgent:false,deal:'전세',cat:'원룸·오피스텔',region:'geumcheon',title:'블라썸시티 (오피스텔)',price:'전세 1억 5,000만',priceNum:15000,monthly:0,
+ area:'전용 23.6㎡ (7.1평)',floor:'7층/11층',source:'당근부동산',date:'2026-11-18',
+ note:'독산역 도보 2분 초역세권, 남서향 중고층. 전세대출 가능·근저당 없음. 입주 12-18 이후 협의. 직거래 매물.',
+ addr:'서울 금천구 벚꽃로 120 (독산동, 블라썸시티)',mapQuery:'서울 금천구 벚꽃로 120',url:'https://realty.daangn.com/articles/5075347'},
+
+{id:'ds13',urgent:false,deal:'전세',cat:'원룸·오피스텔',region:'geumcheon',title:'우미그린빌 (주상복합)',price:'전세 2억 2,000만',priceNum:22000,monthly:0,
+ area:'전용 36.76㎡ (11.1평)',floor:'7층/7층',source:'당근부동산',date:'2026-11-23',
+ note:'2020년 준공 풀옵션 투룸(방2). 화장실 분리, 관리비 5만원, 주차 11대. 즉시 입주.',
+ addr:'서울 금천구 독산로101길 48 (독산동, 우미그린빌)',mapQuery:'서울 금천구 독산로101길 48',url:'https://realty.daangn.com/articles/5113390'},
+
+{id:'ds14',urgent:false,deal:'전세',cat:'원룸·오피스텔',region:'geumcheon',title:'돌체비타타워 (오피스텔)',price:'전세 2억 4,100만',priceNum:24100,monthly:0,
+ area:'전용 39.74㎡ (12평)',floor:'고층/9층',source:'당근부동산',date:'2026-11-20',
+ note:'방2+거실 투룸, 융자 없는 집(계약기간 근저당 설정 없음). 시흥대로 버스정류장 도보 3분. 임대인 국세·지방세 완납 확인 후 계약. 입주 2027-02-22.',
+ addr:'서울 금천구 시흥대로102길 29 (독산동, 돌체비타타워)',mapQuery:'서울 금천구 시흥대로102길 29',url:'https://realty.daangn.com/articles/5092301'},
+
+{id:'ds15',urgent:false,deal:'전세',cat:'원룸·오피스텔',region:'geumcheon',title:'헤리움팰리스 (오피스텔)',price:'전세 2억 2,800만',priceNum:22800,monthly:0,
+ area:'전용 26.97㎡ (8.1평)',floor:'2층/7층',source:'당근부동산',date:'2026-11-21',
+ note:'2021년 준공 풀옵션 투룸, HUG·버팀목·보증보험 가능. 주차 21대·엘리베이터. 즉시 입주.',
+ addr:'서울 금천구 독산로101길 46 (독산동, 헤리움팰리스)',mapQuery:'서울 금천구 독산로101길 46',url:'https://realty.daangn.com/articles/5104290'},
+
+{id:'ds16',urgent:false,deal:'전세',cat:'원룸·오피스텔',region:'geumcheon',title:'분리형 1.5룸 (독산로88길)',price:'전세 1억 5,000만',priceNum:15000,monthly:0,
+ area:'전용 26.4㎡ (7.9평)',floor:'4층/4층',source:'당근부동산',date:'2026-11-20',
+ note:'2021년 준공 분리형 1.5룸. 구로디지털단지역 도보 18분·독산역 도보 20분이라 역에서는 조금 떨어짐. HUG·보증보험·중기청 전세대출 상담 가능, 4층 최상층.',
+ addr:'서울 금천구 독산로88길 32 (독산동)',mapQuery:'서울 금천구 독산로88길 32',url:'https://realty.daangn.com/articles/4728206'},
+
+{id:'ds17',urgent:false,deal:'전세',cat:'원룸·오피스텔',region:'geumcheon',title:'원룸 (범안로15길 27-14)',price:'전세 5,000만',priceNum:5000,monthly:0,
+ area:'전용 16㎡ (4.8평)',floor:'7층/8층',source:'당근부동산',date:'2026-11-19',
+ note:'독산역 도보 7분. 같은 집 월세 조건은 보증금 3,000/월 20만원(관리비 8만원)이라 현금 사정에 따라 골라 잡을 수 있음. 즉시 입주.',
+ addr:'서울 금천구 범안로15길 27-14 (독산동)',mapQuery:'서울 금천구 범안로15길 27-14',url:'https://realty.daangn.com/articles/5041676'},
+
+{id:'ds18',urgent:false,deal:'전세',cat:'원룸·오피스텔',region:'geumcheon',title:'디지털빌 원룸',price:'전세 5,000만',priceNum:5000,monthly:0,
+ area:'전용 18㎡ (5.4평)',floor:'5층/8층',source:'당근부동산',date:'2026-11-16',
+ note:'반려동물 가능·풀옵션. 같은 집 월세는 3,000/20만. 관리비 12만원(가스·수도·인터넷·TV 포함). 독산역 도보 8분, 즉시 입주.',
+ addr:'서울 금천구 벚꽃로18길 52 (독산동, 디지털빌)',mapQuery:'서울 금천구 벚꽃로18길 52',url:'https://realty.daangn.com/articles/4434413'},
+
+{id:'ds19',urgent:false,deal:'전세',cat:'빌라·다세대',region:'geumcheon',title:'미니 투룸 (독산로78다길)',price:'전세 1억 5,000만',priceNum:15000,monthly:0,
+ area:'전용 22.5㎡ (6.8평)',floor:'3층/5층',source:'당근부동산',date:'2026-11-20',
+ note:'2021년 준공 미니투룸(방2). 독산역·구로디지털단지역 더블역세권, 반려동물 가능·엘리베이터. 주차 불가.',
+ addr:'서울 금천구 독산로78다길 4 (독산동)',mapQuery:'서울 금천구 독산로78다길 4',url:'https://realty.daangn.com/articles/5091506'},
+
+{id:'ds20',urgent:false,deal:'전세',cat:'빌라·다세대',region:'geumcheon',title:'로얄타운 (12평)',price:'전세 1억 8,000만',priceNum:18000,monthly:0,
+ area:'전용 39.7㎡ (12평)',floor:'2층/3층',source:'당근부동산',date:'2026-11-01',
+ note:'20m 도로 접한 방2·주차 불가. 중요: 보증보험·버팀목·HUG 불가, 카카오뱅크·토스뱅크 일반대출만 가능이라고 매물에 적혀 있음 — 보증금 안전장치 확인 필수.',
+ addr:'서울 금천구 독산로82길 29 (독산동)',mapQuery:'서울 금천구 독산로82길 29',url:'https://realty.daangn.com/articles/3267711'},
+
+{id:'ds21',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'geumcheon',title:'분리형 원룸 (범안로15길 31)',price:'보증금 500 / 월 55만',priceNum:6000,monthly:55,
+ area:'전용 21㎡ (6.3평)',floor:'6층/7층',source:'당근부동산',date:'2026-11-16',
+ note:'독산역 도보 8분, 관리비 8만원(공용·수도·인터넷 포함). 주차 불가·엘리베이터 있음. 설명에는 "8월 10일 이후 입주 가능"과 "즉시 입주"가 함께 적혀 있어 확인 필요.',
+ addr:'서울 금천구 범안로15길 31 (독산동)',mapQuery:'서울 금천구 범안로15길 31',url:'https://realty.daangn.com/articles/4180618'},
+
+{id:'ds22',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'geumcheon',title:'원룸 (범안로15길 27-14)',price:'보증금 3,000 / 월 22만',priceNum:5200,monthly:22,
+ area:'전용 17㎡ (5.1평)',floor:'7층/7층',source:'당근부동산',date:'2026-11-15',
+ note:'판교로 이직해 급히 내놓은 직거래 매물. 7층 최상층·앞이 트여 채광 좋음. 월세 22만은 동네 중앙값(월 41만)보다 크게 낮지만 보증금이 3,000 — 환산(보증금+월세×100)으로는 5,200만으로 중앙값 4,600만보다 높음. 관리비 8만 별도.',
+ addr:'서울 금천구 범안로15길 27-14 (독산동)',mapQuery:'서울 금천구 범안로15길 27-14',url:'https://realty.daangn.com/articles/5035558'},
+
+{id:'ds23',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'geumcheon',title:'우리오피스텔 B동',price:'보증금 500 / 월 40만',priceNum:4500,monthly:40,
+ area:'전용 20㎡ (6평)',floor:'4층/6층',source:'당근부동산',date:'2026-11-23',
+ note:'관리비 3만원으로 낮고 풀옵션. 버스정류장 인접(도보권 지하철역은 멀어 버스 위주). 2003년 준공. 세입자 거주 중이라 내부 사진 없음.',
+ addr:'서울 금천구 독산로51길 11-13 (독산동, 우리오피스텔) B동',mapQuery:'서울 금천구 독산로51길 11-13',url:'https://realty.daangn.com/articles/5021143'},
+
+{id:'ds24',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'geumcheon',title:'상떼빌신독산역 (복층)',price:'보증금 1,000 / 월 130만',priceNum:14000,monthly:130,
+ area:'전용 25.58㎡ (7.7평)',floor:'7층/16층',source:'당근부동산',date:'2026-11-13',
+ note:'2023년 준공 신축 복층, 반려동물 가능·주차 84대. 다만 월 130만원은 독산동 오피스텔 호가 중 상위권 — 1인 거주용으로는 비싼 편이라 사업자 임차·투룸 대안과 비교 권장. 독산역 도보 13분.',
+ addr:'서울 금천구 시흥대로105길 12 (독산동, 상떼빌신독산역)',mapQuery:'서울 금천구 시흥대로105길 12',url:'https://realty.daangn.com/articles/4478085'},
+
+{id:'ds25',urgent:true,deal:'월세',cat:'원룸·오피스텔',region:'geumcheon',title:'SM벨리체 (복층·초저보증)',price:'보증금 150 / 월 80만',priceNum:8150,monthly:80,
+ area:'전용 17.66㎡ (5.3평)',floor:'7층/10층',source:'당근부동산',date:'2026-11-16',
+ note:'무보증에 가까운 초저보증(150만원) 특가. 단 조건이 무겁습니다 — 3개월 선납이고 등기상 주택임차권이 설정되어 전입신고는 되지만 확정일자·임대차신고가 불가. 2019년 준공 복층.',
+ addr:'서울 금천구 시흥대로139길 19 (독산동, SM Belice)',mapQuery:'서울 금천구 시흥대로139길 19',url:'https://realty.daangn.com/articles/5007885'},
+
+{id:'ds26',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'geumcheon',title:'테라시움 (신축 복층)',price:'보증금 5,000 / 월 100만',priceNum:15000,monthly:100,
+ area:'전용 17.45㎡ (5.2평)',floor:'7층/9층',source:'당근부동산',date:'2026-11-23',
+ note:'2023년 준공 복층, 독산역 도보 3분·주차 44대·반려동물 협의. 보증금 조정 조건(4,000/105, 3,000/110)도 함께 제시됨.',
+ addr:'서울 금천구 벚꽃로12길 9 (독산동, 테라시움)',mapQuery:'서울 금천구 벚꽃로12길 9',url:'https://realty.daangn.com/articles/3713249'},
+
+{id:'ds27',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'geumcheon',title:'오피스텔 (가산로 90)',price:'보증금 1,000 / 월 50만',priceNum:6000,monthly:50,
+ area:'전용 23.14㎡ (7평)',floor:'4층/7층',source:'당근부동산',date:'2026-11-21',
+ note:'전용 7평으로 원룸치고 넓은 편, 관리비 10만원, 주차 33대. 1·7호선 이용과 대단지 아파트 정문 앞 도로변. 2007년 준공.',
+ addr:'서울 금천구 가산로 90 (독산동)',mapQuery:'서울 금천구 가산로 90',url:'https://realty.daangn.com/articles/3175005'},
+
+{id:'ds28',urgent:false,deal:'월세',cat:'빌라·다세대',region:'geumcheon',title:'무송베스트빌',price:'보증금 5,500 / 월 110만',priceNum:16500,monthly:110,
+ area:'전용 39.01㎡ (11평)',floor:'2층/6층',source:'당근부동산',date:'2026-11-19',
+ note:'방3·욕실2 올수리, 필로티라 1층처럼 사용. 보증금 조정(6,000/100, 4,500/120) 가능. 승강기 수선 완료, 주차 가능. 도보 1분 편의점.',
+ addr:'서울 금천구 시흥대로88가길 33 (독산동, 무송베스트빌)',mapQuery:'서울 금천구 시흥대로88가길 33',url:'https://realty.daangn.com/articles/5014112'},
+
+{id:'ds29',urgent:false,deal:'월세',cat:'빌라·다세대',region:'geumcheon',title:'언더힐17 (투룸)',price:'보증금 3,000 / 월 90만',priceNum:12000,monthly:90,
+ area:'전용 33.05㎡ (10평)',floor:'3층/5층',source:'당근부동산',date:'2026-11-19',
+ note:'독산역 도보 6~8분 투룸(방2), 2016년 준공·엘리베이터. 관리비 8만원, 주차는 월 5만원. 세탁실 별도.',
+ addr:'서울 금천구 범안로17길 17-17 (독산동, 언더힐17)',mapQuery:'서울 금천구 범안로17길 17-17',url:'https://realty.daangn.com/articles/5022228'},
+
+{id:'ds30',urgent:true,deal:'월세',cat:'빌라·다세대',region:'geumcheon',title:'지상층 투룸 (시흥대로141길)',price:'보증금 1,000 / 월 63만',priceNum:7300,monthly:63,
+ area:'전용 30.13㎡ (9.1평)',floor:'3층/3층',source:'당근부동산',date:'2026-11-13',
+ note:'매물 설명에 "반지층보다 저렴한 지상층 투룸"으로 표기 — 같은 건물·동네 반지하보다 낮은 조건을 내세운 건. 남향·화장실 리모델링, 관리비 없음. 1977년 준공 노후·주차 불가.',
+ addr:'서울 금천구 시흥대로141길 67 (독산동)',mapQuery:'서울 금천구 시흥대로141길 67',url:'https://realty.daangn.com/articles/5016274'},
+
+{id:'ds31',urgent:false,deal:'월세',cat:'아파트',region:'geumcheon',title:'금천롯데캐슬골드파크1차 (반전세)',price:'보증금 5억 / 월 120만',priceNum:62000,monthly:120,
+ area:'전용 84㎡ (25평)',floor:'고층',source:'당근부동산(단지 페이지)',date:'',
+ note:'전세 5억에 월 120만원 반전세. 같은 34평 최근 전세 실거래가 6억 6,150만원(11-17, 12층)이라 보증금을 1억 6,000 낮춘 조건. 금천구청역 도보 7분, 1,743세대.',
+ addr:'서울 금천구 벚꽃로 40 (독산동, 금천롯데캐슬골드파크1차)',mapQuery:'서울 금천구 벚꽃로 40',url:'https://realty.daangn.com/complexes/10808530'},
+
+{id:'ds32',urgent:false,deal:'월세',cat:'아파트',region:'geumcheon',title:'금천롯데캐슬골드파크1차 (1억/300)',price:'보증금 1억 / 월 300만',priceNum:40000,monthly:300,
+ area:'전용 84㎡ (25평)',floor:'저층',source:'당근부동산(단지 페이지)',date:'',
+ note:'보증금 1억·월 300만원 조건. 같은 단지 34평 전세 실거래 6억 6,150만원(11-17)과 비교하면 보증금을 크게 낮춘 대신 월세가 높은 구조라 월 현금흐름이 중요할 때 검토.',
+ addr:'서울 금천구 벚꽃로 40 (독산동, 금천롯데캐슬골드파크1차)',mapQuery:'서울 금천구 벚꽃로 40',url:'https://realty.daangn.com/complexes/10808530'},
+
+{id:'ds33',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'geumcheon',title:'원룸 (독산동 161-15)',price:'보증금 500 / 월 40만',priceNum:4500,monthly:40,
+ area:'전용 16.5㎡ (5평)',floor:'반지하',source:'자리톡',date:'',
+ note:'독산역 인근 반지하 5평, 관리비 5만원 포함 시 월 45만원. 즉시 입주·주차 불가. 같은 동네 원룸 중앙값(보증금 500/월 41만)과 비슷한 수준.',
+ addr:'서울 금천구 독산동 161-15',mapQuery:'서울 금천구 독산동 161-15',url:'https://vacancy.zaritalk.com/vacancy/%EB%8F%85%EC%82%B0%EB%8F%99-%EC%9B%90%EB%A3%B8-%EC%9B%94%EC%84%B8-214772'},
+
+{id:'ds34',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'geumcheon',title:'원룸 (독산역 1번출구 인근)',price:'보증금 500 / 월 40만',priceNum:4500,monthly:40,
+ area:'전용 13.2㎡ (4평)',floor:'3층/3층',source:'위시스',date:'',
+ note:'독산역 1번출구 인근 4평 원룸, 관리비 2만원(공용). 1982년 준공 단독주택. 다만 매물 갱신일이 2026-06-17로 오래돼 지금도 나와 있는지 먼저 확인해야 함.',
+ addr:'서울 금천구 독산동 (독산역 1번출구 인근)',mapQuery:'서울 금천구 독산역',url:'https://wishes.co.kr/map/93839'},
+
+/* ── 경기 동두천 · 지행동 ───────────────────────────── */
+{id:'dd01',urgent:false,deal:'매매',cat:'아파트',region:'dongducheon',title:'송내주공1단지 (1층)',price:'매매 1억 9,000만',priceNum:19000,monthly:0,
+ area:'전용 59㎡ (17.9평)',floor:'1층',source:'당근부동산(단지 페이지)',date:'',
+ note:'전세를 끼고 매매(갭투자금 약 3,000만원) 조건. 역 근접동·보일러 교체 완료. 단지 최근 실거래 매매 1억 8,872만원(당근 FAQ)과 비슷. 1,862세대·지행역 도보 11분.',
+ addr:'경기 동두천시 지행로 16 (지행동, 송내주공1단지)',mapQuery:'경기 동두천시 지행로 16',url:'https://realty.daangn.com/complexes/14926995'},
+
+{id:'dd02',urgent:false,deal:'매매',cat:'아파트',region:'dongducheon',title:'부영3단지',price:'매매 1억 8,700만',priceNum:18700,monthly:0,
+ area:'전용 84㎡ (25평)',floor:'중층',source:'당근부동산(단지 페이지)',date:'',
+ note:'지행역 도보 9분, 380세대. 단지 실거래 매매 1억 8,907만원·전세 1억 7,000만원(당근 FAQ) 수준. 2003년 준공, 신천초 도보 5분.',
+ addr:'경기 동두천시 생연로 28 (지행동, 부영3단지)',mapQuery:'경기 동두천시 생연로 28',url:'https://realty.daangn.com/complexes/14927114'},
+
+{id:'dd03',urgent:false,deal:'매매',cat:'아파트',region:'dongducheon',title:'지행동양엔파트 (2억 2,000)',price:'매매 2억 2,000만',priceNum:22000,monthly:0,
+ area:'전용 84㎡ (25평)',floor:'14층',source:'당근부동산(단지 페이지)',date:'',
+ note:'같은 단지 14층에 2억 2,500만원 매물도 있어 500만원 차이. 단지 실거래 매매 중위 2억 2,333만원(당근 FAQ). 언덕 위 단지라 도보 이동은 힘든 편, 지행역 도보 12분.',
+ addr:'경기 동두천시 행선로20번길 43 (지행동, 지행동양엔파트)',mapQuery:'경기 동두천시 행선로20번길 43',url:'https://realty.daangn.com/complexes/14926125'},
+
+{id:'dd04',urgent:false,deal:'매매',cat:'아파트',region:'dongducheon',title:'지행동양엔파트 (올수리 3억 4,000)',price:'매매 3억 4,000만',priceNum:34000,monthly:0,
+ area:'전용 84㎡ (25평)',floor:'9층',source:'당근부동산(단지 페이지)',date:'',
+ note:'2024-12 올리모델링·거실과 방3개 올확장·정남향 산뷰 로열층. 같은 단지 다른 매물(2억 2,000)보다 1억 2,000 높아 개별 상태 프리미엄 — 값이 맞는지 실거래와 꼭 견줘 보세요.',
+ addr:'경기 동두천시 행선로20번길 43 (지행동, 지행동양엔파트)',mapQuery:'경기 동두천시 행선로20번길 43',url:'https://realty.daangn.com/complexes/14926125'},
+
+{id:'dd05',urgent:false,deal:'매매',cat:'아파트',region:'dongducheon',title:'지행역동원베네스트',price:'매매 2억 6,000만',priceNum:26000,monthly:0,
+ area:'전용 84㎡ (25평)',floor:'4층',source:'당근부동산(단지 페이지)',date:'',
+ note:'지행역 도보 7분, 486세대·헬스장·골프연습장. 단지 실거래 매매 2억 5,850만원(당근 FAQ)과 거의 같은 호가. 트인 뷰·수납 넓음.',
+ addr:'경기 동두천시 이담로 89 (지행동, 지행역동원베네스트)',mapQuery:'경기 동두천시 이담로 89',url:'https://realty.daangn.com/complexes/14927069'},
+
+{id:'dd06',urgent:false,deal:'매매',cat:'아파트',region:'dongducheon',title:'지행역휴먼빌 (45평)',price:'매매 3억 5,500만',priceNum:35500,monthly:0,
+ area:'45평 · 방4·욕실2',floor:'중층',source:'당근부동산(단지 페이지)',date:'',
+ note:'지행역 도보 9분·지행초 도보 2분. 같은 45평·같은 호가 매물이 2건. 단지 실거래 매매 2억 5,200만원(당근 FAQ, 주력 평형 기준)이라 45평 프리미엄을 감안해도 확인 필요.',
+ addr:'경기 동두천시 행선로 52 (지행동, 지행역휴먼빌)',mapQuery:'경기 동두천시 행선로 52',url:'https://realty.daangn.com/complexes/14926752'},
+
+{id:'dd07',urgent:false,deal:'전세',cat:'아파트',region:'dongducheon',title:'현진에버빌',price:'전세 2억 6,000만',priceNum:26000,monthly:0,
+ area:'전용 90㎡ (27평)',floor:'14층',source:'당근부동산(단지 페이지)',date:'',
+ note:'지행역 도보 7분·신천초 도보 2분, 628세대·주차 여유. 단지 실거래 전세 2억 2,000만원(당근 FAQ)보다 4,000만원 높은 호가라 협의 여지 확인.',
+ addr:'경기 동두천시 생연로 10 (지행동, 현진에버빌)',mapQuery:'경기 동두천시 생연로 10',url:'https://realty.daangn.com/complexes/14927120'},
+
+{id:'dd08',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'dongducheon',title:'분리형 원룸 (거북마루로12번길 5-18)',price:'보증금 200 / 월 27만',priceNum:2900,monthly:27,
+ area:'전용 23.1㎡ (6.9평)',floor:'1층/3층',source:'당근부동산',date:'2026-11-17',
+ note:'보증금 200만·월 27만원으로 지행동 원룸 중 낮은 조건. 건물주가 직접 관리, 앞에 주차 편하고 큰 창 2개. 1·2층 사용(매물 표기).',
+ addr:'경기 동두천시 거북마루로12번길 5-18 (지행동)',mapQuery:'경기 동두천시 거북마루로12번길 5-18',url:'https://realty.daangn.com/articles/939212'},
+
+{id:'dd09',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'dongducheon',title:'지행홈씨티 원룸',price:'보증금 300 / 월 30만',priceNum:3300,monthly:30,
+ area:'전용 23.1㎡ (6.9평)',floor:'3층/3층',source:'당근부동산',date:'2026-11-16',
+ note:'풀옵션·조용한 원룸, 전세 전환도 가능하다고 표기. 관리비 10만원. 지행동 신천초 인근, 주차 가능.',
+ addr:'경기 동두천시 생연로19번길 32-9 (지행동)',mapQuery:'경기 동두천시 생연로19번길 32-9',url:'https://realty.daangn.com/articles/3010153'},
+
+{id:'dd10',urgent:false,deal:'전세',cat:'원룸·오피스텔',region:'dongducheon',title:'원룸 전세 (생연로19번길)',price:'전세 4,000만',priceNum:4000,monthly:0,
+ area:'전용 23.2㎡ (7평)',floor:'2층/3층',source:'당근부동산',date:'',
+ note:'보증금 4,000만원 전세로 현금 부담이 작음. 신천초 인근 분리형(현관·주방 분리) 풀옵션, 관리비 10만원·주차 가능. 렌트는 집주인 직접 공고였고 화면에 "예약중" 표시가 있어 현재 계약 가능 여부 확인 필요.',
+ addr:'경기 동두천시 생연로19번길 30 (지행동)',mapQuery:'경기 동두천시 생연로19번길 30',url:'https://realty.daangn.com/articles/3516815'},
+
+{id:'dd11',urgent:true,deal:'매매',cat:'빌라·다세대',region:'dongducheon',title:'명지빌라 2동 1층 (생연동)',price:'매매 5,500만',priceNum:5500,monthly:0,
+ area:'전용 59.8㎡ (18평)',floor:'1층/4층',source:'당근부동산',date:'2026-11-15',
+ note:'매물에 "급매로 가격 확 내립니다. 급매!!!"라고 표기. 방2·화2, 대지지분 12.5평, 2013년 준공. 중앙역·보산역 차량 3분, 집주인 거주 중이라 입주 협의. 관리비 없음.',
+ addr:'경기 동두천시 못골로134번길 36-5 (생연동) 2동',mapQuery:'경기 동두천시 못골로134번길 36-5',url:'https://realty.daangn.com/articles/3466797'},
+
+{id:'dd12',urgent:true,deal:'매매',cat:'빌라·다세대',region:'dongducheon',title:'세정그린빌라 (상봉암동)',price:'매매 4,500만',priceNum:4500,monthly:0,
+ area:'전용 49.6㎡ (15평)',floor:'2층/4층',source:'당근부동산',date:'2026-11-21',
+ note:'매물에 "빌라 급매매"로 표기. 소요초 바로 옆, 소요산역 도보 13분. 방3·주차 가능, 즉시 입주. 오래된 빌라라 벽지 교체 필요(매도인은 그대로 둔 상태).',
+ addr:'경기 동두천시 봉동로 62-18 (상봉암동, 세정그린빌라)',mapQuery:'경기 동두천시 봉동로 62-18',url:'https://realty.daangn.com/articles/3013062'},
+
+{id:'dd13',urgent:false,deal:'매매',cat:'빌라·다세대',region:'dongducheon',title:'백년빌라 (상패동)',price:'매매 8,200만',priceNum:8200,monthly:0,
+ area:'전용 85.9㎡ (25.9평)',floor:'4층/4층',source:'당근부동산',date:'2026-11-19',
+ note:'25평대·방2·욕실2를 8,200만원에 내놓은 구축 빌라. 안방 붙박이장, 도배·장판만 하면 상태 양호. 4층 최상층·엘리베이터 없음, 2001년 준공.',
+ addr:'경기 동두천시 어수로 29-31 (상패동, 백년빌라)',mapQuery:'경기 동두천시 어수로 29-31',url:'https://realty.daangn.com/articles/4042626'},
+
+{id:'dd14',urgent:false,deal:'전세',cat:'빌라·다세대',region:'dongducheon',title:'수정타운 105동 (동두천동)',price:'전세 7,000만',priceNum:7000,monthly:0,
+ area:'전용 66㎡ (19.9평)',floor:'1층/4층',source:'당근부동산',date:'2026-11-22',
+ note:'방3·욕2 전원마을 1층, 보증금 7,000만원의 저렴한 전세(매매도 가능). 관리비 2만원·주차 편함. LH·GH 공사 전세대출은 어렵다고 표기. 동두천역 차량 3분·도보 18분.',
+ addr:'경기 동두천시 안창말로39번길 62-29 (동두천동, 수정타운) 105동',mapQuery:'경기 동두천시 안창말로39번길 62-29',url:'https://realty.daangn.com/articles/2063563'},
+
+{id:'dd15',urgent:false,deal:'매매',cat:'빌라·다세대',region:'dongducheon',title:'오르비제 빌리지 4캐슬 (보산동)',price:'매매 2억 9,000만',priceNum:29000,monthly:0,
+ area:'전용 72.33㎡ (21.8평)',floor:'중층/4층',source:'당근부동산',date:'2026-11-11',
+ note:'2022년 준공 신축급, 보산역 도보 10분. 방3·욕2·주차. 중개사 광고에 "시세 대비 저렴한 급매 위주" 문구가 있지만 이 물건 자체를 급매로 적은 것은 아니어서 급매 표시는 하지 않았습니다.',
+ addr:'경기 동두천시 장고갯로258번길 22 (보산동, 오르비제 빌리지 4캐슬)',mapQuery:'경기 동두천시 장고갯로258번길 22',url:'https://realty.daangn.com/articles/4446473'},
+
+/* ── 서울 구로 · 관악 ───────────────────────────────── */
+{id:'gr01',urgent:false,deal:'매매',cat:'아파트',region:'guro',title:'경원주택 (구로동)',price:'매매 3억 2,000만',priceNum:32000,monthly:0,
+ area:'전용 45.63㎡ (13.8평)',floor:'4층/5층',source:'당근부동산',date:'2026-11-16',
+ note:'남구로역 도보 5~10분·가산디지털단지역 10~15분. 신속통합기획 재개발 추진(정비구역 지정 용역 발주). 방3·욕2·베란다, 엘리베이터 없음. 다른 중개사 광고(고층)도 같은 3억 2,000.',
+ addr:'서울 구로구 구로동로15길 31 (구로동, 경원주택)',mapQuery:'서울 구로구 구로동로15길 31',url:'https://realty.daangn.com/articles/4229123'},
+
+{id:'gr02',urgent:false,deal:'매매',cat:'아파트',region:'guro',title:'소형 아파트 (구로동로12길)',price:'매매 2억 1,000만',priceNum:21000,monthly:0,
+ area:'전용 31.11㎡ (9.4평)',floor:'2층/5층',source:'당근부동산',date:'2026-11-10',
+ note:'남구로역 도보 5분, 올수리 2룸. 1996년 준공·주차 불가. 9평대 2억 1,000만원으로 구로동에서 가장 낮은 축.',
+ addr:'서울 구로구 구로동로12길 4-14 (구로동)',mapQuery:'서울 구로구 구로동로12길 4-14',url:'https://realty.daangn.com/articles/3140837'},
+
+{id:'gr03',urgent:false,deal:'매매',cat:'아파트',region:'guro',title:'신안타워 (전세 끼고)',price:'매매 5억 3,000만',priceNum:53000,monthly:0,
+ area:'전용 59.43㎡ (17.9평)',floor:'고층/21층',source:'당근부동산',date:'2026-11-21',
+ note:'전세 3억 5,000만원(2028-01 만기) 세입자를 안고 매매. 방3·주차 세대당 1.56대. 구로역·대림역 도보권. 입주는 2028-01 이후 협의.',
+ addr:'서울 구로구 구로중앙로 68 (구로동, 신안타워)',mapQuery:'서울 구로구 구로중앙로 68',url:'https://realty.daangn.com/articles/5103494'},
+
+{id:'gr04',urgent:false,deal:'매매',cat:'아파트',region:'guro',title:'구로현대로얄',price:'매매 5억 2,000만',priceNum:52000,monthly:0,
+ area:'전용 68.63㎡ (20.7평)',floor:'3층/11층',source:'당근부동산',date:'2026-11-20',
+ note:'가산디지털단지·구로 업무지역 도보권, 올수리 화이트톤. 준공업지역이라 용적률 완화 등 정비사업 검토 대상. 직거래 매물.',
+ addr:'서울 구로구 가마산로 97 (구로동, 구로현대아파트)',mapQuery:'서울 구로구 가마산로 97',url:'https://realty.daangn.com/articles/4940236'},
+
+{id:'gr05',urgent:false,deal:'전세',cat:'원룸·오피스텔',region:'guro',title:'분리형 원룸 (봉천동)',price:'전세 1억 4,500만',priceNum:14500,monthly:0,
+ area:'전용 19.8㎡ (5.9평)',floor:'5층/5층',source:'당근부동산',date:'2026-11-18',
+ note:'신림역 도보 6~8분, 2020년 준공 분리형 원룸. HUG·보증보험·중기청·버팀목 상담. 5층 최상층, 주차 2대.',
+ addr:'서울 관악구 봉천로 308-14 (봉천동)',mapQuery:'서울 관악구 봉천로 308-14',url:'https://realty.daangn.com/articles/5076113'},
+
+{id:'gr06',urgent:false,deal:'월세',cat:'원룸·오피스텔',region:'guro',title:'오픈형 원룸 (보라매로)',price:'보증금 2,000 / 월 50만',priceNum:7000,monthly:50,
+ area:'전용 19.8㎡ (5.9평)',floor:'6층/7층',source:'당근부동산',date:'2026-11-16',
+ note:'당곡역 도보 3분·보라매병원역 도보 7분. 관리비 8만원, 주차 3대. 2018년 준공.',
+ addr:'서울 관악구 보라매로 15-9 (봉천동)',mapQuery:'서울 관악구 보라매로 15-9',url:'https://realty.daangn.com/articles/5049673'},
+
+{id:'gr07',urgent:false,deal:'전세',cat:'원룸·오피스텔',region:'guro',title:'August Tower (신림동)',price:'전세 2억 4,000만',priceNum:24000,monthly:0,
+ area:'전용 15.7㎡ (4.7평)',floor:'7층/8층',source:'당근부동산',date:'2026-11-17',
+ note:'당곡역 도보 5분·신림역 7분, 2021년 준공. 4평대 원룸인데 전세 2억 4,000만원 — 신림권 전세가 높은 편이라 다른 동네와 비교해 보세요. HUG 가능.',
+ addr:'서울 관악구 봉천로12길 17 (신림동, August Tower)',mapQuery:'서울 관악구 봉천로12길 17',url:'https://realty.daangn.com/articles/5050073'},
+
+/* ── 서울 영등포 · 강서 ─────────────────────────────── */
+{id:'yd01',urgent:false,deal:'매매',cat:'원룸·오피스텔',region:'ydp',title:'서경팰리스101 (16.5평)',price:'매매 4억 8,000만',priceNum:48000,monthly:0,
+ area:'전용 54.66㎡ (16.5평)',floor:'중층/14층',source:'당근부동산',date:'2026-11-20',
+ note:'2021년 준공 3룸(방3·욕2), 영등포역 1호선 이용. 현 세입자 거주 중이라 입주일 협의 필요. 관리비 8만원·주차 41대.',
+ addr:'서울 영등포구 가마산로 466 (신길동, 서경팰리스101)',mapQuery:'서울 영등포구 가마산로 466',url:'https://realty.daangn.com/articles/4046886'},
+
+{id:'yd02',urgent:false,deal:'매매',cat:'원룸·오피스텔',region:'ydp',title:'서경팰리스101 (9평)',price:'매매 2억 9,000만',priceNum:29000,monthly:0,
+ area:'전용 29.86㎡ (9평)',floor:'8층/14층',source:'당근부동산',date:'2026-11-10',
+ note:'방2·욕1, 시스템에어컨·냉장고·세탁기 옵션, 입주청소 완료. 7호선 신풍역 이용. 생애최초 80% 대출·HUG·HF 안내. 같은 건물 16.5평은 4억 8,000만원.',
+ addr:'서울 영등포구 가마산로 466 (신길동, 서경팰리스101)',mapQuery:'서울 영등포구 가마산로 466',url:'https://realty.daangn.com/articles/4367413'},
+
+{id:'yd03',urgent:false,deal:'전세',cat:'아파트',region:'ydp',title:'신길AK푸르지오 (7층)',price:'전세 5억 2,000만',priceNum:52000,monthly:0,
+ area:'전용 49㎡ (14.8평)',floor:'7층',source:'당근부동산(단지 페이지)',date:'',
+ note:'2024년 준공 주상복합, 신풍역 도보 12분. 같은 단지 19층 전세 6억 2,000만원도 있어 층·평형 차이를 견줘야 함. 단지 실거래 전세 4억 9,034만원(당근 FAQ).',
+ addr:'서울 영등포구 가마산로 483 (신길동, 신길AK푸르지오)',mapQuery:'서울 영등포구 가마산로 483',url:'https://realty.daangn.com/complexes/10784043'},
+
+/* ── 경기 포천 · 양주 ───────────────────────────────── */
+{id:'pc01',urgent:false,deal:'매매',cat:'아파트',region:'pocheon',title:'한국아파트 (포천 신읍동)',price:'매매 9,800만',priceNum:9800,monthly:0,
+ area:'전용 67.2㎡ (20.3평)',floor:'2층/15층',source:'당근부동산',date:'2026-11-13',
+ note:'3룸 20평을 9,800만원에 — 포천 구축 아파트 중 낮은 가격대. 공실·즉시 입주, 씽크대·도배·장판·보일러·샷시 교체. 1993년 준공.',
+ addr:'경기 포천시 호병골길 16 (신읍동, 한국아파트) 102동',mapQuery:'경기 포천시 호병골길 16',url:'https://realty.daangn.com/articles/5021583'},
+
+{id:'pc02',urgent:true,deal:'매매',cat:'아파트',region:'pocheon',title:'양주벨라시티 105동 (광적면)',price:'매매 2억 6,500만',priceNum:26500,monthly:0,
+ area:'전용 74.87㎡ (22.6평)',floor:'2층/14층',source:'당근부동산',date:'2026-11-09',
+ note:'매물에 "보유세 중과 이슈로 가격 확 낮춰 진행하는 급매처분"이라고 표기. 2017년 준공, 방3·욕2·드레스룸, 남동향 전면뷰, 공실.',
+ addr:'경기 양주시 광적면 지섬로198번길 16 (양주벨라시티아파트) 105동',mapQuery:'경기 양주시 광적면 지섬로198번길 16',url:'https://realty.daangn.com/articles/2922332'},
+
+{id:'pc03',urgent:true,deal:'매매',cat:'아파트',region:'pocheon',title:'산내들마을 한양수자인 (고읍동)',price:'매매 3억 5,000만',priceNum:35000,monthly:0,
+ area:'전용 84.43㎡ (25.5평)',floor:'3층/15층',source:'당근부동산',date:'2026-11-23',
+ note:'매물에 "매매(급매)"로 표기. 7호선 연장 예정지 역세권, 덕현초·중·고 도보권, B타입 확장형·거실 양창. 입주 2027-01 초 협의.',
+ addr:'경기 양주시 고읍로 11-7 (고읍동, 산내들마을 한양수자인) 110동',mapQuery:'경기 양주시 고읍로 11-7',url:'https://realty.daangn.com/articles/4993925'},
+
+/* ── 서울 기타 ──────────────────────────────────────── */
+{id:'se01',urgent:true,deal:'매매',cat:'아파트',region:'seoul-etc',title:'길훈아파트 5동 (신월동)',price:'매매 3억 5,000만',priceNum:35000,monthly:0,
+ area:'전용 49.77㎡ (15평)',floor:'3층/5층',source:'당근부동산',date:'2026-11-23',
+ note:'매물에 "강추 급매", "집주인 사정으로 가격인하"로 표기. 정밀안전진단 통과·가로주택정비 재건축 추진, 3층 로열층·수리 완료. 1987년 준공, 지양산·서서울호수공원 인접.',
+ addr:'서울 양천구 지양로 101 (신월동, 길훈아파트) 5동',mapQuery:'서울 양천구 지양로 101',url:'https://realty.daangn.com/articles/5078243'},
+
+{id:'se02',urgent:true,deal:'매매',cat:'아파트',region:'seoul-etc',title:'선릉LG에클라트 B동 (삼성동)',price:'매매 3억 2,000만',priceNum:32000,monthly:0,
+ area:'전용 36.47㎡ (11평)',floor:'10층/15층',source:'당근부동산',date:'2026-11-16',
+ note:'매물에 "(급매)" 표기 — 임신·출산으로 급매처리한다고 적음. 선릉역 10번 출구 도보 3~5분 초역세권, 관리 잘 된 건물. 전세 2억 9,000만원 병행(조정 불가).',
+ addr:'서울 강남구 테헤란로63길 12 (삼성동, LG 선릉에클라트 B)',mapQuery:'서울 강남구 테헤란로63길 12',url:'https://realty.daangn.com/articles/3918305'},
+
+/* ── 인천 ───────────────────────────────────────────── */
+{id:'ic01',urgent:true,deal:'매매',cat:'아파트',region:'incheon',title:'미도6차 2동 (청천동)',price:'매매 1억 4,800만',priceNum:14800,monthly:0,
+ area:'전용 52.38㎡ (15.8평)',floor:'6층/6층',source:'당근부동산',date:'2026-11-16',
+ note:'매물에 "주변시세대비 급매, 한 달만 가격조정, 전세가격으로 매매"로 표기. 부평구청역 도보 11분(1·7호선), 정비 완료된 2룸, 2026-11-23 입주 가능.',
+ addr:'인천 부평구 길주로494번길 50 (청천동, 미도아파트) 2동',mapQuery:'인천 부평구 길주로494번길 50',url:'https://realty.daangn.com/articles/4497241'},
+
+{id:'ic02',urgent:true,deal:'매매',cat:'아파트',region:'incheon',title:'선우아파트 1동 (작전동)',price:'매매 1억 5,000만',priceNum:15000,monthly:0,
+ area:'전용 48.96㎡ (14.8평)',floor:'5층/5층',source:'당근부동산',date:'2026-11-04',
+ note:'매물에 "급매" 표기. 재건축 추진 단지, 대지지분 15평·트인 뷰. 방3, 5층 최상층·주차 가능.',
+ addr:'인천 계양구 주부토로472번길 51 (작전동, 선우아파트) 1동',mapQuery:'인천 계양구 주부토로472번길 51',url:'https://realty.daangn.com/articles/4453208'}
+];
+
+const REGIONS = [
+ {key:'geumcheon',label:'서울 금천구 (독산동)',short:'금천·독산동',q:'서울 금천구 독산동',daangn:'서울특별시/금천구/독산동'},
+ {key:'dongducheon',label:'경기 동두천 (지행동)',short:'동두천·지행동',q:'경기 동두천시 지행동',daangn:'경기도/동두천시'},
+ {key:'guro',label:'서울 구로·관악',short:'구로·관악',q:'서울 구로구 관악구',daangn:'서울특별시/구로구'},
+ {key:'ydp',label:'서울 영등포·강서',short:'영등포·강서',q:'서울 영등포구 신길동',daangn:'서울특별시/영등포구'},
+ {key:'pocheon',label:'경기 포천·양주',short:'포천·양주',q:'경기 포천시 양주시',daangn:'경기도/포천시'},
+ {key:'seoul-etc',label:'서울 기타 (양천·강남 등)',short:'서울 기타',q:'서울 아파트',daangn:''},
+ {key:'incheon',label:'인천',short:'인천',q:'인천 아파트',daangn:'인천광역시'}
+];
+</script>
+
+<script>
+(function(){
+  'use strict';
+  const LS_INT='huni_re_interest_v1', LS_FAV='huni_re_fav_v1';
+  const $=function(id){return document.getElementById(id)};
+  const won=function(n){return n.toLocaleString('ko-KR')};
+
+  /* ── state ── */
+  let state={
+    tab:'all',        // 'all' | 'fire'
+    deal:'전체', cat:'전체', region:'전체', money:'전체',
+    kw:'', sort:'price', favOnly:false, interestOnly:false,
+    interest:{regions:[],customs:[]},
+    favs:[]
+  };
+  try{
+    const ri=JSON.parse(localStorage.getItem(LS_INT)||'null');
+    if(ri && Array.isArray(ri.regions)) state.interest=ri;
+    if(!Array.isArray(state.interest.customs)) state.interest.customs=[];
+    const rf=JSON.parse(localStorage.getItem(LS_FAV)||'null');
+    if(Array.isArray(rf)) state.favs=rf;
+  }catch(e){}
+  const saveInterest=function(){ try{localStorage.setItem(LS_INT,JSON.stringify(state.interest))}catch(e){} };
+  const saveFav=function(){ try{localStorage.setItem(LS_FAV,JSON.stringify(state.favs))}catch(e){} };
+
+  const regionOf=function(k){ return REGIONS.find(function(r){return r.key===k}) || {label:k,short:k,q:k,daangn:''} };
+
+  /* ── toast ── */
+  let toastT=null;
+  function toast(msg){
+    const t=$('toast'); t.textContent=msg; t.classList.add('on');
+    clearTimeout(toastT); toastT=setTimeout(function(){t.classList.remove('on')},2600);
+  }
+
+  /* ── interest matching ── */
+  function hitCustom(it,c){
+    const hay=(it.addr+' '+it.title+' '+regionOf(it.region).label+' '+it.note).replace(/\s+/g,'');
+    return hay.indexOf(c.replace(/\s+/g,''))>=0;
+  }
+  function inInterest(it){
+    if(!state.interestOnly) return true;
+    if(state.interest.regions.indexOf(it.region)>=0) return true;
+    return state.interest.customs.some(function(c){return hitCustom(it,c)});
+  }
+  const hasInterest=function(){ return state.interest.regions.length+state.interest.customs.length>0 };
+
+  /* ── filter + sort ── */
+  function moneyOk(it){
+    switch(state.money){
+      case '5천만 이하': return it.priceNum<=5000;
+      case '1억 이하': return it.priceNum<=10000;
+      case '3억 이하': return it.priceNum<=30000;
+      case '3억 초과': return it.priceNum>30000;
+      case '월세 50만 이하': return it.deal==='월세' && it.monthly<=50;
+      default: return true;
+    }
+  }
+  function filtered(){
+    const kw=state.kw.trim().replace(/\s+/g,'').toLowerCase();
+    let list=DATA.filter(function(it){
+      if(state.tab==='fire' && !it.urgent) return false;
+      if(state.deal!=='전체' && it.deal!==state.deal) return false;
+      if(state.cat!=='전체' && it.cat!==state.cat) return false;
+      if(state.region!=='전체' && it.region!==state.region) return false;
+      if(!moneyOk(it)) return false;
+      if(state.favOnly && state.favs.indexOf(it.id)<0) return false;
+      if(!inInterest(it)) return false;
+      if(kw){
+        const hay=(it.title+' '+it.addr+' '+regionOf(it.region).label+' '+it.note+' '+it.source+' '+it.price+' '+it.deal+' '+it.cat).replace(/\s+/g,'').toLowerCase();
+        if(hay.indexOf(kw)<0) return false;
+      }
+      return true;
+    });
+    if(state.sort==='price') list.sort(function(a,b){return a.priceNum-b.priceNum});
+    else if(state.sort==='new') list.sort(function(a,b){ return (b.date||'').localeCompare(a.date||'') });
+    else list.sort(function(a,b){
+      if(a.urgent!==b.urgent) return a.urgent?-1:1;
+      return a.priceNum-b.priceNum;
+    });
+    return list;
+  }
+
+  /* ── render filters ── */
+  function chipRow(el,options,current,onPick){
+    el.innerHTML='';
+    options.forEach(function(o){
+      const b=document.createElement('button');
+      b.className='fbtn'+(o===current?' on':'');
+      b.textContent=o;
+      b.addEventListener('click',function(){onPick(o)});
+      el.appendChild(b);
+    });
+  }
+  function renderFilters(){
+    chipRow($('fDeal'),['전체','매매','전세','월세'],state.deal,function(v){state.deal=v;renderFilters();render()});
+    chipRow($('fCat'),['전체','아파트','빌라·다세대','원룸·오피스텔'],state.cat,function(v){state.cat=v;renderFilters();render()});
+    const regOpts=['전체'].concat(REGIONS.map(function(r){return r.label}));
+    const regCur=state.region==='전체'?'전체':regionOf(state.region).label;
+    chipRow($('fRegion'),regOpts,regCur,function(v){
+      state.region = v==='전체' ? '전체' : (REGIONS.find(function(r){return r.label===v})||{key:'전체'}).key;
+      renderFilters(); render();
+    });
+    chipRow($('fMoney'),['전체','5천만 이하','1억 이하','3억 이하','3억 초과','월세 50만 이하'],state.money,function(v){state.money=v;renderFilters();render()});
+  }
+
+  /* ── interest chips ── */
+  function renderInterestChips(){
+    const box=$('interestChips'); box.innerHTML='';
+    const items=[];
+    state.interest.regions.forEach(function(k){ const r=regionOf(k); items.push({kind:'region',v:k,label:r.short,q:r.q}) });
+    state.interest.customs.forEach(function(c){ items.push({kind:'custom',v:c,label:c,q:c}) });
+    if(!items.length){
+      const s=document.createElement('span');
+      s.className='chip'; s.style.color='#6d7f9c'; s.textContent='아직 고른 관심지역이 없어요 — 오른쪽 [관심지역 설정]';
+      box.appendChild(s);
+    }
+    items.forEach(function(it){
+      const b=document.createElement('button');
+      b.className='chip';
+      b.innerHTML='📍 '+it.label;
+      b.title='누르면 이 지역으로 실시간 검색어가 채워집니다';
+      b.addEventListener('click',function(){
+        $('q').value=it.q;
+        Array.prototype.forEach.call(box.children,function(c){c.classList&&c.classList.remove('on')});
+        b.classList.add('on');
+        toast('실시간 검색어: '+it.q+' — 아래 네이버·당근 버튼을 누르세요');
+      });
+      box.appendChild(b);
+    });
+    $('interestOnly').classList.toggle('on',state.interestOnly);
+    $('interestOnly').setAttribute('aria-pressed',state.interestOnly?'true':'false');
+    $('interestHint').textContent=hasInterest()
+      ? '⭐ 를 켜면 고른 '+ (state.interest.regions.length+state.interest.customs.length) +'개 지역 매물만 남습니다. 칩을 누르면 실시간 검색어가 채워집니다.'
+      : '관심지역을 고르면 그 동네 매물만 모아 볼 수 있어요. [관심지역 설정]에서 시·구·동을 직접 추가할 수도 있습니다.';
+  }
+
+  /* ── interest sheet ── */
+  function renderSheet(){
+    const list=$('optList'); list.innerHTML='';
+    REGIONS.forEach(function(r){
+      const n=DATA.filter(function(it){return it.region===r.key}).length;
+      const on=state.interest.regions.indexOf(r.key)>=0;
+      const d=document.createElement('button');
+      d.className='opt'+(on?' on':'');
+      d.innerHTML='<span class="cb">'+(on?'✓':'')+'</span><span class="ol"><b>'+r.label+'</b><small>'+r.q+'</small></span><span class="oc">'+n+'건</span>';
+      d.addEventListener('click',function(){
+        const i=state.interest.regions.indexOf(r.key);
+        if(i>=0) state.interest.regions.splice(i,1); else state.interest.regions.push(r.key);
+        saveInterest(); renderSheet(); renderInterestChips(); render();
+      });
+      list.appendChild(d);
+    });
+    const cl=$('custList'); cl.innerHTML='';
+    state.interest.customs.forEach(function(c){
+      const n=DATA.filter(function(it){return hitCustom(it,c)}).length;
+      const s=document.createElement('span');
+      s.className='cust'; s.innerHTML='📍 '+c+' <small style="color:#6d7f9c">'+n+'건</small>';
+      const x=document.createElement('button'); x.textContent='✕'; x.setAttribute('aria-label',c+' 삭제');
+      x.addEventListener('click',function(){
+        state.interest.customs=state.interest.customs.filter(function(v){return v!==c});
+        saveInterest(); renderSheet(); renderInterestChips(); render();
+      });
+      s.appendChild(x); cl.appendChild(s);
+    });
+  }
+  function addCustom(){
+    const inp=$('custInput'), v=inp.value.trim().replace(/\s+/g,' ');
+    if(!v) return;
+    if(state.interest.customs.indexOf(v)>=0){ toast('이미 추가된 지역입니다'); return; }
+    const n=DATA.filter(function(it){return hitCustom(it,v)}).length;
+    state.interest.customs.push(v); inp.value='';
+    saveInterest(); renderSheet(); renderInterestChips(); render();
+    toast(n? ('"'+v+'" 매물 '+n+'건을 찾았습니다') : ('"'+v+'"는 지금 목록에 없지만 검색·필터에는 저장했습니다'));
+  }
+
+  /* ── cards ── */
+  function card(it){
+    const el=document.createElement('article');
+    el.className='card'+(it.urgent?' urgent':'');
+    const isFav=state.favs.indexOf(it.id)>=0;
+    const reg=regionOf(it.region).short;
+    el.innerHTML=
+      '<div class="top">'+
+        '<div class="badges">'+
+          (it.urgent?'<span class="bg fire">🔥 급매</span>':'')+
+          '<span class="bg deal">'+it.deal+'</span>'+
+          '<span class="bg cat">'+it.cat+'</span>'+
+          '<span class="bg reg">'+reg+'</span>'+
+        '</div>'+
+        '<button class="star'+(isFav?' on':'')+'" aria-label="관심 매물 표시" aria-pressed="'+(isFav?'true':'false')+'">'+(isFav?'★':'☆')+'</button>'+
+      '</div>'+
+      '<h3>'+it.title+'</h3>'+
+      '<div class="price">'+it.price+'</div>'+
+      '<div class="meta"><span>'+it.area+'</span><span class="sep">·</span><span>'+it.floor+'</span><span class="sep">·</span><span>'+it.source+(it.date?' · '+it.date.slice(5).replace('-','/')+' 확인':'')+'</span></div>'+
+      '<p class="note">'+it.note+'</p>'+
+      '<div class="more">카드를 누르면 전체 설명 · 관심 · 지도 ›</div>'+
+      '<p class="addr">'+it.addr+'</p>'+
+      '<div class="acts">'+
+        '<a href="https://map.naver.com/p/search/'+encodeURIComponent(it.mapQuery)+'" target="_blank" rel="noopener">📍 네이버지도</a>'+
+        '<a class="src" href="'+it.url+'" target="_blank" rel="noopener">🔗 매물 원문</a>'+
+      '</div>';
+    el.querySelector('.star').addEventListener('click',function(e){
+      e.stopPropagation();
+      const i=state.favs.indexOf(it.id);
+      if(i>=0) state.favs.splice(i,1); else state.favs.push(it.id);
+      saveFav(); render();
+      toast(i>=0?'관심 매물에서 뺐습니다':'★ 관심 매물에 담았습니다');
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('.acts a'),function(a){
+      a.addEventListener('click',function(e){ e.stopPropagation(); });
+    });
+    el.addEventListener('click',function(){ openDetail(it.id) });
+    return el;
+  }
+
+  function render(){
+    $('tabAll').classList.toggle('on',state.tab==='all');
+    $('tabFire').classList.toggle('on',state.tab==='fire');
+    $('tabAll').setAttribute('aria-selected',state.tab==='all'?'true':'false');
+    $('tabFire').setAttribute('aria-selected',state.tab==='fire'?'true':'false');
+    $('favOnly').classList.toggle('on',state.favOnly);
+    $('favOnly').setAttribute('aria-pressed',state.favOnly?'true':'false');
+    $('kwClr').hidden=!state.kw;
+
+    const all=DATA.length, fire=DATA.filter(function(i){return i.urgent}).length;
+    $('cntAll').textContent=all;
+    $('cntFire').textContent=fire;
+
+    const list=filtered();
+    $('resCnt').textContent=list.length;
+    const notes=[];
+    notes.push(state.tab==='fire'?'🔥 급매만':'📋 전체 매물');
+    if(state.interestOnly) notes.push('⭐ 관심지역');
+    if(state.favOnly) notes.push('★ 관심');
+    $('resNote').textContent=notes.join(' · ')+' / 총 '+all+'건 중';
+
+    const box=$('cards'); box.innerHTML='';
+    if(!list.length){
+      const e=document.createElement('div'); e.className='empty';
+      e.innerHTML='<b>조건에 맞는 매물이 없습니다</b>필터를 하나씩 풀어 보세요. '+(state.interestOnly?'⭐ 관심지역을 켠 상태라면 [관심지역 설정]에서 지역을 더 고르거나 ⭐를 끄면 됩니다.':'');
+      box.appendChild(e);
+    } else {
+      list.forEach(function(it){ box.appendChild(card(it)) });
+    }
+  }
+
+  /* ── external quick search ── */
+  function regionForQuery(q){
+    const flat=q.replace(/\s+/g,'');
+    return REGIONS.find(function(r){
+      return r.daangn && (flat.indexOf(r.q.split(' ').pop())>=0 || flat.indexOf(r.short.split('·')[0])>=0);
+    });
+  }
+  function openProvider(p){
+    const base=$('q').value.trim()||'독산동';
+    const fire=$('qFire').classList.contains('on');
+    const q=base+(fire?' 급매':'');
+    if(p==='naver'){
+      window.open('https://new.land.naver.com/search?query='+encodeURIComponent(q),'_blank','noopener');
+      return;
+    }
+    if(p==='daangn'){
+      const r=regionForQuery(base);
+      if(r&&r.daangn){
+        const path=r.daangn.split('/').map(encodeURIComponent).join('/');
+        window.open('https://realty.daangn.com/map/'+path,'_blank','noopener');
+      }else{
+        window.open('https://realty.daangn.com/','_blank','noopener');
+        copyText(base,'당근부동산은 앱 설치를 권유합니다. "'+base+'"를 복사했습니다 — 검색창에 붙여넣으세요');
+      }
+      if(fire) toast('당근부동산은 급매 필터가 없어 "'+base+'" 지도로 엽니다. 목록에서 🔥 표시를 찾아보세요');
+      return;
+    }
+    if(p==='kb'){
+      window.open('https://kbland.kr/','_blank','noopener');
+      copyText(base,'KB부동산 홈을 열었습니다. "'+base+'"를 복사했습니다 — 검색창에 붙여넣으세요');
+      return;
+    }
+    window.open('https://hogangnono.com/','_blank','noopener');
+    copyText(base,'호갱노노 홈을 열었습니다. "'+base+'"를 복사했습니다 — 검색창에 붙여넣으세요');
+  }
+  function copyText(text,msg){
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){toast(msg)},function(){toast(msg)}); return; }
+    }catch(e){}
+    toast(msg);
+  }
+
+  /* ── detail sheet ── */
+  function renderDetail(it){
+    const reg=regionOf(it.region);
+    const isFav=state.favs.indexOf(it.id)>=0;
+    $('dBody').innerHTML=
+      '<div class="badges">'+
+        (it.urgent?'<span class="bg fire">🔥 급매</span>':'')+
+        '<span class="bg deal">'+it.deal+'</span>'+
+        '<span class="bg cat">'+it.cat+'</span>'+
+        '<span class="bg reg">'+reg.short+'</span>'+
+      '</div>'+
+      '<h3 class="d-title">'+it.title+'</h3>'+
+      '<p class="addr" style="margin:0">'+it.addr+'</p>'+
+      '<div class="d-price'+(it.urgent?' fire':'')+'">'+it.price+'</div>'+
+      '<div class="d-grid">'+
+        '<div><span>거래형태</span><b>'+it.deal+'</b></div>'+
+        '<div><span>매물종류</span><b>'+it.cat+'</b></div>'+
+        '<div><span>면적</span><b>'+it.area+'</b></div>'+
+        '<div><span>층수</span><b>'+it.floor+'</b></div>'+
+        '<div><span>지역</span><b>'+reg.label+'</b></div>'+
+        '<div><span>출처 · 확인일</span><b>'+it.source+(it.date?' · '+it.date:'')+'</b></div>'+
+      '</div>'+
+      '<p class="d-cap">'+(it.urgent?'🔥 급매 근거 · 특징':'특징 · 유의점')+'</p>'+
+      '<p class="d-note">'+it.note+'</p>'+
+      '<div class="d-acts">'+
+        '<button class="fav'+(isFav?' on':'')+'" id="dFav">'+(isFav?'★ 관심중':'☆ 관심')+'</button>'+
+        '<a href="https://map.naver.com/p/search/'+encodeURIComponent(it.mapQuery)+'" target="_blank" rel="noopener">🗺️ 네이버 지도</a>'+
+        '<a class="src" href="'+it.url+'" target="_blank" rel="noopener">🔗 원문/검색</a>'+
+      '</div>';
+    $('dFav').addEventListener('click',function(e){
+      e.stopPropagation();
+      const i=state.favs.indexOf(it.id);
+      if(i>=0) state.favs.splice(i,1); else state.favs.push(it.id);
+      saveFav(); render(); renderDetail(it);
+      toast(i>=0?'관심 매물에서 뺐습니다':'★ 관심 매물에 담았습니다');
+    });
+  }
+  function openDetail(id){
+    const it=DATA.filter(function(d){return d.id===id})[0];
+    if(!it) return;
+    renderDetail(it);
+    $('dmask').classList.add('on');
+    document.body.style.overflow='hidden';
+  }
+  function closeDetail(){
+    $('dmask').classList.remove('on');
+    document.body.style.overflow='';
+  }
+
+  /* ── bind ── */
+  $('tabAll').addEventListener('click',function(){state.tab='all';render()});
+  $('tabFire').addEventListener('click',function(){state.tab='fire';render()});
+  $('interestOnly').addEventListener('click',function(){
+    if(!state.interestOnly && !hasInterest()){
+      openSheet(); toast('먼저 관심지역을 골라 주세요'); return;
+    }
+    state.interestOnly=!state.interestOnly; renderInterestChips(); render();
+  });
+  $('openInterest').addEventListener('click',openSheet);
+  $('sheetDone').addEventListener('click',function(){ $('mask').classList.remove('on') });
+  $('mask').addEventListener('click',function(e){ if(e.target===$('mask')) $('mask').classList.remove('on') });
+  $('dClose').addEventListener('click',closeDetail);
+  $('dmask').addEventListener('click',function(e){ if(e.target===$('dmask')) closeDetail() });
+  document.addEventListener('keydown',function(e){
+    if(e.key!=='Escape') return;
+    if($('dmask').classList.contains('on')) closeDetail();
+    else $('mask').classList.remove('on');
+  });
+  $('custAdd').addEventListener('click',addCustom);
+  $('custInput').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); addCustom(); } });
+  $('qFire').addEventListener('click',function(){
+    const on=$('qFire').classList.toggle('on');
+    $('qFire').setAttribute('aria-pressed',on?'true':'false');
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-prov]'),function(b){
+    b.addEventListener('click',function(){ openProvider(b.getAttribute('data-prov')) });
+  });
+  $('kw').addEventListener('input',function(e){ state.kw=e.target.value; render() });
+  $('kwClr').addEventListener('click',function(){ state.kw=''; $('kw').value=''; render(); $('kw').focus() });
+  $('sort').addEventListener('change',function(e){ state.sort=e.target.value; render() });
+  $('favOnly').addEventListener('click',function(){ state.favOnly=!state.favOnly; render() });
+
+  function openSheet(){ renderSheet(); $('mask').classList.add('on') }
+
+  /* init */
+  if(!$('q').value) $('q').value='독산동';
+  renderFilters();
+  renderInterestChips();
+  render();
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',function(){ navigator.serviceWorker.register('/sw.js').catch(function(){}) });
+  }
+})();
+</script>
+</body>
+</html>

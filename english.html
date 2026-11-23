@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FFF9F0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="영어놀이터">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<title>🐣 후니의 영어 놀이터</title>
+<style>
+:root{
+  --ink:#4A4038;
+  --ink2:#8B7C6E;
+  --ink3:#AC9C8A;
+  --cream:#FFF9F0;
+  --line:#F1E4D5;
+  --card-shadow:0 5px 14px rgba(168,146,124,.15);
+  --mint:#E7F8EC;
+  --sky:#E6F4FD;
+  --lilac:#F1EAFC;
+  --peach:#FFEFE3;
+  --pink:#FFEDF3;
+  --sun:#FFF6E2;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;overflow-x:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  -webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;
+  touch-action:manipulation;
+  overscroll-behavior:none;
+  line-height:1.35;
+}
+#bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 8% 4%, #E6F4FD 0%, rgba(230,244,253,0) 46%),
+    radial-gradient(circle at 94% 10%, #E7F8EC 0%, rgba(231,248,236,0) 44%),
+    radial-gradient(circle at 50% 104%, #FFE9DC 0%, rgba(255,233,220,0) 56%),
+    #FFF9F0;
+}
+#app{
+  position:relative;z-index:1;
+  height:100vh;height:100dvh;
+  max-width:640px;margin:0 auto;
+  display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+  overflow:hidden;
+}
+.hidden{display:none!important}
+
+/* ── top bar ── */
+#topbar{
+  flex:0 0 auto;display:flex;align-items:center;gap:8px;
+  height:54px;padding:0 12px;
+}
+#topTitle{
+  flex:1 1 auto;min-width:0;
+  font-size:16px;font-weight:900;letter-spacing:-.02em;color:#5B4B3E;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#topTitle.center{text-align:center}
+.icon-btn{
+  flex:0 0 auto;width:42px;height:42px;border-radius:14px;border:none;
+  background:rgba(255,255,255,.86);
+  box-shadow:0 3px 9px rgba(168,146,124,.16);
+  font-size:19px;display:grid;place-items:center;cursor:pointer;color:#7A6857;
+  font-family:inherit;
+}
+.icon-btn:active{filter:brightness(.93)}
+.rate-pill{
+  flex:0 0 auto;height:34px;padding:0 12px;border-radius:13px;
+  border:1.5px solid #EFE0CF;background:rgba(255,255,255,.86);
+  font-size:12.5px;font-weight:900;color:#9A8574;font-family:inherit;
+  display:flex;align-items:center;gap:4px;cursor:pointer;
+}
+.rate-pill:active{background:#FFF3E2}
+.rate-pill.slow{background:#FFF1DF;color:#D98B57;border-color:#F6CFA8}
+/* ── 전체 앱 목록(런처) 버튼 ── */
+.applist-pill{
+  flex:0 0 auto;height:34px;padding:0 10px;border-radius:13px;
+  border:1.5px solid #EFE0CF;background:rgba(0,0,0,.06);
+  font-size:12px;font-weight:900;color:#6B5747;text-decoration:none;
+  display:flex;align-items:center;gap:3px;white-space:nowrap;font-family:inherit;
+}
+.applist-pill:active{background:rgba(0,0,0,.12)}
+
+/* ── screens ── */
+#stage{position:relative;flex:1 1 auto;min-height:0;display:flex}
+.screen{
+  display:none;flex:1 1 auto;min-width:0;min-height:0;
+  flex-direction:column;
+}
+.screen.active{display:flex}
+
+/* ── home ── */
+#scr-home{overflow-y:auto;overflow-x:hidden;padding:0 16px 18px}
+#scr-home .hero{margin-top:auto}
+#scr-home .home-note{margin-bottom:auto}
+.hero{text-align:center;padding:6px 0 16px}
+.hero-emoji{font-size:clamp(48px,15vw,62px);line-height:1;animation:bob 2.8s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.hero h1{font-size:clamp(23px,6.6vw,29px);font-weight:900;letter-spacing:-.035em;margin:8px 0 2px;color:#57483B}
+.hero p{margin:0;font-size:13px;font-weight:800;color:#A6957F}
+.menu{display:flex;flex-direction:column;gap:11px}
+.menu-card{
+  position:relative;overflow:hidden;
+  border:none;border-radius:24px;
+  padding:16px 16px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:var(--card-shadow);
+  font-family:inherit;text-align:left;cursor:pointer;
+  min-height:82px;
+  transition:filter .12s;
+  width:100%;
+}
+.menu-card:active{filter:brightness(.955)}
+.menu-card .ico{flex:0 0 auto;font-size:34px;line-height:1;width:44px;text-align:center}
+.menu-card .body{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+.menu-card .lb{font-size:clamp(16px,4.6vw,18px);font-weight:900;color:#57483B;letter-spacing:-.025em}
+.menu-card .sub{font-size:11.5px;font-weight:700;color:#9A8878}
+.menu-card .arrow{flex:0 0 auto;font-size:20px;color:#B7A695;padding-left:2px}
+.menu-card.small{flex-direction:column;gap:3px;align-items:center;justify-content:center;padding:14px 8px 15px;min-height:104px}
+.menu-card.small .lb{font-size:15px}
+.menu-card.small .ico{font-size:30px;width:auto}
+.menu-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.badge{
+  position:absolute;top:9px;right:10px;
+  font-size:9.5px;font-weight:900;letter-spacing:-.01em;
+  color:#B4772F;background:#FFE7BD;
+  padding:3px 7px;border-radius:8px;
+  box-shadow:0 1px 3px rgba(180,119,47,.18);
+}
+.c-mint{background:linear-gradient(165deg,#EBFAF0,#D8F2E1)}
+.c-sky{background:linear-gradient(165deg,#EBF6FD,#D8ECFA)}
+.c-lilac{background:linear-gradient(165deg,#F4EEFC,#E8DCFA)}
+.c-peach{background:linear-gradient(165deg,#FFF3E9,#FFE3CE)}
+.c-pink{background:linear-gradient(165deg,#FFF1F6,#FFDEEB)}
+.c-sun{background:linear-gradient(165deg,#FFF9EA,#FFEDC7)}
+.home-note{
+  margin:18px 0 0;text-align:center;font-size:11.5px;line-height:1.65;color:#B3A493;font-weight:700;
+}
+
+/* ── pills / chips ── */
+.pills{flex:0 0 auto;display:flex;gap:7px;padding:0 14px 8px}
+.pill{
+  flex:1 1 0;min-width:0;
+  height:40px;border-radius:14px;border:1.5px solid #EDDFCE;
+  background:rgba(255,255,255,.8);
+  font-family:inherit;font-size:12px;font-weight:900;color:#9C8977;
+  display:flex;align-items:center;justify-content:center;gap:3px;
+  cursor:pointer;padding:0 4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:background .13s,color .13s,border-color .13s;
+}
+.pill:active{filter:brightness(.97)}
+.pill.on{background:#FFF0DC;border-color:#F4CDA3;color:#C97A44;box-shadow:0 2px 6px rgba(201,122,68,.12)}
+.chips{flex:0 0 auto;display:flex;gap:6px;padding:0 14px 9px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;height:30px;padding:0 11px;border-radius:11px;
+  border:1.5px solid #EEE0CF;background:rgba(255,255,255,.7);
+  font-family:inherit;font-size:11.5px;font-weight:900;color:#A2907E;
+  cursor:pointer;
+}
+.chip.on{background:#E7F8EC;border-color:#BFE6CC;color:#4E8F65}
+
+/* ── scrolling area ── */
+.scroll{
+  flex:1 1 auto;min-height:0;min-width:0;
+  overflow-y:auto;overflow-x:hidden;overflow-wrap:anywhere;
+  -webkit-overflow-scrolling:touch;
+  padding:0 14px 18px;
+}
+.hintline{
+  display:flex;gap:6px;align-items:flex-start;
+  background:linear-gradient(180deg,#FFF6E9,#FFFBF4);
+  border:1.5px solid #FFE4C8;border-radius:14px;
+  padding:8px 11px;margin:0 0 10px;
+  font-size:12px;line-height:1.4;font-weight:700;color:#8A6A4E;
+}
+.hintline b{color:#DE8A5C;font-weight:900;white-space:nowrap}
+
+/* ── word cards ── */
+.wcard{
+  background:#fff;border-radius:20px;
+  box-shadow:var(--card-shadow);
+  padding:12px 13px;margin:0 0 9px;
+  transition:transform .13s, box-shadow .13s;
+}
+.wcard:active{transform:scale(.994)}
+.wtop{display:flex;align-items:center;gap:12px;min-width:0}
+.wemoji{
+  flex:0 0 auto;width:52px;height:52px;border-radius:16px;
+  display:grid;place-items:center;font-size:30px;line-height:1;
+  background:linear-gradient(165deg,#FFF7EA,#FFEEDB);
+  border:1px solid #F6E7D4;
+}
+.wtext{flex:1 1 auto;min-width:0}
+.wen{font-size:19px;font-weight:900;color:#4F4136;letter-spacing:-.02em;line-height:1.2;word-break:break-word}
+.wko{font-size:13px;font-weight:800;color:#9C8B79;margin-top:1px}
+.spk{
+  flex:0 0 auto;width:42px;height:42px;border-radius:50%;border:none;
+  background:linear-gradient(165deg,#E9F7FD,#D6EDFA);
+  font-size:18px;display:grid;place-items:center;cursor:pointer;
+  box-shadow:0 2px 6px rgba(120,160,190,.18);
+}
+.spk:active{filter:brightness(.94)}
+.spk.playing{animation:pulse .9s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+.wex{
+  margin-top:9px;padding-top:9px;border-top:1px dashed #F0E3D3;
+  font-size:12.5px;line-height:1.5;color:#7C6A57;font-weight:700;
+}
+.wex .en{color:#5C6E7E;font-weight:800}
+.wex .ko{display:block;color:#A79685;font-size:11.5px;margin-top:1px}
+.cat-tag{
+  display:inline-block;font-size:10px;font-weight:900;color:#B08968;
+  background:#FFF3E2;border-radius:7px;padding:2px 6px;margin-left:6px;vertical-align:2px;
+}
+
+/* ── conversation ── */
+.cgroup{background:#fff;border-radius:20px;box-shadow:var(--card-shadow);padding:12px 13px 8px;margin:0 0 11px}
+.ghead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.gtitle{flex:1 1 auto;min-width:0;font-size:14px;font-weight:900;color:#5B4B3E;letter-spacing:-.02em}
+.playall{
+  flex:0 0 auto;height:30px;padding:0 11px;border-radius:11px;border:1.5px solid #D9EDE0;
+  background:#EDF9F1;font-family:inherit;font-size:11px;font-weight:900;color:#4E8F65;cursor:pointer;
+}
+.playall:active{filter:brightness(.96)}
+.line{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:8px 4px;border-radius:12px;
+  transition:background .15s;
+}
+.playall.stop{background:#FDECE3;border-color:#F7D3C0;color:#C0683E}
+.line+.line{border-top:1px dashed #F3E8DA}
+.line.speaking{background:#FFF6E7}
+.who{
+  flex:0 0 auto;width:22px;height:22px;border-radius:8px;
+  display:grid;place-items:center;font-size:10.5px;font-weight:900;
+  margin-top:1px;
+}
+.who.a{background:#E5F2FD;color:#4E86B8}
+.who.b{background:#FFE9DC;color:#C97A44}
+.linetext{flex:1 1 auto;min-width:0}
+.len{font-size:14.5px;font-weight:900;color:#4F4136;line-height:1.35;word-break:break-word}
+.lko{font-size:11.5px;font-weight:700;color:#A79685;margin-top:1px}
+.line .spk{width:32px;height:32px;font-size:14px;box-shadow:none;background:#F2F8FC}
+
+/* ── listening ── */
+.lpanel{display:none;flex-direction:column;flex:1 1 auto;min-height:0}
+.lpanel.on{display:flex}
+.listen-card{
+  background:#fff;border-radius:24px;box-shadow:var(--card-shadow);
+  padding:18px 16px 16px;margin:0 0 12px;text-align:center;
+}
+.listen-emoji{font-size:clamp(52px,16vw,68px);line-height:1.1;margin-bottom:4px}
+.listen-word{font-size:26px;font-weight:900;color:#4F4136;letter-spacing:-.03em;min-height:34px;word-break:break-word}
+.listen-word.hideblur{filter:blur(9px);opacity:.5;transition:filter .2s}
+.listen-ko{font-size:14px;font-weight:800;color:#9C8B79;margin-top:2px;min-height:20px}
+.listen-ex{font-size:12px;font-weight:700;color:#8C7B69;margin-top:8px;line-height:1.45}
+.listen-ex .ko{display:block;color:#AE9E8C;font-size:11px}
+.bigplay{
+  width:100%;height:62px;border-radius:20px;border:none;
+  background:linear-gradient(165deg,#E9F7FD,#D3EBFA);
+  font-family:inherit;font-size:16px;font-weight:900;color:#3E7FA8;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;box-shadow:0 4px 12px rgba(110,160,195,.2);
+  margin:12px 0 0;
+}
+.bigplay:active{filter:brightness(.95);transform:scale(.995)}
+.bigplay.playing{animation:pulse 1s ease-in-out infinite}
+.rowbtns{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}
+.btn2{
+  height:46px;border-radius:16px;border:1.5px solid #EDDFCE;
+  background:rgba(255,255,255,.9);font-family:inherit;
+  font-size:13.5px;font-weight:900;color:#8A7663;cursor:pointer;
+}
+.btn2:active{background:#FFF6EA}
+.btn2.main{background:linear-gradient(165deg,#FFF1DC,#FFE3C4);border-color:#F5D2AC;color:#B47338}
+.qscore{font-size:12px;font-weight:900;color:#A2907E;text-align:center;margin:0 0 8px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.opt{
+  position:relative;min-height:88px;border-radius:18px;border:2px solid #EFE2D2;
+  background:#fff;box-shadow:var(--card-shadow);
+  font-family:inherit;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  padding:8px;transition:transform .14s,border-color .14s,background .14s;
+}
+.opt:active{transform:scale(.98)}
+.opt .oe{font-size:32px;line-height:1.1}
+.opt .ol{font-size:13px;font-weight:900;color:#5B4B3E}
+.opt.right{border-color:#9ED5B0;background:#EDFAF1}
+.opt.wrong{border-color:#F3DCCE;background:#FBF2ED;opacity:.62}
+.opt.off{pointer-events:none}
+@keyframes softShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}55%{transform:translateX(3px)}80%{transform:translateX(-2px)}}
+.opt.shake{animation:softShake .42s ease}
+.feedback{min-height:24px;text-align:center;font-size:13px;font-weight:900;color:#C97A44;margin:10px 0 0}
+.feedback.good{color:#4E9F6A}
+
+/* ── coming soon ── */
+.soon{
+  background:#fff;border-radius:24px;box-shadow:var(--card-shadow);
+  padding:26px 20px 24px;text-align:center;margin:0 0 12px;
+}
+.soon .se{font-size:56px;line-height:1.1}
+.soon h2{font-size:20px;font-weight:900;margin:10px 0 4px;color:#57483B;letter-spacing:-.02em}
+.soon .sb{
+  display:inline-block;font-size:11px;font-weight:900;color:#B4772F;background:#FFE7BD;
+  padding:4px 10px;border-radius:9px;margin:0 0 12px;
+}
+.soon p{font-size:13px;font-weight:700;line-height:1.65;color:#9C8B79;margin:0}
+.soon .plan{
+  margin-top:14px;text-align:left;background:#FFFAF3;border:1.5px dashed #F2E1CD;border-radius:16px;
+  padding:12px 13px;font-size:12px;line-height:1.7;color:#8C7A67;font-weight:700;
+}
+.soon .plan b{color:#C08A5C}
+
+/* ── toast ── */
+#toast{
+  position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);
+  transform:translateX(-50%) translateY(14px);
+  background:rgba(74,64,56,.93);color:#FFF8EE;
+  font-size:12.5px;font-weight:800;line-height:1.45;
+  padding:10px 15px;border-radius:14px;max-width:min(88vw,360px);text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:60;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (min-width:560px){
+  .wcard{padding:14px 16px}
+  .wen{font-size:21px}
+}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div id="app">
+  <header id="topbar">
+    <button id="backBtn" class="icon-btn hidden" aria-label="뒤로">←</button>
+    <div id="topTitle">🐣 후니의 영어 놀이터</div>
+    <button id="rateBtn" class="rate-pill hidden" aria-label="말하기 속도">🐢 0.7x</button>
+    <a class="applist-pill" href="/" aria-label="전체 앱 목록으로 이동">🏠 앱 목록</a>
+  </header>
+
+  <main id="stage">
+    <!-- HOME -->
+    <section class="screen active" id="scr-home">
+      <div class="hero">
+        <div class="hero-emoji">🐣</div>
+        <h1>후니의 영어 놀이터</h1>
+        <p>그림 보고 · 듣고 · 따라 말해요</p>
+      </div>
+      <div class="menu">
+        <button class="menu-card c-mint" data-go="words">
+          <span class="ico">📚</span>
+          <span class="body"><span class="lb">단어 공부</span><span class="sub">유아 기초 · 초등 · 중학 단어 카드</span></span>
+          <span class="arrow">›</span>
+        </button>
+        <button class="menu-card c-sky" data-go="conv">
+          <span class="ico">💬</span>
+          <span class="body"><span class="lb">회화 공부</span><span class="sub">엄마·아빠 부르기부터 친구 대화까지</span></span>
+          <span class="arrow">›</span>
+        </button>
+        <button class="menu-card c-lilac" data-go="listen">
+          <span class="ico">🔊</span>
+          <span class="body"><span class="lb">듣기 공부</span><span class="sub">단어·회화 듣기 + 듣고 맞히기 퀴즈</span></span>
+          <span class="arrow">›</span>
+        </button>
+        <div class="menu-row">
+          <button class="menu-card small c-peach" data-go="speaking">
+            <span class="badge">업데이트 예정</span>
+            <span class="ico">🎤</span>
+            <span class="lb">말하기</span>
+          </button>
+          <button class="menu-card small c-pink" data-go="writing">
+            <span class="badge">업데이트 예정</span>
+            <span class="ico">✏️</span>
+            <span class="lb">쓰기</span>
+          </button>
+        </div>
+      </div>
+      <p class="home-note">홈 화면에 추가하면 앱처럼 열립니다<br>(Safari → 공유 → 홈 화면에 추가)</p>
+    </section>
+
+    <!-- WORDS -->
+    <section class="screen" id="scr-words">
+      <div class="pills" id="wordStages"></div>
+      <div class="chips" id="wordCats"></div>
+      <div class="scroll">
+        <div class="hintline"><b>💡 엄마 팁</b><span>카드를 눌러 단어를 듣고, 아이가 따라 말해 보게 해 주세요. 위쪽 <b style="display:inline">🐢</b> 버튼으로 말하는 속도를 바꿀 수 있어요.</span></div>
+        <div id="wordList"></div>
+      </div>
+    </section>
+
+    <!-- CONVERSATION -->
+    <section class="screen" id="scr-conv">
+      <div class="pills" id="convLevels"></div>
+      <div class="scroll">
+        <div class="hintline"><b>💡 엄마 팁</b><span>한 줄씩 듣고 함께 말해 보세요. '전체 듣기'로 대화 흐름을 익힐 수 있어요.</span></div>
+        <div id="convList"></div>
+      </div>
+    </section>
+
+    <!-- LISTENING -->
+    <section class="screen" id="scr-listen">
+      <div class="chips" id="listenTabs"></div>
+      <div class="lpanel on" id="lp-word">
+        <div class="pills" id="listenStages"></div>
+        <div class="scroll">
+          <div class="listen-card">
+            <div class="listen-emoji" id="lwEmoji">🐶</div>
+            <div class="listen-word hideblur" id="lwWord">dog</div>
+            <div class="listen-ko" id="lwKo">강아지</div>
+            <div class="listen-ex hidden" id="lwEx"><span class="en">A dog is cute.</span><span class="ko">강아지는 귀여워요.</span></div>
+            <button class="bigplay" id="lwPlay">🔊 소리로 듣기</button>
+            <div class="rowbtns">
+              <button class="btn2" id="lwShow">👀 뜻 보기</button>
+              <button class="btn2 main" id="lwNext">다음 단어 →</button>
+            </div>
+          </div>
+          <div class="hintline"><b>🎧 이렇게</b><span>먼저 귀만 기울여 듣고, 그다음 '뜻 보기'로 그림과 뜻을 확인해요.</span></div>
+        </div>
+      </div>
+
+      <div class="lpanel" id="lp-conv">
+        <div class="pills" id="listenConvLevels"></div>
+        <div class="scroll"><div id="listenConvList"></div></div>
+      </div>
+
+      <div class="lpanel" id="lp-quiz">
+        <div class="pills" id="quizStages"></div>
+        <div class="scroll">
+          <p class="qscore" id="qScore">맞힌 개수 0 · 푼 문제 0</p>
+          <div class="listen-card">
+            <button class="bigplay" id="qPlay">🔊 다시 듣기</button>
+            <div class="options" id="qOptions" style="margin-top:12px"></div>
+            <p class="feedback" id="qFeedback" aria-live="polite">잘 듣고 맞는 것을 골라 보세요!</p>
+            <div class="rowbtns">
+              <button class="btn2" id="qReplay">🔁 한 번 더</button>
+              <button class="btn2 main" id="qNext">다음 문제 →</button>
+            </div>
+          </div>
+          <div class="hintline"><b>🌱 힌트</b><span>틀려도 괜찮아요. 부드럽게 다시 들려주고 다음 문제로 넘어가요.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPEAKING -->
+    <section class="screen" id="scr-speaking">
+      <div class="scroll">
+        <div class="soon">
+          <div class="se">🎤</div>
+          <h2>말하기 공부</h2>
+          <div class="sb">업데이트 예정</div>
+          <p>말하기와 쓰기 기능은 곧 업데이트될 예정이에요!</p>
+          <div class="plan">
+            <b>이렇게 준비하고 있어요</b><br>
+            · 들은 단어를 직접 따라 말해 보기<br>
+            · 내 목소리와 원어민 발음 비교하기<br>
+            · 회화 상황에서 역할 바꿔 말해 보기
+          </div>
+        </div>
+        <div class="soon">
+          <div class="se">📚</div>
+          <h2>그동안은 이렇게</h2>
+          <p>단어 카드와 듣기 퀴즈로 귀와 눈을 먼저 열어 두세요. 말하기·쓰기는 준비되는 대로 알려 드릴게요.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WRITING -->
+    <section class="screen" id="scr-writing">
+      <div class="scroll">
+        <div class="soon">
+          <div class="se">✏️</div>
+          <h2>쓰기 공부</h2>
+          <div class="sb">업데이트 예정</div>
+          <p>말하기와 쓰기 기능은 곧 업데이트될 예정이에요!</p>
+          <div class="plan">
+            <b>이렇게 준비하고 있어요</b><br>
+            · 보고 따라 쓰는 단어 연습장<br>
+            · 손글씨 확인과 칭찬 스티커<br>
+            · 배운 단어로 짧은 문장 만들기
+          </div>
+        </div>
+        <div class="soon">
+          <div class="se">🌱</div>
+          <h2>기다리는 동안</h2>
+          <p>단어 공부에서 오늘의 단어를 정하고, 회화 공부로 한 문장씩 말해 보세요.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   후니의 영어 놀이터 — 단일 HTML (단어·회화·듣기)
+   ========================================================= */
+(function(){
+  'use strict';
+
+  /* ---------- 데이터: 단어 ----------
+     [분류, 영어, 뜻, 그림, 예문, 예문 뜻] */
+  const RAW = {
+    baby: [
+      ['동물','dog','강아지','🐶','A dog is cute.','강아지는 귀여워요.'],
+      ['동물','cat','고양이','🐱','A cat says meow.','고양이는 야옹 해요.'],
+      ['동물','fish','물고기','🐟','The fish can swim.','물고기는 헤엄쳐요.'],
+      ['동물','bird','새','🐦','A bird can fly.','새는 날 수 있어요.'],
+      ['동물','pig','돼지','🐷','The pig is pink.','돼지는 분홍색이에요.'],
+      ['동물','cow','소','🐮','The cow says moo.','소는 음메 해요.'],
+      ['동물','rabbit','토끼','🐰','The rabbit can jump.','토끼는 잘 뛰어요.'],
+      ['동물','bear','곰','🐻','The bear is big.','곰은 커요.'],
+      ['동물','duck','오리','🦆','The duck is in the pond.','오리가 연못에 있어요.'],
+      ['동물','lion','사자','🦁','The lion is strong.','사자는 힘이 세요.'],
+      ['과일','apple','사과','🍎','I eat an apple.','나는 사과를 먹어요.'],
+      ['과일','banana','바나나','🍌','The banana is yellow.','바나나는 노래요.'],
+      ['과일','grapes','포도','🍇','I like grapes.','나는 포도를 좋아해요.'],
+      ['과일','strawberry','딸기','🍓','The strawberry is red.','딸기는 빨개요.'],
+      ['과일','orange','오렌지','🍊','This orange is sweet.','이 오렌지는 달아요.'],
+      ['과일','watermelon','수박','🍉','We eat watermelon in summer.','우리는 여름에 수박을 먹어요.'],
+      ['과일','pear','배','🍐','The pear is soft.','배는 부드러워요.'],
+      ['과일','peach','복숭아','🍑','I like peaches.','나는 복숭아를 좋아해요.'],
+      ['색깔','red','빨강','🔴','The apple is red.','사과는 빨개요.'],
+      ['색깔','blue','파랑','🔵','The sky is blue.','하늘은 파래요.'],
+      ['색깔','yellow','노랑','🟡','The sun is yellow.','해는 노래요.'],
+      ['색깔','green','초록','🟢','The grass is green.','풀은 초록색이에요.'],
+      ['색깔','purple','보라','🟣','I like purple.','나는 보라색을 좋아해요.'],
+      ['색깔','white','하양','⚪','The snow is white.','눈은 하얘요.'],
+      ['색깔','black','검정','⚫','The night is black.','밤은 까매요.'],
+      ['색깔','pink','분홍','🌸','My bag is pink.','내 가방은 분홍색이에요.'],
+      ['가족','mom','엄마','👩','Mom is cooking.','엄마가 요리해요.'],
+      ['가족','dad','아빠','👨','Dad is reading.','아빠가 책을 읽어요.'],
+      ['가족','baby','아기','👶','The baby is sleeping.','아기가 자고 있어요.'],
+      ['가족','grandma','할머니','👵','Grandma loves me.','할머니는 나를 사랑해요.'],
+      ['가족','grandpa','할아버지','👴','Grandpa tells a story.','할아버지가 이야기해 주세요.'],
+      ['가족','sister','언니·누나','👧','My sister is kind.','우리 언니는 친절해요.'],
+      ['가족','brother','형·오빠','👦','My brother is funny.','우리 오빠는 재미있어요.'],
+      ['몸','eyes','눈','👀','Close your eyes.','눈을 감아 보세요.'],
+      ['몸','nose','코','👃','Touch your nose.','코를 만져 보세요.'],
+      ['몸','mouth','입','👄','Open your mouth.','입을 벌려 보세요.'],
+      ['몸','ear','귀','👂','I have two ears.','나는 귀가 두 개 있어요.'],
+      ['몸','hand','손','✋','Wash your hands.','손을 씻으세요.'],
+      ['몸','foot','발','🦶','My foot is small.','내 발은 작아요.'],
+      ['몸','teeth','이','🦷','Brush your teeth.','이를 닦으세요.']
+    ],
+    elementary: [
+      ['학교','school','학교','🏫','I go to school by bus.','나는 버스로 학교에 가요.'],
+      ['학교','pencil','연필','✏️','This is my pencil.','이것은 내 연필이에요.'],
+      ['학교','book','책','📚','I read a book.','나는 책을 읽어요.'],
+      ['학교','teacher','선생님','🧑‍🏫','The teacher is kind.','선생님은 친절하세요.'],
+      ['학교','student','학생','🧑‍🎓','She is a good student.','그녀는 좋은 학생이에요.'],
+      ['학교','homework','숙제','📝','I do my homework.','나는 숙제를 해요.'],
+      ['학교','friend','친구','🧒','My friend is funny.','내 친구는 재미있어요.'],
+      ['음식','bread','빵','🍞','I eat bread for breakfast.','나는 아침으로 빵을 먹어요.'],
+      ['음식','rice','밥','🍚','We eat rice every day.','우리는 매일 밥을 먹어요.'],
+      ['음식','egg','달걀','🥚','I like boiled eggs.','나는 삶은 달걀을 좋아해요.'],
+      ['음식','water','물','💧','Drink some water.','물 좀 마셔요.'],
+      ['음식','juice','주스','🧃','The juice is cold.','주스가 차가워요.'],
+      ['음식','chicken','닭고기','🍗','We had chicken for dinner.','우리는 저녁에 닭고기를 먹었어요.'],
+      ['음식','ice cream','아이스크림','🍦','Ice cream is sweet.','아이스크림은 달아요.'],
+      ['음식','vegetable','채소','🥦','Eat your vegetables.','채소를 먹어요.'],
+      ['날씨','sunny','맑은','☀️','It is sunny today.','오늘은 맑아요.'],
+      ['날씨','rainy','비 오는','🌧️','It is rainy outside.','밖에 비가 와요.'],
+      ['날씨','snowy','눈 오는','❄️','It is snowy in winter.','겨울에는 눈이 와요.'],
+      ['날씨','windy','바람 부는','🌬️','It is windy today.','오늘은 바람이 불어요.'],
+      ['날씨','cloudy','흐린','☁️','The sky is cloudy.','하늘이 흐려요.'],
+      ['날씨','hot','더운','🥵','It is hot in summer.','여름은 더워요.'],
+      ['날씨','cold','추운','🥶','It is cold in winter.','겨울은 추워요.'],
+      ['직업','doctor','의사','👨‍⚕️','The doctor helps sick people.','의사는 아픈 사람을 도와요.'],
+      ['직업','nurse','간호사','👩‍⚕️','The nurse is busy.','간호사는 바빠요.'],
+      ['직업','police officer','경찰관','👮','The police officer is brave.','경찰관은 용감해요.'],
+      ['직업','cook','요리사','👨‍🍳','The cook makes soup.','요리사가 수프를 만들어요.'],
+      ['직업','farmer','농부','👩‍🌾','The farmer grows rice.','농부는 쌀을 길러요.'],
+      ['직업','singer','가수','🎤','The singer has a nice voice.','가수는 목소리가 좋아요.'],
+      ['동작','run','달리다','🏃','I can run fast.','나는 빨리 달릴 수 있어요.'],
+      ['동작','jump','뛰어오르다','🤸','Let us jump together.','같이 뛰어 봐요.'],
+      ['동작','swim','수영하다','🏊','I swim in the pool.','나는 수영장에서 수영해요.'],
+      ['동작','read','읽다','📖','I read every night.','나는 매일 밤 책을 읽어요.'],
+      ['동작','write','쓰다','✍️','Write your name here.','여기에 이름을 쓰세요.'],
+      ['동작','sing','노래하다','🎵','We sing a song.','우리는 노래를 불러요.'],
+      ['동작','dance','춤추다','💃','She likes to dance.','그녀는 춤추는 것을 좋아해요.'],
+      ['동작','draw','그리다','🎨','I draw a picture.','나는 그림을 그려요.'],
+      ['동작','sleep','자다','😴','I sleep at nine.','나는 9시에 자요.'],
+      ['동작','eat','먹다','🍽️','Let us eat lunch.','점심을 먹어요.'],
+      ['기분','happy','행복한','😊','I am happy today.','나는 오늘 행복해요.'],
+      ['기분','sad','슬픈','😢','The movie was sad.','그 영화는 슬펐어요.'],
+      ['기분','angry','화난','😠','Do not be angry.','화내지 마세요.'],
+      ['기분','tired','피곤한','😪','I am very tired.','나는 아주 피곤해요.'],
+      ['기분','excited','신난','🤩','I am excited about the trip.','나는 여행이 신나요.'],
+      ['기분','scared','무서운','😨','The dog is scared.','그 개는 무서워해요.'],
+      ['시간','morning','아침','🌅','I wake up in the morning.','나는 아침에 일어나요.'],
+      ['시간','night','밤','🌙','Good night, mom.','잘 자요, 엄마.'],
+      ['시간','today','오늘','📅','Today is Monday.','오늘은 월요일이에요.']
+    ],
+    middle: [
+      ['사람·성격','achieve','이루다, 성취하다','🏆','She worked hard to achieve her dream.','그녀는 꿈을 이루기 위해 열심히 노력했다.'],
+      ['사람·성격','brave','용감한','🦸','The brave boy saved the cat.','그 용감한 소년이 고양이를 구했다.'],
+      ['사람·성격','careful','조심스러운','🔍','Be careful when you cross the street.','길을 건널 때 조심해라.'],
+      ['사람·성격','generous','관대한, 너그러운','🎁','My uncle is generous to everyone.','우리 삼촌은 누구에게나 너그럽다.'],
+      ['사람·성격','patient','참을성 있는','⏳','You need to be patient with children.','아이들에게는 참을성이 필요하다.'],
+      ['사람·성격','honest','정직한','🤝','An honest answer is always best.','정직한 대답이 항상 최선이다.'],
+      ['사람·성격','quiet','조용한','🤫','The library is a quiet place.','도서관은 조용한 곳이다.'],
+      ['사람·성격','healthy','건강한','💪','Eating vegetables keeps you healthy.','채소를 먹으면 건강해진다.'],
+      ['환경','environment','환경','🌍','We should protect the environment.','우리는 환경을 보호해야 한다.'],
+      ['환경','energy','에너지','⚡','Solar energy is clean.','태양 에너지는 깨끗하다.'],
+      ['환경','pollution','오염','🏭','Air pollution is a serious problem.','대기 오염은 심각한 문제다.'],
+      ['환경','recycle','재활용하다','♻️','We recycle paper and plastic.','우리는 종이와 플라스틱을 재활용한다.'],
+      ['환경','climate','기후','🌤️','Climate change affects everyone.','기후 변화는 모든 사람에게 영향을 준다.'],
+      ['환경','protect','보호하다','🛡️','We must protect wild animals.','우리는 야생 동물을 보호해야 한다.'],
+      ['학교·공부','knowledge','지식','📘','Knowledge comes from reading.','지식은 독서에서 온다.'],
+      ['학교·공부','experience','경험','🧭','Traveling alone was a great experience.','혼자 여행한 것은 좋은 경험이었다.'],
+      ['학교·공부','improve','향상시키다','📈','Reading every day will improve your English.','매일 읽으면 영어가 향상될 것이다.'],
+      ['학교·공부','describe','묘사하다, 설명하다','🗣️','Can you describe what you saw?','네가 본 것을 설명해 줄 수 있니?'],
+      ['학교·공부','observe','관찰하다','👀','We observed the stars last night.','우리는 어젯밤 별을 관찰했다.'],
+      ['학교·공부','discover','발견하다','🔭','Scientists discover new facts.','과학자들은 새로운 사실을 발견한다.'],
+      ['학교·공부','explain','설명하다','📖','Please explain the rule again.','규칙을 다시 설명해 주세요.'],
+      ['학교·공부','solve','해결하다','🧩','We solved the problem together.','우리는 함께 그 문제를 해결했다.'],
+      ['학교·공부','challenge','도전','🧗','Learning a language is a fun challenge.','언어를 배우는 것은 재미있는 도전이다.'],
+      ['생활·사회','necessary','필요한','✅','It is necessary to wear a seat belt.','안전벨트를 매는 것은 필요하다.'],
+      ['생활·사회','suggest','제안하다','💡','I suggest we start early tomorrow.','내일 일찍 출발할 것을 제안한다.'],
+      ['생활·사회','volunteer','자원봉사하다, 자원봉사자','🙋','She volunteers at the shelter every Sunday.','그녀는 일요일마다 보호소에서 봉사한다.'],
+      ['생활·사회','culture','문화','🏯','Korean culture is popular around the world.','한국 문화는 세계에서 인기가 있다.'],
+      ['생활·사회','communicate','의사소통하다','💬','We communicate by text message.','우리는 문자로 의사소통한다.'],
+      ['생활·사회','opportunity','기회','🚪','This is a good opportunity to learn.','이것은 배울 수 있는 좋은 기회다.'],
+      ['생활·사회','respect','존경하다, 존중하다','🙇','We should respect other opinions.','우리는 다른 의견을 존중해야 한다.'],
+      ['생활·사회','promise','약속하다, 약속','🤞','He promised to call me tonight.','그는 오늘 밤 전화하겠다고 약속했다.'],
+      ['생활·사회','decide','결정하다','⚖️','I decided to join the club.','나는 동아리에 가입하기로 결정했다.'],
+      ['생활·사회','reason','이유','🤔','What is the reason for your choice?','네 선택의 이유는 무엇이니?'],
+      ['생활·사회','journey','여정, 여행','🧳','The journey took five hours.','그 여행은 다섯 시간 걸렸다.'],
+      ['생활·사회','medicine','약, 의학','💊','Take this medicine after meals.','이 약을 식후에 드세요.'],
+      ['생활·사회','future','미래','🔮','I want to be a doctor in the future.','나는 미래에 의사가 되고 싶다.'],
+      ['생활·사회','increase','증가하다','⬆️','The number of students increased.','학생 수가 증가했다.'],
+      ['생활·사회','reduce','줄이다','⬇️','We should reduce plastic waste.','우리는 플라스틱 쓰레기를 줄여야 한다.'],
+      ['생활·사회','different','다른','🔀','We have different hobbies.','우리는 취미가 다르다.'],
+      ['생활·사회','important','중요한','❗','Sleep is important for your health.','잠은 건강에 중요하다.'],
+      ['생활·사회','danger','위험','⚠️','The sign says danger.','그 표지판에는 위험이라고 쓰여 있다.'],
+      ['사람·성격','believe','믿다','🙏','I believe you can do it.','나는 네가 해낼 수 있다고 믿는다.'],
+      ['학교·공부','imagine','상상하다','✨','Imagine you are on the moon.','네가 달에 있다고 상상해 보아라.'],
+      ['학교·공부','prepare','준비하다','🎒','We prepared for the exam.','우리는 시험을 준비했다.']
+    ]
+  };
+
+  const STAGES = [
+    {key:'baby', icon:'🐣', label:'유아 기초'},
+    {key:'elementary', icon:'🌱', label:'초등'},
+    {key:'middle', icon:'📘', label:'중학'}
+  ];
+
+  const WORDS = {};
+  Object.keys(RAW).forEach(function(k){
+    WORDS[k] = RAW[k].map(function(r){
+      return {c:r[0], en:r[1], ko:r[2], emoji:r[3], ex:r[4], exko:r[5]};
+    });
+  });
+
+  /* ---------- 데이터: 회화 ---------- */
+  const CONV = {
+    1: {
+      icon:'👶', label:'엄마·아빠',
+      groups:[
+        {title:'👩 부르기', lines:[
+          ['A','Mommy!','엄마!'],
+          ['A','Daddy!','아빠!'],
+          ['A','Mommy, look!','엄마, 이거 봐!'],
+          ['A','Daddy, up!','아빠, 안아 줘!']
+        ]},
+        {title:'💧 달라고 하기', lines:[
+          ['A','Water, please.','물 주세요.'],
+          ['A','More, please.','더 주세요.'],
+          ['A','Milk, please.','우유 주세요.'],
+          ['A','I want a cookie.','쿠키 먹고 싶어요.']
+        ]},
+        {title:'💕 사랑·고마움', lines:[
+          ['A','I love you!','사랑해요!'],
+          ['B','I love you too, sweetie.','나도 사랑해, 우리 아가.'],
+          ['A','Thank you, Mommy.','고마워요, 엄마.'],
+          ['A','Good night!','잘 자요!']
+        ]},
+        {title:'🙂 내 기분·상태', lines:[
+          ['A','I am hungry.','배고파요.'],
+          ['A','I am sleepy.','졸려요.'],
+          ['A','I am happy!','행복해요!'],
+          ['A','Help me, please.','도와주세요.'],
+          ['A','I am sorry.','미안해요.']
+        ]}
+      ]
+    },
+    2: {
+      icon:'👦', label:'친구·일상',
+      groups:[
+        {title:'👋 만나고 인사', lines:[
+          ['A','Hi! How are you?','안녕! 어떻게 지내?'],
+          ['B','I am fine, thank you.','잘 지내, 고마워.'],
+          ['A','What is your name?','이름이 뭐야?'],
+          ['B','My name is Hoon. Nice to meet you!','내 이름은 훈이야. 만나서 반가워!']
+        ]},
+        {title:'🤸 같이 놀기', lines:[
+          ['A','Let us play together!','같이 놀자!'],
+          ['B','Sure! What do you want to play?','좋아! 뭘 하고 싶어?'],
+          ['A','Do you want to play tag?','술래잡기 할래?'],
+          ['B','That is a good idea!','좋은 생각이야!'],
+          ['A','Your turn!','이번엔 네 차례야!']
+        ]},
+        {title:'✏️ 부탁하고 미안', lines:[
+          ['A','Can I borrow your pencil?','네 연필 빌려도 돼?'],
+          ['B','Sure, here you are.','그래, 여기 있어.'],
+          ['A','I am sorry I am late.','늦어서 미안해.'],
+          ['B','It is okay. Do not worry.','괜찮아. 걱정하지 마.']
+        ]},
+        {title:'🏫 학교에서', lines:[
+          ['A','May I go to the bathroom?','화장실에 가도 될까요?'],
+          ['B','Yes, you may.','그래, 가도 돼.'],
+          ['A','Can you help me with this?','이것 좀 도와줄 수 있어?'],
+          ['B','Of course. Let me see.','그럼. 내가 볼게.']
+        ]},
+        {title:'👋 헤어질 때', lines:[
+          ['A','See you tomorrow!','내일 보자!'],
+          ['B','See you! Have a nice day!','또 보자! 좋은 하루 보내!'],
+          ['A','Let us meet at the playground.','놀이터에서 만나자.'],
+          ['B','Okay, see you there!','좋아, 거기서 보자!']
+        ]}
+      ]
+    },
+    3: {
+      icon:'🎒', label:'학교·중학',
+      groups:[
+        {title:'🗓️ 주말 이야기', lines:[
+          ['A','How was your weekend?','주말 어떻게 보냈어?'],
+          ['B','It was great. I went hiking with my family.','좋았어. 가족과 등산을 갔어.'],
+          ['A','Sounds fun! Where did you go?','재미있겠다! 어디에 갔어?'],
+          ['B','We went to the mountain near my house.','집 근처 산에 갔어.']
+        ]},
+        {title:'💡 의견 말하기', lines:[
+          ['A','What do you think about the school festival?','학교 축제에 대해 어떻게 생각해?'],
+          ['B','I think it is a great idea.','좋은 생각이라고 생각해.'],
+          ['A','I am not sure about that.','나는 잘 모르겠어.'],
+          ['B','Why do you think so?','왜 그렇게 생각해?']
+        ]},
+        {title:'📖 수업·질문', lines:[
+          ['A','Could you explain that again, please?','다시 한 번 설명해 주시겠어요?'],
+          ['B','Of course. Let me say it slowly.','물론이죠. 천천히 말해 볼게요.'],
+          ['A','I have a question about this part.','이 부분에 대해 질문이 있어요.'],
+          ['B','Go ahead. I am listening.','말해 보세요. 듣고 있어요.']
+        ]},
+        {title:'🎒 계획·약속', lines:[
+          ['A','I am looking forward to the trip.','여행이 기대돼.'],
+          ['B','Me too. Let us meet at the library at four.','나도. 4시에 도서관에서 만나자.'],
+          ['A','Do not forget your umbrella.','우산 잊지 마.'],
+          ['B','Thanks for reminding me.','알려줘서 고마워.']
+        ]},
+        {title:'🙋 도움·사과', lines:[
+          ['A','Excuse me, could you help me?','실례합니다, 도와주실 수 있나요?'],
+          ['B','Sure. What do you need?','그럼요. 무엇이 필요하세요?'],
+          ['A','I am sorry for being late.','늦어서 죄송합니다.'],
+          ['B','That is all right. Please sit down.','괜찮아요. 앉으세요.']
+        ]}
+      ]
+    }
+  };
+
+  /* ---------- 상태 ---------- */
+  var state = {
+    rate: 1,
+    wordStage: 'baby',
+    wordCat: '전체',
+    convLevel: 1,
+    listenStage: 'baby',
+    listenIndex: 0,
+    listenRevealed: false,
+    quizStage: 'baby',
+    quizWord: null,
+    quizLocked: false,
+    quizSolved: 0,
+    quizTried: 0,
+    quizOptions: []
+  };
+
+  var el = function(id){ return document.getElementById(id); };
+  function clear(node){ while(node.firstChild){ node.removeChild(node.firstChild); } }
+  function make(tag, cls, text){
+    var n = document.createElement(tag);
+    if(cls) n.className = cls;
+    if(text !== undefined && text !== null) n.textContent = text;
+    return n;
+  }
+
+  /* ---------- 음성 ---------- */
+  var speechOK = (typeof window !== 'undefined') && ('speechSynthesis' in window) && (typeof SpeechSynthesisUtterance !== 'undefined');
+  /* iOS Safari/PWA: 첫 사용자 제스처에서 음성 엔진을 한 번 깨워 둬야
+     이후 setTimeout으로 이어지는 재생(퀴즈·연속 듣기)에서도 소리가 난다. */
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent || '') || ((navigator.platform === 'MacIntel') && (navigator.maxTouchPoints > 1));
+  var speechPrimed = false;
+  function primeSpeech(){
+    if(!speechOK || speechPrimed) return;
+    speechPrimed = true;
+    try{
+      var p = new SpeechSynthesisUtterance(' ');
+      p.lang = 'en-US'; p.rate = 1; p.pitch = 1; p.volume = 0;
+      window.speechSynthesis.speak(p);
+    }catch(e){}
+  }
+  function listenForPrime(){
+    if(!speechOK || !isIOS) return;
+    try{
+      document.addEventListener('touchstart', primeSpeech, { passive: true, capture: true });
+      document.addEventListener('click', primeSpeech, { passive: true, capture: true });
+    }catch(e){}
+  }
+  var toastTimer = null;
+  function toast(msg){
+    var t = el('toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+  }
+  var noSpeechNotified = false;
+  var speakToken = 0;
+  function speak(text, rate, onEnd, onStart){
+    var r = rate || state.rate;
+    var token = ++speakToken;
+    if(!speechOK){
+      if(!noSpeechNotified){ noSpeechNotified = true; toast('이 브라우저에서는 소리를 들려줄 수 없어요. 화면의 글자로 함께 공부해요!'); }
+      if(onStart) onStart();
+      if(onEnd) setTimeout(onEnd, 260);
+      return false;
+    }
+    var u;
+    try{
+      u = new SpeechSynthesisUtterance(text);
+    }catch(e){
+      if(onEnd) setTimeout(onEnd, 260);
+      return false;
+    }
+    /* 기기 기본 영어 음성을 그대로 쓴다. voice 객체 강제 할당이나 높은 pitch는
+       iOS Safari/PWA에서 무음·오류를 만들 수 있어 쓰지 않는다. */
+    u.lang = 'en-US';
+    u.rate = (r < 1) ? 0.72 : 0.96;
+    u.pitch = 1.0;
+    u.volume = 1;
+    if(onStart) u.onstart = function(){ onStart(); };
+    u.onend = function(){ if(onEnd) onEnd(); };
+    u.onerror = function(){ if(onEnd) onEnd(); };
+    var syn = window.speechSynthesis;
+    try{
+      if(syn.speaking || syn.pending){
+        /* iOS: cancel() 직후 곧바로 speak()하면 간헐적으로 무음이 된다.
+           재생 중일 때만 취소하고 30ms 뒤에 말한다(제스처 유효 시간 안). */
+        syn.cancel();
+        setTimeout(function(){
+          if(token !== speakToken) return; /* 그새 다른 재생·정지가 있으면 취소 */
+          try{ syn.speak(u); }
+          catch(e){ if(onEnd) onEnd(); }
+        }, 30);
+      }else{
+        try{ if(syn.paused) syn.resume(); }catch(e){}
+        syn.speak(u);
+      }
+      return true;
+    }catch(e){
+      toast('소리를 재생하지 못했어요. 글자로 함께 볼게요.');
+      if(onEnd) setTimeout(onEnd, 260);
+      return false;
+    }
+  }
+  function speakQueue(items, onDone, onIndex){
+    /* items: [{text, rate}] */
+    var i = 0, active = true;
+    function step(){
+      if(!active) return;
+      if(i >= items.length){ active = false; if(onDone) onDone(); return; }
+      var item = items[i];
+      var idx = i;
+      i++;
+      if(onIndex) onIndex(idx);
+      speak(item.text, item.rate || state.rate, function(){
+        if(!active) return;
+        setTimeout(step, 420);
+      });
+    }
+    step();
+    return { stop: function(){ active = false; try{ window.speechSynthesis.cancel(); }catch(e){} } };
+  }
+  var currentQueue = null;
+  function stopAll(){
+    speakToken++;
+    if(currentQueue){ currentQueue.stop(); currentQueue = null; }
+    try{ if(speechOK) window.speechSynthesis.cancel(); }catch(e){}
+    var act = document.querySelectorAll('.spk.playing, .bigplay.playing');
+    for(var i=0;i<act.length;i++){ act[i].classList.remove('playing'); }
+  }
+
+  /* ---------- 화면 전환 ---------- */
+  var TITLES = {
+    home: '🐣 후니의 영어 놀이터',
+    words: '📚 단어 공부',
+    conv: '💬 회화 공부',
+    listen: '🔊 듣기 공부',
+    speaking: '🎤 말하기 공부',
+    writing: '✏️ 쓰기 공부'
+  };
+  var RATE_SCREENS = {words:1, conv:1, listen:1};
+  var currentScreen = 'home';
+
+  function go(name){
+    stopAll();
+    var screens = document.querySelectorAll('.screen');
+    for(var i=0;i<screens.length;i++){ screens[i].classList.remove('active'); }
+    var target = el('scr-' + name);
+    if(target) target.classList.add('active');
+    currentScreen = name;
+    el('topTitle').textContent = TITLES[name] || TITLES.home;
+    el('topTitle').classList.toggle('center', name === 'home');
+    el('backBtn').classList.toggle('hidden', name === 'home');
+    el('rateBtn').classList.toggle('hidden', !RATE_SCREENS[name]);
+    try{ window.scrollTo(0,0); }catch(e){}
+  }
+
+  function paintRate(){
+    var b = el('rateBtn');
+    b.textContent = state.rate < 1 ? '🐢 0.7x' : '🐇 1.0x';
+    b.classList.toggle('slow', state.rate < 1);
+  }
+
+  /* ---------- 공용 pills ---------- */
+  function buildStagePills(container, current, onPick){
+    clear(container);
+    STAGES.forEach(function(s){
+      var b = make('button', 'pill' + (s.key === current ? ' on' : ''), s.icon + ' ' + s.label);
+      b.type = 'button';
+      b.addEventListener('click', function(){ onPick(s.key); });
+      container.appendChild(b);
+    });
+  }
+
+  /* ---------- 단어 화면 ---------- */
+  function renderWordCats(){
+    var box = el('wordCats');
+    var words = WORDS[state.wordStage];
+    var cats = [];
+    words.forEach(function(w){ if(cats.indexOf(w.c) < 0) cats.push(w.c); });
+    if(cats.indexOf(state.wordCat) < 0) state.wordCat = '전체';
+    clear(box);
+    var all = make('button', 'chip' + (state.wordCat === '전체' ? ' on' : ''), '전체 ' + words.length);
+    all.type = 'button';
+    all.addEventListener('click', function(){ state.wordCat = '전체'; renderWordCats(); renderWordList(); });
+    box.appendChild(all);
+    cats.forEach(function(c){
+      var b = make('button', 'chip' + (state.wordCat === c ? ' on' : ''), c);
+      b.type = 'button';
+      b.addEventListener('click', function(){ state.wordCat = c; renderWordCats(); renderWordList(); });
+      box.appendChild(b);
+    });
+  }
+
+  function renderWordList(){
+    var list = el('wordList');
+    clear(list);
+    var words = WORDS[state.wordStage].filter(function(w){
+      return state.wordCat === '전체' || w.c === state.wordCat;
+    });
+    words.forEach(function(w){
+      var card = make('article', 'wcard');
+      var top = make('div', 'wtop');
+      var em = make('div', 'wemoji', w.emoji);
+      em.setAttribute('aria-hidden', 'true');
+      var txt = make('div', 'wtext');
+      var en = make('div', 'wen', w.en);
+      var tag = make('span', 'cat-tag', w.c);
+      en.appendChild(tag);
+      var ko = make('div', 'wko', w.ko);
+      txt.appendChild(en); txt.appendChild(ko);
+      var spk = make('button', 'spk', '🔊');
+      spk.type = 'button';
+      spk.setAttribute('aria-label', w.en + ' 듣기');
+      spk.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        stopAll();
+        spk.classList.add('playing');
+        speak(w.en, state.rate, function(){ spk.classList.remove('playing'); });
+      });
+      top.appendChild(em); top.appendChild(txt); top.appendChild(spk);
+
+      var exBox = make('div', 'wex');
+      exBox.appendChild(make('span', 'en', w.ex));
+      exBox.appendChild(make('span', 'ko', w.exko));
+
+      card.appendChild(top);
+      card.appendChild(exBox);
+      card.addEventListener('click', function(){
+        stopAll();
+        card.style.transform = 'scale(.994)';
+        setTimeout(function(){ card.style.transform = ''; }, 130);
+        speak(w.en + '. ' + w.ex, state.rate, null);
+      });
+      list.appendChild(card);
+    });
+  }
+
+  function renderWords(){
+    buildStagePills(el('wordStages'), state.wordStage, function(k){
+      state.wordStage = k; state.wordCat = '전체';
+      renderWords();
+    });
+    renderWordCats();
+    renderWordList();
+  }
+
+  /* ---------- 회화 화면 ---------- */
+  function buildConvPills(container, current, onPick){
+    clear(container);
+    Object.keys(CONV).forEach(function(k){
+      var lv = CONV[k];
+      var b = make('button', 'pill' + (String(current) === String(k) ? ' on' : ''), lv.icon + ' ' + lv.label);
+      b.type = 'button';
+      b.addEventListener('click', function(){ onPick(Number(k)); });
+      container.appendChild(b);
+    });
+  }
+
+  function buildConvGroup(group, opts){
+    var showAll = !opts || opts.playAll !== false;
+    var card = make('div', 'cgroup');
+    var head = make('div', 'ghead');
+    head.appendChild(make('div', 'gtitle', group.title));
+    var lines = group.lines;
+    var rows = [];
+    var playState = {on:false, queue:null};
+    if(showAll){
+      var pa = make('button', 'playall', '▶ 전체 듣기');
+      pa.type = 'button';
+      pa.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        if(playState.on){
+          if(playState.queue) playState.queue.stop();
+          playState.on = false;
+          currentQueue = null;
+          setActive(-1);
+          pa.textContent = '▶ 전체 듣기';
+          pa.classList.remove('stop');
+          return;
+        }
+        stopAll();
+        playState.on = true;
+        pa.textContent = '■ 멈춤';
+        pa.classList.add('stop');
+        var seq = lines.map(function(l){ return {text: l[1], rate: state.rate}; });
+        var q = speakQueue(seq, function(){
+          playState.on = false; if(playState.queue === q) currentQueue = null;
+          setActive(-1); pa.textContent = '▶ 전체 듣기'; pa.classList.remove('stop');
+        }, function(i){ setActive(i); });
+        playState.queue = q;
+        currentQueue = q;
+      });
+      head.appendChild(pa);
+    }
+    card.appendChild(head);
+
+    function setActive(i){
+      rows.forEach(function(r, idx){ r.classList.toggle('speaking', idx === i); });
+    }
+
+    lines.forEach(function(line, idx){
+      var row = make('div', 'line');
+      var who = make('span', 'who ' + (line[0] === 'B' ? 'b' : 'a'), line[0]);
+      var txt = make('div', 'linetext');
+      txt.appendChild(make('div', 'len', line[1]));
+      txt.appendChild(make('div', 'lko', line[2]));
+      var spk = make('button', 'spk', '🔊');
+      spk.type = 'button';
+      spk.setAttribute('aria-label', line[1] + ' 듣기');
+      spk.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        stopAll(); playState.on = false; setActive(idx);
+        spk.classList.add('playing');
+        speak(line[1], state.rate, function(){ spk.classList.remove('playing'); setActive(-1); });
+      });
+      row.appendChild(who); row.appendChild(txt); row.appendChild(spk);
+      row.addEventListener('click', function(){
+        stopAll(); playState.on = false; setActive(idx);
+        speak(line[1], state.rate, function(){ setActive(-1); });
+      });
+      rows.push(row);
+      card.appendChild(row);
+    });
+    return card;
+  }
+
+  function renderConv(){
+    buildConvPills(el('convLevels'), state.convLevel, function(k){
+      state.convLevel = k; renderConv();
+    });
+    var box = el('convList');
+    clear(box);
+    CONV[state.convLevel].groups.forEach(function(g){
+      box.appendChild(buildConvGroup(g));
+    });
+  }
+
+  /* ---------- 듣기: 탭 ---------- */
+  var LISTEN_TABS = [
+    {key:'word', label:'🔊 단어 듣기'},
+    {key:'conv', label:'💬 회화 듣기'},
+    {key:'quiz', label:'🎯 듣기 퀴즈'}
+  ];
+  var listenTab = 'word';
+  function renderListenTabs(){
+    var box = el('listenTabs');
+    clear(box);
+    LISTEN_TABS.forEach(function(t){
+      var b = make('button', 'chip' + (listenTab === t.key ? ' on' : ''), t.label);
+      b.type = 'button';
+      b.style.height = '34px';
+      b.style.fontSize = '12px';
+      b.addEventListener('click', function(){
+        listenTab = t.key;
+        renderListenTabs();
+        ['word','conv','quiz'].forEach(function(k){
+          el('lp-' + k).classList.toggle('on', k === t.key);
+        });
+        if(t.key === 'word') renderListenWord();
+        if(t.key === 'conv') renderListenConv();
+        if(t.key === 'quiz') newQuiz();
+      });
+      box.appendChild(b);
+    });
+  }
+
+  /* ---------- 듣기: 단어 ---------- */
+  function currentListenWord(){
+    var list = WORDS[state.listenStage];
+    return list[state.listenIndex % list.length];
+  }
+  function renderListenWord(){
+    buildStagePills(el('listenStages'), state.listenStage, function(k){
+      state.listenStage = k; state.listenIndex = 0; state.listenRevealed = false;
+      renderListenWord();
+    });
+    var w = currentListenWord();
+    var em = el('lwEmoji'), word = el('lwWord'), ko = el('lwKo'), ex = el('lwEx');
+    em.textContent = state.listenRevealed ? w.emoji : '🎧';
+    word.textContent = state.listenRevealed ? w.en : '· · ·';
+    ko.textContent = state.listenRevealed ? w.ko : '무슨 단어일까요?';
+    if(state.listenRevealed){
+      ex.classList.remove('hidden');
+      var exEn = ex.querySelector('.en'), exKo = ex.querySelector('.ko');
+      if(exEn) exEn.textContent = w.ex;
+      if(exKo) exKo.textContent = w.exko;
+    } else {
+      ex.classList.add('hidden');
+    }
+    word.classList.toggle('hideblur', false);
+    el('lwShow').textContent = state.listenRevealed ? '🙈 뜻 가리기' : '👀 뜻 보기';
+  }
+  function playListenWord(){
+    var w = currentListenWord();
+    var btn = el('lwPlay');
+    stopAll();
+    btn.classList.add('playing');
+    btn.textContent = '🔊 듣는 중...';
+    speak(w.en, state.rate, function(){
+      btn.classList.remove('playing');
+      btn.textContent = '🔊 소리로 듣기';
+      if(!state.listenRevealed){
+        state.listenRevealed = true;
+        renderListenWord();
+      }
+    });
+  }
+
+  /* ---------- 듣기: 회화 ---------- */
+  function renderListenConv(){
+    buildConvPills(el('listenConvLevels'), state.convLevel, function(k){
+      state.convLevel = k; renderListenConv();
+    });
+    var box = el('listenConvList');
+    clear(box);
+    CONV[state.convLevel].groups.forEach(function(g){
+      box.appendChild(buildConvGroup(g));
+    });
+  }
+
+  /* ---------- 듣기: 퀴즈 ---------- */
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function updateScore(){
+    el('qScore').textContent = '맞힌 개수 ' + state.quizSolved + ' · 푼 문제 ' + state.quizTried;
+  }
+  var quizGen = 0;
+  function newQuiz(){
+    var gen = ++quizGen;
+    buildStagePills(el('quizStages'), state.quizStage, function(k){
+      state.quizStage = k; newQuiz();
+    });
+    stopAll();
+    state.quizLocked = false;
+    var pool = WORDS[state.quizStage];
+    var others = pool.filter(function(w){ return !state.quizWord || w.en !== state.quizWord.en; });
+    var pick = others[Math.floor(Math.random() * others.length)] || pool[0];
+    state.quizWord = pick;
+    var distract = shuffle(pool.filter(function(w){ return w.en !== pick.en; })).slice(0, 3);
+    state.quizOptions = shuffle([pick].concat(distract));
+    el('qFeedback').textContent = '잘 듣고 맞는 것을 골라 보세요!';
+    el('qFeedback').className = 'feedback';
+    var box = el('qOptions');
+    clear(box);
+    state.quizOptions.forEach(function(w){
+      var b = make('button', 'opt');
+      b.type = 'button';
+      b.appendChild(make('span', 'oe', w.emoji));
+      b.appendChild(make('span', 'ol', w.ko));
+      b.addEventListener('click', function(){ answerQuiz(b, w); });
+      box.appendChild(b);
+    });
+    updateScore();
+    playQuiz();
+  }
+  function playQuiz(){
+    if(!state.quizWord) return;
+    var btn = el('qPlay');
+    btn.classList.add('playing');
+    speak(state.quizWord.en, state.rate, function(){ btn.classList.remove('playing'); });
+  }
+  function answerQuiz(btn, word){
+    if(state.quizLocked) return;
+    var fb = el('qFeedback');
+    if(word.en === state.quizWord.en){
+      state.quizLocked = true;
+      state.quizSolved++;
+      state.quizTried++;
+      btn.classList.add('right');
+      var opts = el('qOptions').children;
+      for(var i=0;i<opts.length;i++){ opts[i].classList.add('off'); }
+      fb.className = 'feedback good';
+      fb.textContent = '정확해요! ' + state.quizWord.en + ' — ' + state.quizWord.ko + ' 👍';
+      speak(state.quizWord.en, state.rate);
+      updateScore();
+      setTimeout(function(){
+        if(gen === quizGen && state.quizLocked && currentScreen === 'listen' && listenTab === 'quiz'){ newQuiz(); }
+      }, 1900);
+    } else {
+      btn.classList.add('wrong', 'shake');
+      btn.classList.add('off');
+      state.quizTried++;
+      updateScore();
+      fb.className = 'feedback';
+      fb.textContent = '괜찮아요, 천천히 다시 들어 볼까요? 🎧';
+      setTimeout(function(){ btn.classList.remove('shake'); }, 460);
+      setTimeout(function(){ playQuiz(); }, 700);
+    }
+  }
+
+  /* ---------- 이벤트 연결 ---------- */
+  function bind(){
+    var goBtns = document.querySelectorAll('[data-go]');
+    for(var i=0;i<goBtns.length;i++){
+      (function(b){
+        b.addEventListener('click', function(){
+          var d = b.getAttribute('data-go');
+          go(d);
+          if(d === 'words') renderWords();
+          if(d === 'conv') renderConv();
+          if(d === 'listen'){ renderListenTabs(); renderListenWord(); }
+        });
+      })(goBtns[i]);
+    }
+    el('backBtn').addEventListener('click', function(){ go('home'); });
+    el('rateBtn').addEventListener('click', function(){
+      state.rate = state.rate < 1 ? 1 : 0.7;
+      paintRate();
+      toast(state.rate < 1 ? '천천히(0.7x)로 들려줄게요 🐢' : '보통 속도(1.0x)로 들려줄게요 🐇');
+    });
+
+    /* 단어 */
+    el('lwPlay').addEventListener('click', playListenWord);
+    el('lwShow').addEventListener('click', function(){
+      state.listenRevealed = !state.listenRevealed;
+      renderListenWord();
+      if(state.listenRevealed) setTimeout(function(){ speak(currentListenWord().en, state.rate); }, 120);
+    });
+    el('lwNext').addEventListener('click', function(){
+      stopAll();
+      state.listenIndex = (state.listenIndex + 1) % WORDS[state.listenStage].length;
+      state.listenRevealed = false;
+      renderListenWord();
+      setTimeout(playListenWord, 180);
+    });
+
+    /* 퀴즈 */
+    el('qPlay').addEventListener('click', playQuiz);
+    el('qReplay').addEventListener('click', playQuiz);
+    el('qNext').addEventListener('click', function(){ newQuiz(); });
+
+    document.addEventListener('visibilitychange', function(){
+      if(document.hidden) stopAll();
+    });
+    window.addEventListener('pagehide', stopAll);
+  }
+
+  /* ---------- 시작 ---------- */
+  function init(){
+    paintRate();
+    listenForPrime();
+    renderWords();
+    renderConv();
+    renderListenTabs();
+    renderListenWord();
+    bind();
+    go('home');
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); }
+  else { init(); }
+})();
+</script>
+
+<script>
+/* PWA: 홈 화면 앱 + 오프라인 캐시 */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+</script>
+</body>
+</html>

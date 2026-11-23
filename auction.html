@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="경공매">
+<meta name="application-name" content="경공매">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="법원경매·온비드 공매 물건을 보증금·최저가·종류·지역으로 찾는 후니의 경·공매 검색기">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<title>후니의 경·공매 검색기</title>
+<style>
+  :root{
+    --bg:#0b1220;
+    --bg2:#0e1727;
+    --card:#111c2e;
+    --card2:#16243a;
+    --line:#22314c;
+    --ink:#e9f0ff;
+    --ink2:#9fb0cc;
+    --ink3:#6d7f9c;
+    --accent:#4f8dff;
+    --accent2:#7bd1ff;
+    --gold:#ffcf5c;
+    --ok:#3ddc97;
+    --warn:#ffb057;
+    --danger:#ff6b6b;
+    --safe-t:env(safe-area-inset-top,0px);
+    --safe-b:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  [hidden]{display:none !important}
+  html,body{margin:0;padding:0;width:100%;overflow-x:hidden}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{
+    background:
+      radial-gradient(1000px 500px at 82% -8%, rgba(79,141,255,.18), transparent 60%),
+      radial-gradient(760px 420px at 4% 0%, rgba(123,209,255,.10), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+    font-size:14.5px;line-height:1.45;
+    min-height:100vh;min-height:100dvh;
+    padding-bottom:calc(28px + var(--safe-b));
+  }
+  button,input,select{font:inherit;color:inherit}
+  button{cursor:pointer;border:0;background:none;touch-action:manipulation}
+  a{color:var(--accent2)}
+  .wrap{max-width:560px;margin:0 auto;padding-left:14px;padding-right:14px}
+
+  /* ---------- header ---------- */
+  header.app{position:sticky;top:0;z-index:30;background:rgba(11,18,32,.92);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(34,49,76,.8);padding-top:var(--safe-t)}
+  .hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:11px;padding-bottom:11px}
+  .brand{display:flex;align-items:center;gap:9px;min-width:0}
+  .brand .ico{font-size:21px;line-height:1;flex:none;filter:drop-shadow(0 0 10px rgba(123,209,255,.4))}
+  .brand h1{margin:0;min-width:0;display:flex;flex-direction:column;gap:1px;letter-spacing:-.02em}
+  .brand h1 .t1{font-size:10.5px;font-weight:600;color:var(--ink3);white-space:nowrap}
+  .brand h1 .t2{font-size:18px;font-weight:800;color:var(--ink);white-space:nowrap}
+  .home-pill{flex:none;display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 12px;border-radius:999px;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;
+    font-size:12.5px;font-weight:700;line-height:1;text-decoration:none;white-space:nowrap}
+  .home-pill:active{background:rgba(255,255,255,.24)}
+  @media (max-width:359px){ .brand h1 .t2{font-size:16.5px} .home-pill{padding:0 10px;font-size:12px} }
+
+  /* ---------- stat bar ---------- */
+  .statbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:0 0 3px}
+  .pill{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:999px;
+    font-size:11.5px;font-weight:700;white-space:nowrap;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink2)}
+  .pill b{color:var(--ink);font-weight:800}
+  .pill.count{background:rgba(79,141,255,.16);border-color:rgba(79,141,255,.45);color:#cfe2ff}
+  .pill.count b{color:#fff}
+
+  /* ---------- search / sort ---------- */
+  .searchbar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:9px 13px;margin:8px 0 9px;min-width:0}
+  .searchbar .sico{font-size:14px;opacity:.75;flex:none}
+  .searchbar input{flex:1;min-width:0;background:none;border:0;outline:none;font-size:14.5px;color:var(--ink);padding:0}
+  .searchbar input::placeholder{color:var(--ink3)}
+  .searchbar input::-webkit-search-cancel-button,.searchbar input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
+  .searchbar .clr{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.09);color:var(--ink2);
+    font-size:11px;display:grid;place-items:center;flex:none}
+  .searchbar .clr[hidden]{display:none}
+
+  .ctrlrow{display:flex;gap:8px;align-items:center;margin:0 0 11px}
+  .selwrap{position:relative;flex:1;min-width:0}
+  .selwrap select{width:100%;appearance:none;-webkit-appearance:none;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:10px 30px 10px 12px;font-size:13px;font-weight:700;color:var(--ink);outline:none}
+  .selwrap::after{content:"▾";position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--ink3);font-size:12px;pointer-events:none}
+  .favbtn{flex:none;display:inline-flex;align-items:center;gap:5px;padding:10px 13px;border-radius:12px;
+    border:1px solid var(--line);background:var(--card);font-size:13px;font-weight:700;color:var(--ink2);white-space:nowrap}
+  .favbtn .st{color:#5b6b85;font-size:14px;line-height:1}
+  .favbtn[aria-pressed="true"]{background:rgba(255,207,92,.14);border-color:rgba(255,207,92,.5);color:var(--gold)}
+  .favbtn[aria-pressed="true"] .st{color:var(--gold)}
+
+  /* ---------- filters ---------- */
+  .filters{padding:2px 0 6px}
+  .frow{display:flex;align-items:center;gap:8px;margin:0 0 7px;min-width:0}
+  .flab{flex:none;width:34px;font-size:11px;font-weight:800;color:var(--ink3);letter-spacing:-.01em}
+  .chips{flex:1;min-width:0;display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+    padding:1px 0;-webkit-overflow-scrolling:touch}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;padding:6px 11px;border-radius:999px;font-size:12.5px;font-weight:700;
+    color:var(--ink2);background:rgba(255,255,255,.05);border:1px solid transparent;white-space:nowrap}
+  .chip:active{background:rgba(255,255,255,.11)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 3px 12px rgba(79,141,255,.35)}
+  .chip.on.money{background:#2f6bd6}
+  .freset-row{display:flex;justify-content:space-between;align-items:center;padding:2px 1px 4px;min-height:20px}
+  .fsum{font-size:11.5px;color:var(--ink3);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .freset{font-size:11.5px;color:var(--ink2);text-decoration:underline;padding:0}
+
+  /* ---------- list ---------- */
+  main{padding:6px 0 4px}
+  .list{display:flex;flex-direction:column;gap:11px}
+  .card{background:linear-gradient(175deg,var(--card2),var(--card));border:1px solid var(--line);
+    border-radius:16px;padding:13px 13px 12px;box-shadow:0 8px 22px rgba(0,0,0,.3);min-width:0;
+    cursor:pointer;transition:border-color .15s ease, transform .12s ease}
+  .card:active{transform:scale(.994);border-color:rgba(79,141,255,.45)}
+  .openhint{display:flex;align-items:center;justify-content:flex-end;gap:3px;margin:9px 0 0;
+    font-size:11.5px;font-weight:700;color:var(--ink3)}
+  .openhint .ar{font-size:14px;line-height:1;margin-top:-1px}
+  .badges{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:0 0 8px}
+  .b{display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:7px;
+    font-size:10.5px;font-weight:800;white-space:nowrap}
+  .b.cat{background:rgba(255,255,255,.08);color:#cfdcf3}
+  .b.court{background:rgba(255,107,107,.14);color:#ffb3b3;border:1px solid rgba(255,107,107,.32)}
+  .b.onbid{background:rgba(61,220,151,.13);color:#8ff0c4;border:1px solid rgba(61,220,151,.3)}
+  .b.dday{background:rgba(255,207,92,.14);color:var(--gold);border:1px solid rgba(255,207,92,.32)}
+  .b.dday.soon{background:rgba(255,107,107,.18);color:#ffadad;border-color:rgba(255,107,107,.45)}
+  .b.dday.past{background:rgba(255,255,255,.05);color:var(--ink3);border-color:var(--line)}
+  .star{margin-left:auto;flex:none;width:32px;height:28px;display:grid;place-items:center;border-radius:9px;
+    font-size:16px;line-height:1;color:#4a5872;background:rgba(255,255,255,.05);border:1px solid transparent}
+  .star[aria-pressed="true"]{color:var(--gold);background:rgba(255,207,92,.13);border-color:rgba(255,207,92,.35)}
+  .ctitle{margin:0 0 3px;font-size:15px;font-weight:800;letter-spacing:-.02em;line-height:1.32;word-break:keep-all;overflow-wrap:anywhere}
+  .ccase{margin:0 0 9px;font-size:11.5px;color:var(--ink3);font-weight:600;word-break:break-all}
+  .price{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin:0 0 3px}
+  .price .v{font-size:19px;font-weight:800;color:#fff;letter-spacing:-.02em}
+  .price .u{font-size:11.5px;font-weight:700;color:var(--ink3)}
+  .price .dp{font-size:12px;font-weight:700;color:var(--accent2);background:rgba(123,209,255,.1);
+    border-radius:7px;padding:2px 7px;white-space:nowrap}
+  .nums{display:flex;gap:5px 11px;flex-wrap:wrap;font-size:11.5px;color:var(--ink3);margin:0 0 9px}
+  .nums b{color:var(--ink2);font-weight:700}
+  .nums .rv{color:var(--warn);font-weight:800}
+  .note{margin:0 0 11px;font-size:12.5px;line-height:1.5;color:#c3d0e4;word-break:keep-all;overflow-wrap:anywhere}
+  .note .risk{color:#ffa8a8;font-weight:800}
+  .links{display:flex;gap:7px}
+  .links a{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;
+    padding:9px 6px;border-radius:11px;font-size:12.5px;font-weight:700;text-decoration:none;
+    background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+  .links a:active{background:rgba(255,255,255,.12)}
+  .links a.map{color:#9be8be;border-color:rgba(61,220,151,.28);background:rgba(61,220,151,.09)}
+
+  .empty{padding:44px 16px;text-align:center;color:var(--ink3);font-size:13.5px;line-height:1.7}
+  .empty .big{font-size:32px;display:block;margin-bottom:8px;opacity:.7}
+  .empty button{margin-top:12px;padding:9px 16px;border-radius:999px;background:var(--accent);color:#fff;font-weight:800;font-size:13px}
+
+  /* ---------- bottom sheet ---------- */
+  .sheetwrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+  .sheetbg{position:absolute;inset:0;background:rgba(3,8,18,.7);animation:fade .18s ease}
+  .sheetbox{position:relative;width:100%;max-width:560px;max-height:88vh;max-height:88dvh;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;background:linear-gradient(180deg,#16233a,#0f1a2b);
+    border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;
+    padding:9px 15px calc(15px + var(--safe-b));box-shadow:0 -14px 44px rgba(0,0,0,.6);
+    animation:slideup .24s cubic-bezier(.22,1,.36,1)}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes slideup{from{transform:translateY(20px);opacity:.35}to{transform:translateY(0);opacity:1}}
+  .grab{width:38px;height:4px;border-radius:99px;background:rgba(255,255,255,.18);margin:2px auto 11px}
+  .sx{position:absolute;right:11px;top:9px;width:30px;height:30px;border-radius:50%;
+    background:rgba(255,255,255,.08);color:var(--ink2);font-size:12px;display:grid;place-items:center}
+  .sheetbox .badges{margin:0 0 8px}
+  .sheetbox h2{margin:0 0 4px;font-size:17px;font-weight:800;line-height:1.32;letter-spacing:-.02em;
+    padding-right:38px;word-break:keep-all;overflow-wrap:anywhere}
+  .sheetbox .ccase{margin:0 0 12px;font-size:11.5px}
+  .kv{border-top:1px solid var(--line);margin:0 0 12px}
+  .kv .row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(46,64,92,.55);font-size:12.5px}
+  .kv .k{flex:0 0 62px;color:var(--ink3);font-weight:700}
+  .kv .v{flex:1;min-width:0;font-weight:600;color:var(--ink);word-break:keep-all;overflow-wrap:anywhere}
+  .kv .v .em{color:#fff;font-weight:800}
+  .kv .v .rv{color:var(--warn);font-weight:800}
+  .snote{margin:0 0 14px;font-size:12.5px;line-height:1.6;color:#c3d0e4;word-break:keep-all;overflow-wrap:anywhere}
+  .snote b{color:var(--ink2);font-weight:800;margin-right:4px}
+  .sbtns{display:flex;gap:7px}
+  .sbtns button,.sbtns a{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;
+    padding:11px 5px;border-radius:12px;font-size:12.5px;font-weight:800;text-decoration:none;
+    background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+  .sbtns .sfav[aria-pressed="true"]{background:rgba(255,207,92,.16);border-color:rgba(255,207,92,.5);color:var(--gold)}
+  .sbtns .map{color:#9be8be;border-color:rgba(61,220,151,.28);background:rgba(61,220,151,.09)}
+
+  footer{padding:22px 2px 8px;color:#5b6b85;font-size:11px;line-height:1.7;text-align:center}
+  footer b{color:#7f8fa9}
+  .morewrap{display:flex;justify-content:center;padding:14px 0 2px}
+  .more{padding:11px 22px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);
+    color:var(--ink);font-size:13px;font-weight:800}
+  .toast{position:fixed;left:50%;bottom:calc(22px + var(--safe-b));transform:translate(-50%,14px);
+    background:rgba(24,36,58,.97);border:1px solid var(--line);color:var(--ink);font-size:12.5px;font-weight:700;
+    padding:10px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.22s;z-index:60;max-width:88vw;text-align:center}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div class="wrap">
+    <div class="hdr">
+      <div class="brand">
+        <span class="ico" aria-hidden="true">🏛️</span>
+        <h1><span class="t1">후니의</span><span class="t2">경·공매 검색기</span></h1>
+      </div>
+      <a class="home-pill" href="/" aria-label="전체 앱 목록으로 이동">🏠 앱 목록</a>
+    </div>
+    <div class="statbar">
+      <span class="pill">📅 데이터 기준 <b>2026-11-23</b></span>
+      <span class="pill count">🔎 <b id="cnt">0</b>건 / 전체 <span id="cntAll">0</span>건</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="searchbar">
+    <span class="sico" aria-hidden="true">🔍</span>
+    <input id="q" type="search" inputmode="search" autocomplete="off" enterkeyhint="search"
+           placeholder="물건명·사건번호·지역·메모 검색">
+    <button class="clr" id="qclr" hidden aria-label="검색어 지우기">✕</button>
+  </div>
+
+  <div class="ctrlrow">
+    <div class="selwrap">
+      <select id="sort" aria-label="정렬">
+        <option value="price_asc">최저가 낮은순</option>
+        <option value="price_desc">최저가 높은순</option>
+        <option value="date_asc">기일 임박순</option>
+        <option value="fail_desc">유찰 많은순</option>
+      </select>
+    </div>
+    <button class="favbtn" id="favonly" aria-pressed="false"><span class="st">★</span> 관심만</button>
+  </div>
+
+  <section class="filters" aria-label="필터">
+    <div class="frow">
+      <span class="flab">구분</span>
+      <div class="chips" id="f-source"></div>
+    </div>
+    <div class="frow">
+      <span class="flab">종류</span>
+      <div class="chips" id="f-cat"></div>
+    </div>
+    <div class="frow">
+      <span class="flab">금액</span>
+      <div class="chips" id="f-money"></div>
+    </div>
+    <div class="frow">
+      <span class="flab">지역</span>
+      <div class="chips" id="f-region"></div>
+    </div>
+    <div class="freset-row">
+      <span class="fsum" id="fsum"></span>
+      <button class="freset" id="freset">필터 초기화</button>
+    </div>
+  </section>
+
+  <main>
+    <div class="list" id="list"></div>
+    <div class="morewrap" id="morewrap" hidden><button class="more" id="more">더 보기</button></div>
+  </main>
+
+  <footer>
+    출처: <b>대법원 법원경매정보</b> · <b>온비드</b> (2026-11-23 조회 기준)<br>
+    감정가·최저가·보증금은 조회 시점 표기이며, 입찰 전 <b>매각물건명세서·등기부</b> 확인이 필요합니다.<br>
+    leechardhun-hash.github.io · 홈 화면에 추가하면 앱처럼 열립니다
+  </footer>
+</div>
+
+<div class="sheetwrap" id="sheetwrap" hidden>
+  <div class="sheetbg" data-close></div>
+  <section class="sheetbox" role="dialog" aria-modal="true" aria-labelledby="sTitle">
+    <div class="grab"></div>
+    <button class="sx" data-close aria-label="닫기">✕</button>
+    <div id="sbody"></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script id="auction-data" type="application/json">[{"id":"c-1","source":"법원경매","category":"주거","region":"제주","title":"제주 코아루디펠리체 128호 (24.89㎡)","caseNo":"제주 2023타경24871","appraisalPrice":125000000,"minPrice":594000,"deposit":59400,"failCount":15,"bidDate":"2026-11-24","note":"오피스텔. 15회 장기 유찰 — 임차인·권리관계 명세서 확인 필수","mapQuery":"제주시 고마로16 코아루디펠리체","url":"https://www.courtauction.go.kr/"},{"id":"c-2","source":"법원경매","category":"주거","region":"충청·대전","title":"청주 율량동 율량신라 411호 (26.6㎡)","caseNo":"청주 2025타경51406","appraisalPrice":46000000,"minPrice":909000,"deposit":90900,"failCount":11,"bidDate":"2026-11-26","note":"대항력 임차인 — 배당 부족분 낙찰자 인수 위험","mapQuery":"청주시 청원구 율량동 율량신라","url":"https://www.courtauction.go.kr/"},{"id":"c-3","source":"법원경매","category":"주거","region":"강원","title":"홍천 비발디힐 205호 (43.4㎡)","caseNo":"춘천 2024타경56183","appraisalPrice":99000000,"minPrice":960000,"deposit":96000,"failCount":13,"bidDate":"2026-11-23","note":"주택임차권 잔액 인수 — 보증금 승계 확인 필수","mapQuery":"홍천군 비발디힐","url":"https://www.courtauction.go.kr/"},{"id":"c-4","source":"법원경매","category":"주거","region":"인천","title":"인천 미추홀 투민힐스빌 1705호 (69.25㎡)","caseNo":"인천 2024타경509294","appraisalPrice":211000000,"minPrice":1002000,"deposit":100200,"failCount":15,"bidDate":"2026-11-30","note":"15회 유찰. 최저가율 0%대 — 인수 부담 확인","mapQuery":"인천 미추홀구 투민힐스빌","url":"https://www.courtauction.go.kr/"},{"id":"c-5","source":"법원경매","category":"주거","region":"서울","title":"강서 공항동 발쿠치네하우스 404호 (17.25㎡)","caseNo":"서울남부 2023타경126956","appraisalPrice":159000000,"minPrice":1833000,"deposit":366600,"failCount":20,"bidDate":"2026-12-01","note":"특별매각조건 20% — 보증금 2배. 20회 유찰","mapQuery":"서울 강서구 공항동 발쿠치네하우스","url":"https://www.courtauction.go.kr/"},{"id":"c-6","source":"법원경매","category":"주거","region":"경기","title":"의정부 미리온타워 1011호 (19.62㎡)","caseNo":"의정부 2024타경89685","appraisalPrice":68000000,"minPrice":1345000,"deposit":134500,"failCount":11,"bidDate":"2026-11-24","note":"채권자 매수신고 193.45만 원 — 이보다 높게 써야 함","mapQuery":"의정부시 미리온타워","url":"https://www.courtauction.go.kr/"},{"id":"c-7","source":"법원경매","category":"주거","region":"경기","title":"일산 주엽동 강선마을 1202호 (101.88㎡)","caseNo":"고양 2023타경79325","appraisalPrice":677000000,"minPrice":2250000,"deposit":450000,"failCount":16,"bidDate":"2026-12-01","note":"재매각 20%·채권자 매수신청 400만 원. 16회 유찰","mapQuery":"고양시 일산서구 주엽동 강선마을","url":"https://www.courtauction.go.kr/"},{"id":"c-8","source":"법원경매","category":"주거","region":"서울","title":"금천 가산동 가산미소지움 529호 (16.24㎡)","caseNo":"서울남부 2024타경102094","appraisalPrice":112000000,"minPrice":2522000,"deposit":252200,"failCount":17,"bidDate":"2026-11-25","note":"독산 인접. 17회 유찰 — 인수·명도 조건 확인","mapQuery":"서울 금천구 가산동 가산미소지움","url":"https://www.courtauction.go.kr/"},{"id":"c-9","source":"법원경매","category":"주거","region":"부산·경남","title":"통영 리오죽림슈 502호 (52.35㎡)","caseNo":"통영 2024타경28832","appraisalPrice":72000000,"minPrice":2125000,"deposit":212500,"failCount":11,"bidDate":"2026-11-23","note":"전세권자 = 신청채권자. 전세보증금 인수 여부 확인","mapQuery":"통영시 리오죽림슈","url":"https://www.courtauction.go.kr/"},{"id":"c-10","source":"법원경매","category":"주거","region":"서울","title":"송파 성보팰리채 501호 (20.39㎡)","caseNo":"서울동부 2023타경58135","appraisalPrice":360000000,"minPrice":8106000,"deposit":1621200,"failCount":17,"bidDate":"2026-11-23","note":"특별매각조건 20% — 보증금 162만 원. 위반건축물","mapQuery":"서울 송파구 성보팰리채","url":"https://www.courtauction.go.kr/"},{"id":"c-11","source":"법원경매","category":"차량","region":"서울","title":"K9 2014년식 (법원 차량경매)","caseNo":"서울남부 2025타경9299","appraisalPrice":10000000,"minPrice":2622000,"deposit":524400,"failCount":6,"bidDate":"2026-11-24","note":"특별매각조건 20%. 6회 유찰 — 보관장소·열쇠·과태료 확인","mapQuery":"서울남부지방법원","url":"https://www.courtauction.go.kr/"},{"id":"c-12","source":"법원경매","category":"차량","region":"서울","title":"디스커버리 스포츠 2.2D 2015년식","caseNo":"서울남부 2025타경10002","appraisalPrice":9000000,"minPrice":3686000,"deposit":368600,"failCount":4,"bidDate":"2026-11-26","note":"4회 유찰. 주행 불가·보관료 여부 확인","mapQuery":"서울남부지방법원","url":"https://www.courtauction.go.kr/"},{"id":"c-13","source":"법원경매","category":"차량","region":"서울","title":"K3 2018년식 (법원 차량경매)","caseNo":"서울남부 2025타경10844","appraisalPrice":8500000,"minPrice":2786000,"deposit":557200,"failCount":5,"bidDate":"2026-11-24","note":"특별매각조건 20%. 5회 유찰","mapQuery":"서울남부지방법원","url":"https://www.courtauction.go.kr/"},{"id":"c-14","source":"법원경매","category":"상가","region":"서울","title":"강동 천호동 나비빌딩 상가 4.57㎡","caseNo":"서울동부 2024타경56259","appraisalPrice":20900000,"minPrice":4383000,"deposit":438300,"failCount":7,"bidDate":"2026-11-23","note":"초소형 점포 — 경계 불분명, 활용도 낮음","mapQuery":"서울 강동구 천호동 나비빌딩","url":"https://www.courtauction.go.kr/"},{"id":"c-15","source":"법원경매","category":"상가","region":"서울","title":"강동 천호동 나비빌딩 지하 3.56㎡","caseNo":"서울동부 2024타경56259","appraisalPrice":16500000,"minPrice":3460000,"deposit":346000,"failCount":7,"bidDate":"2026-11-23","note":"지하 점포 — 같은 사건 다른 호실","mapQuery":"서울 강동구 천호동 나비빌딩","url":"https://www.courtauction.go.kr/"},{"id":"c-16","source":"법원경매","category":"상가","region":"서울","title":"강서 공항동 에스엠파크빌 304호 (29.23㎡)","caseNo":"서울남부 2023타경113554","appraisalPrice":250000000,"minPrice":4503000,"deposit":900600,"failCount":18,"bidDate":"2026-11-25","note":"특별매각조건 20%. 근린→다세대 사용, 18회 유찰","mapQuery":"서울 강서구 공항동 에스엠파크빌","url":"https://www.courtauction.go.kr/"},{"id":"c-17","source":"법원경매","category":"상가","region":"서울","title":"구로 신구로자이 나인스에비뉴 지하 비1라032호 (4㎡)","caseNo":"서울남부 2024타경1467","appraisalPrice":12390000,"minPrice":6344000,"deposit":634400,"failCount":3,"bidDate":"2026-11-26","note":"오픈상가 지하 — 4㎡ 초소형","mapQuery":"서울 구로구 신구로자이 나인스에비뉴","url":"https://www.courtauction.go.kr/"},{"id":"c-18","source":"법원경매","category":"상가","region":"서울","title":"동대문 제기동 불로장생타워 13-36-1호 (2.97㎡)","caseNo":"서울북부 2022타경4762","appraisalPrice":4400000,"minPrice":4400000,"deposit":440000,"failCount":0,"bidDate":"2026-11-24","note":"1평 점포 신건 — 감정가 100% 시작","mapQuery":"서울 동대문구 제기동 불로장생타워","url":"https://www.courtauction.go.kr/"},{"id":"c-19","source":"법원경매","category":"상가","region":"서울","title":"광진 구의동 테크노마트21 시052호 (10.66㎡)","caseNo":"서울동부 2025타경51645","appraisalPrice":11000000,"minPrice":9040000,"deposit":904000,"failCount":4,"bidDate":"2026-11-30","note":"채권자 매수신청 — 이보다 높게 써야 함","mapQuery":"서울 광진구 구의동 테크노마트21","url":"https://www.courtauction.go.kr/"},{"id":"o-1","source":"온비드","category":"주거","region":"부산·경남","title":"부산 남구 대연동 635-28 201호 빌라 (84.66㎡)","caseNo":"2026-1000-058255","appraisalPrice":180000000,"minPrice":1000000,"deposit":100000,"failCount":0,"bidDate":"2026-12-10","note":"파산재단 물건. 감정가의 0.6% — 임차인 보증금·대지권 미등기 여부 명세서 필수","mapQuery":"부산 남구 대연동 635-28","url":"https://www.onbid.co.kr/"},{"id":"o-2","source":"온비드","category":"기타","region":"대구·경북","title":"의성 의성읍 중리리 409-2 컨테이너하우스 (27㎡)","caseNo":"2026-1100-059953","appraisalPrice":4000000,"minPrice":4000000,"deposit":400000,"failCount":0,"bidDate":"2026-11-23","note":"토지 별도 — 이전·철거 부담","mapQuery":"의성군 의성읍 중리리 409-2","url":"https://www.onbid.co.kr/"},{"id":"o-3","source":"온비드","category":"기타","region":"대구·경북","title":"의성 단촌면 구계2길 57-9 컨테이너하우스 (27㎡)","caseNo":"2026-1100-059938","appraisalPrice":4000000,"minPrice":4000000,"deposit":400000,"failCount":0,"bidDate":"2026-11-23","note":"토지 별도 — 이전·철거 부담","mapQuery":"의성군 단촌면 구계2길 57-9","url":"https://www.onbid.co.kr/"},{"id":"o-4","source":"온비드","category":"기타","region":"서울","title":"용산동1가 8 버스 주차장 (36㎡)","caseNo":"2026-1100-060386","appraisalPrice":4525000,"minPrice":4100000,"deposit":410000,"failCount":0,"bidDate":"2026-11-26","note":"용산경찰서 불용재산. 초소형 주차장","mapQuery":"서울 용산구 용산동1가 8","url":"https://www.onbid.co.kr/"},{"id":"o-5","source":"온비드","category":"상가","region":"전라·광주","title":"전주 인후동2가 지하1층 상가 35·44호 (23.93㎡)","caseNo":"2020-0600-033826","appraisalPrice":4800000,"minPrice":3149000,"deposit":314900,"failCount":25,"bidDate":"2026-11-24","note":"25회 유찰 — 사실상 시장가격 0. 농협자산관리 매각","mapQuery":"전주시 덕진구 인후동2가","url":"https://www.onbid.co.kr/"},{"id":"o-6","source":"온비드","category":"기타","region":"충청·대전","title":"대전 중구 용두동 17-4 가설건축물 (46.8㎡)","caseNo":"2026-1100-063727","appraisalPrice":2000000,"minPrice":2000000,"deposit":200000,"failCount":0,"bidDate":"2026-11-25","note":"가설건축물 — 존치기간·철거 조건 확인","mapQuery":"대전 중구 용두동 17-4","url":"https://www.onbid.co.kr/"},{"id":"o-7","source":"온비드","category":"기타","region":"경기","title":"남양주 진접역 대합실 꽃자판기 (1㎡)","caseNo":"2026-1100-062381","appraisalPrice":28000000,"minPrice":1540000,"deposit":154000,"failCount":0,"bidDate":"2026-11-23","note":"제한경쟁 — 입찰 자격 제한, 공고문 확인","mapQuery":"남양주시 진접역","url":"https://www.onbid.co.kr/"},{"id":"o-8","source":"온비드","category":"차량","region":"부산·경남","title":"현대 메가트럭CNG 암롤 (2015·213,135km)","caseNo":"김해시 불용차량","appraisalPrice":19000000,"minPrice":9500000,"deposit":950000,"failCount":6,"bidDate":"2026-11-30","note":"대형화물. 관공서 불용차 — 압류 해제·이전 깔끔","mapQuery":"김해시","url":"https://www.onbid.co.kr/"},{"id":"o-9","source":"온비드","category":"차량","region":"전라·광주","title":"메가트럭CNG 음식물쓰레기수거차 (2015·282,342km)","caseNo":"여수시도시관리공단 불용차량","appraisalPrice":10750000,"minPrice":9675000,"deposit":967500,"failCount":2,"bidDate":"2026-11-24","note":"특수차. 주행거리 많음 — 정비비 고려","mapQuery":"여수시","url":"https://www.onbid.co.kr/"},{"id":"o-10","source":"온비드","category":"차량","region":"강원","title":"그랜드스타렉스 (2016·78,701km)","caseNo":"봄빛지역아동센터 불용차량","appraisalPrice":9500000,"minPrice":9500000,"deposit":950000,"failCount":0,"bidDate":"2026-11-27","note":"승합 신건 — 감정가 100% 시작","mapQuery":"강릉시","url":"https://www.onbid.co.kr/"},{"id":"o-11","source":"온비드","category":"차량","region":"경기","title":"싼타페 (2016·142,439km)","caseNo":"안산시 단원구청 불용차량","appraisalPrice":9000000,"minPrice":7200000,"deposit":720000,"failCount":1,"bidDate":"2026-11-23","note":"승용 1회 유찰 — 20% 하락","mapQuery":"안산시 단원구","url":"https://www.onbid.co.kr/"},{"id":"o-12","source":"온비드","category":"차량","region":"인천","title":"쏘울EV (2016·27,931km)","caseNo":"국제식물검역인증원 불용차량","appraisalPrice":9000000,"minPrice":9000000,"deposit":900000,"failCount":1,"bidDate":"2026-11-23","note":"전기 SUV. 배터리 상태 확인","mapQuery":"인천","url":"https://www.onbid.co.kr/"},{"id":"o-13","source":"온비드","category":"차량","region":"경기","title":"아반떼 (2017·17,814km)","caseNo":"고양어린이박물관 불용차량","appraisalPrice":8000000,"minPrice":8000000,"deposit":800000,"failCount":0,"bidDate":"2026-11-24","note":"주행 1.7만km 신건 — 상태 양호","mapQuery":"고양시","url":"https://www.onbid.co.kr/"},{"id":"o-14","source":"온비드","category":"차량","region":"부산·경남","title":"에버다임 고가사다리 소방차 (2012·10,844km)","caseNo":"하동소방서 불용차량","appraisalPrice":9000000,"minPrice":9000000,"deposit":900000,"failCount":0,"bidDate":"2026-11-23","note":"특수차 신건 — 12시 마감","mapQuery":"하동군","url":"https://www.onbid.co.kr/"},{"id":"o-15","source":"온비드","category":"차량","region":"대구·경북","title":"스파크 (2014·49,499km)","caseNo":"대구 서구 불용차량","appraisalPrice":440000,"minPrice":396000,"deposit":39600,"failCount":2,"bidDate":"2026-12-01","note":"경차 — 보증금 3.96만 원, 가장 가벼운 진입","mapQuery":"대구 서구","url":"https://www.onbid.co.kr/"},{"id":"o-16","source":"온비드","category":"토지","region":"전라·광주","title":"목포 온금동 5-7 대지 (63㎡)","caseNo":"2026-0900-047261","appraisalPrice":null,"minPrice":9155600,"deposit":915560,"failCount":1,"bidDate":"2026-11-30","note":"대지 19평 — 도심, 지분 아님. 감정가 비공개","mapQuery":"목포시 온금동 5-7","url":"https://www.onbid.co.kr/"},{"id":"o-17","source":"온비드","category":"토지","region":"충청·대전","title":"청주 문의면 두모리 246-1 답 (221㎡)","caseNo":"2026-0700-039037","appraisalPrice":6895000,"minPrice":6033600,"deposit":603360,"failCount":4,"bidDate":"2026-11-30","note":"텃밭 규모 67평 답 — 농취증 필요 여부 확인","mapQuery":"청주시 상당구 문의면 두모리 246-1","url":"https://www.onbid.co.kr/"},{"id":"o-18","source":"온비드","category":"토지","region":"부산·경남","title":"하동 금남면 대치리 608 전 (377㎡)","caseNo":"2026-0400-022460","appraisalPrice":7729000,"minPrice":6537700,"deposit":653770,"failCount":2,"bidDate":"2026-11-23","note":"114평 전 — 16시 마감 임박. 농취증 필요","mapQuery":"하동군 금남면 대치리 608","url":"https://www.onbid.co.kr/"},{"id":"o-19","source":"온비드","category":"토지","region":"부산·경남","title":"함안 칠서면 용성리 237 전 (1,900㎡)","caseNo":"2026-1000-054931","appraisalPrice":null,"minPrice":4000000,"deposit":400000,"failCount":10,"bidDate":"2026-12-03","note":"파산자산 5회차 400만 원 — 1~5회차 동시접수(2,000/1,600/1,200/800/400만)","mapQuery":"함안군 칠서면 용성리 237","url":"https://www.onbid.co.kr/"},{"id":"o-20","source":"온비드","category":"토지","region":"대구·경북","title":"경주 효현동 632-1 하천 (102㎡)","caseNo":"2024-0800-060083","appraisalPrice":3672000,"minPrice":3672000,"deposit":367200,"failCount":18,"bidDate":"2026-11-24","note":"하천부지 — 사실상 사용 불가. 18회 유찰","mapQuery":"경주시 효현동 632-1","url":"https://www.onbid.co.kr/"},{"id":"o-21","source":"온비드","category":"토지","region":"경기","title":"화성 봉담읍 수영리 394-1 공장용지 (5㎡)","caseNo":"2026-1100-062650","appraisalPrice":null,"minPrice":6338000,"deposit":633800,"failCount":0,"bidDate":"2026-11-24","note":"지명경쟁 입찰 — 5㎡뿐, 자격 제한","mapQuery":"화성시 봉담읍 수영리 394-1","url":"https://www.onbid.co.kr/"},{"id":"o-22","source":"온비드","category":"토지","region":"제주","title":"제주 애월 광령리 4136 묘지 (16㎡)","caseNo":"2026-1100-062111","appraisalPrice":6224000,"minPrice":6793800,"deposit":679380,"failCount":0,"bidDate":"2026-11-26","note":"지명경쟁·묘지 — 개장·사용 제한 확인","mapQuery":"제주시 애월읍 광령리 4136","url":"https://www.onbid.co.kr/"},{"id":"o-23","source":"온비드","category":"토지","region":"전라·광주","title":"남원 보절면 사촌리 1244-3 답 (331.4㎡)","caseNo":"2026-0900-054211","appraisalPrice":7333000,"minPrice":5866100,"deposit":586610,"failCount":3,"bidDate":"2026-11-24","note":"100평 답 — 11/21 실경작 검토(3군) 물건","mapQuery":"남원시 보절면 사촌리 1244-3","url":"https://www.onbid.co.kr/"},{"id":"k-1","source":"온비드","category":"콘도","region":"충청·대전","title":"비체팰리스콘도 501호 (보령)","caseNo":"2026-07908-001 · 042회차","appraisalPrice":24000000,"minPrice":9600000,"deposit":960000,"failCount":5,"bidDate":"2026-11-25","note":"회원권 시세(27평 500만·36평 850만)보다 공매가가 비쌈 — 관망","mapQuery":"보령시 웅천읍 독산리 784-1","url":"https://www.onbid.co.kr/"},{"id":"k-2","source":"온비드","category":"콘도","region":"인천","title":"동양콘도미니엄 212호 (옹진 자월면)","caseNo":"2025-15118-001 · 042회차","appraisalPrice":4500000,"minPrice":3600000,"deposit":360000,"failCount":1,"bidDate":"2026-11-25","note":"섬 지역 접근성 — 지분 여부 확인","mapQuery":"옹진군 자월면 승봉리 784","url":"https://www.onbid.co.kr/"},{"id":"k-3","source":"온비드","category":"콘도","region":"제주","title":"제주토비스콘도 305호 (애월)","caseNo":"2026-06799-001 · 042회차","appraisalPrice":6100000,"minPrice":2440000,"deposit":244000,"failCount":5,"bidDate":"2026-11-25","note":"운영사 계속사업자 확인 — 명의개서료·시설보증금 별도","mapQuery":"제주시 애월읍 애월리 2505","url":"https://www.onbid.co.kr/"},{"id":"k-4","source":"온비드","category":"콘도","region":"제주","title":"제주토비스콘도 208호 (애월)","caseNo":"2026-00295-001 · 042회차","appraisalPrice":6100000,"minPrice":2440000,"deposit":244000,"failCount":5,"bidDate":"2026-11-25","note":"305호와 같은 리조트 — 총투입으로 비교","mapQuery":"제주시 애월읍 애월리 2505","url":"https://www.onbid.co.kr/"},{"id":"k-5","source":"온비드","category":"콘도","region":"대구·경북","title":"경주하일라콘도미니엄 B동 2410호","caseNo":"2025-02212-001 · 042회차","appraisalPrice":10000000,"minPrice":8000000,"deposit":800000,"failCount":11,"bidDate":"2026-11-25","note":"11회 유찰. 감정가 80% — 지분 여부 확인","mapQuery":"경주시 북군동 11-1","url":"https://www.onbid.co.kr/"},{"id":"k-6","source":"온비드","category":"콘도","region":"강원","title":"골프콘도 B동 113호 (원주 지정면)","caseNo":"2026-16276-001 · 042회차","appraisalPrice":39000000,"minPrice":31200000,"deposit":3120000,"failCount":1,"bidDate":"2026-11-25","note":"감정가 80% — 3천만 원대 콘도, 회원권 시세 비교","mapQuery":"원주시 지정면 월송리 1061-10","url":"https://www.onbid.co.kr/"},{"id":"k-7","source":"온비드","category":"콘도","region":"대구·경북","title":"경주하일라 A동 1417호","caseNo":"2026-10298-001 · 042회차","appraisalPrice":11000000,"minPrice":2200000,"deposit":220000,"failCount":7,"bidDate":"2026-11-25","note":"7회 유찰. 보증금 22만 원","mapQuery":"경주시 북군동 11-1","url":"https://www.onbid.co.kr/"},{"id":"k-8","source":"온비드","category":"콘도","region":"대구·경북","title":"경주하일라 A동 1323호","caseNo":"2026-02197-001 · 042회차","appraisalPrice":11000000,"minPrice":2200000,"deposit":220000,"failCount":8,"bidDate":"2026-11-25","note":"8회 유찰 — 같은 건물 1417호와 비교","mapQuery":"경주시 북군동 11-1","url":"https://www.onbid.co.kr/"},{"id":"k-9","source":"온비드","category":"콘도","region":"강원","title":"일성설악 온천동 2201호 (고성)","caseNo":"2026-13161-001 · 042회차","appraisalPrice":5990000,"minPrice":2396000,"deposit":239600,"failCount":5,"bidDate":"2026-11-25","note":"5회 유찰. 설악권 콘도","mapQuery":"고성군 토성면 원암리 331-2","url":"https://www.onbid.co.kr/"},{"id":"k-10","source":"온비드","category":"콘도","region":"대구·경북","title":"일성경주보문 315호","caseNo":"2026-02453-001 · 042회차","appraisalPrice":2000000,"minPrice":1200000,"deposit":120000,"failCount":3,"bidDate":"2026-11-25","note":"3회 유찰. 보증금 12만 원","mapQuery":"경주시 신평동 601-19","url":"https://www.onbid.co.kr/"},{"id":"k-11","source":"온비드","category":"콘도","region":"강원","title":"일성설악 본관동 1314호 (고성)","caseNo":"2026-13603-001 · 042회차","appraisalPrice":2100000,"minPrice":1680000,"deposit":168000,"failCount":1,"bidDate":"2026-11-25","note":"1회 유찰. 1/10 지분 가능성 — 표시면적 확인","mapQuery":"고성군 토성면 원암리 331-2","url":"https://www.onbid.co.kr/"},{"id":"k-12","source":"온비드","category":"콘도","region":"부산·경남","title":"대명리조트거제 A동 914호","caseNo":"2026-13201-001 · 042회차","appraisalPrice":23000000,"minPrice":23000000,"deposit":2300000,"failCount":0,"bidDate":"2026-11-25","note":"신건 감정가 100% — 가격 메리트 없음, 관망","mapQuery":"거제시 일운면 소동리 115","url":"https://www.onbid.co.kr/"},{"id":"k-13","source":"온비드","category":"콘도","region":"제주","title":"한국콘도 525호 (서귀포 색달동)","caseNo":"2025-15711-001 · 042회차","appraisalPrice":7000000,"minPrice":2800000,"deposit":280000,"failCount":5,"bidDate":"2026-11-25","note":"5회 유찰. 이랜드파크 운영 설악 계열과 별개 건물","mapQuery":"서귀포시 색달동 2822-5","url":"https://www.onbid.co.kr/"},{"id":"k-14","source":"온비드","category":"콘도","region":"강원","title":"현대훼미리타운 A동 5102호 (속초)","caseNo":"2024-15568-001 · 042회차","appraisalPrice":3000000,"minPrice":2400000,"deposit":240000,"failCount":1,"bidDate":"2026-11-25","note":"1회 유찰. 속초 노학동","mapQuery":"속초시 노학동 729-3","url":"https://www.onbid.co.kr/"},{"id":"k-15","source":"온비드","category":"콘도","region":"강원","title":"델피노 D동 301호 (고성) 건물 1/6 지분","caseNo":"2026-01005-001 · 042회차","appraisalPrice":55000000,"minPrice":22000000,"deposit":2200000,"failCount":5,"bidDate":"2026-11-25","note":"전유 61.98㎡의 1/6 지분 — 실사용 불가 구조, 비추천","mapQuery":"고성군 토성면 원암리 474-2","url":"https://www.onbid.co.kr/"},{"id":"k-16","source":"온비드","category":"콘도","region":"강원","title":"용평 제2차(빌라) 지3동 2542호","caseNo":"2026-07725-001 · 042회차","appraisalPrice":10000000,"minPrice":6000000,"deposit":600000,"failCount":3,"bidDate":"2026-11-25","note":"3회 유찰. 용평권 — 회원권 시세와 비교","mapQuery":"평창군 대관령면 용산리 28","url":"https://www.onbid.co.kr/"},{"id":"k-17","source":"온비드","category":"콘도","region":"강원","title":"횡성 오원리 539-1 제1동 211호","caseNo":"2026-10027-001 · 042회차","appraisalPrice":2000000,"minPrice":1200000,"deposit":120000,"failCount":3,"bidDate":"2026-11-25","note":"3회 유찰. 소형 리조트 객실","mapQuery":"횡성군 우천면 오원리 539-1","url":"https://www.onbid.co.kr/"},{"id":"k-18","source":"온비드","category":"콘도","region":"강원","title":"세인트하이얀 816호 (평창 봉평)","caseNo":"2026-09089-001 · 042회차","appraisalPrice":2300000,"minPrice":1380000,"deposit":138000,"failCount":3,"bidDate":"2026-11-25","note":"3회 유찰. 보증금 13.8만 원","mapQuery":"평창군 봉평면 무이리 762-1","url":"https://www.onbid.co.kr/"},{"id":"k-19","source":"온비드","category":"콘도","region":"충청·대전","title":"이에스리조트클럽 882호 (제천 수산면)","caseNo":"2026-08103-001 · 042회차","appraisalPrice":12600000,"minPrice":7560000,"deposit":756000,"failCount":3,"bidDate":"2026-11-25","note":"3회 유찰. 충주호권 리조트","mapQuery":"제천시 수산면 능강리 200-19","url":"https://www.onbid.co.kr/"},{"id":"k-20","source":"온비드","category":"콘도","region":"강원","title":"횡성 오원리 539-1 제1동 403호","caseNo":"2026-04828-001 · 042회차","appraisalPrice":2000000,"minPrice":1600000,"deposit":160000,"failCount":6,"bidDate":"2026-11-25","note":"6회 유찰. 211호와 같은 건물","mapQuery":"횡성군 우천면 오원리 539-1","url":"https://www.onbid.co.kr/"},{"id":"k-21","source":"온비드","category":"콘도","region":"제주","title":"한화리조트 제주 동관 453호 (회원권 1구좌)","caseNo":"2025-14722-001 · 042회차","appraisalPrice":5690000,"minPrice":4552000,"deposit":455200,"failCount":1,"bidDate":"2026-11-25","note":"부동산 아닌 회원권 1구좌 — 명의개서 조건 확인","mapQuery":"제주시 회천동 3-16","url":"https://www.onbid.co.kr/"},{"id":"k-22","source":"온비드","category":"콘도","region":"강원","title":"한국콘도미니엄 1동 210호 (속초 설악동)","caseNo":"2025-16029-001 · 044회차","appraisalPrice":5960000,"minPrice":5960000,"deposit":596000,"failCount":0,"bidDate":"2026-12-09","note":"신건 100%. 이랜드파크 한국콘도설악점 영업 중","mapQuery":"속초시 설악동 59-1","url":"https://www.onbid.co.kr/"},{"id":"k-23","source":"온비드","category":"콘도","region":"강원","title":"일성설악 연수동 4206호 (고성)","caseNo":"2026-14951-001 · 044회차","appraisalPrice":2900000,"minPrice":2900000,"deposit":290000,"failCount":0,"bidDate":"2026-12-09","note":"신건 100% — 12월 입찰","mapQuery":"고성군 토성면 원암리 331-2","url":"https://www.onbid.co.kr/"},{"id":"k-24","source":"온비드","category":"콘도","region":"전라·광주","title":"지리산하이츠 215호 (남원 산곡동) 지분 1/10","caseNo":"2026-18944-001 · 044회차","appraisalPrice":2500000,"minPrice":2500000,"deposit":250000,"failCount":0,"bidDate":"2026-12-09","note":"공유지분 1/10 — 공유자 협의 없으면 사용·매각 불가","mapQuery":"남원시 산곡동 15-2","url":"https://www.onbid.co.kr/"},{"id":"k-25","source":"온비드","category":"콘도","region":"강원","title":"현대훼미리타운 B동 3514호 (속초)","caseNo":"2026-07541-001 · 044회차","appraisalPrice":2000000,"minPrice":1200000,"deposit":120000,"failCount":4,"bidDate":"2026-12-09","note":"4회 유찰. 보증금 12만 원","mapQuery":"속초시 노학동 729-3","url":"https://www.onbid.co.kr/"},{"id":"k-26","source":"온비드","category":"콘도","region":"부산·경남","title":"아난티펜트하우스 5동 521호 (남해)","caseNo":"2026-12948-001 · 044회차","appraisalPrice":202000000,"minPrice":202000000,"deposit":20200000,"failCount":0,"bidDate":"2026-12-09","note":"2억 원대 고가 — 신건 100%, 지분 여부 확인","mapQuery":"남해군 남면 덕월리 266-7","url":"https://www.onbid.co.kr/"},{"id":"k-27","source":"온비드","category":"콘도","region":"강원","title":"세인트하이얀 616호 (평창 봉평)","caseNo":"2026-12157-001 · 044회차","appraisalPrice":2300000,"minPrice":2300000,"deposit":230000,"failCount":0,"bidDate":"2026-12-09","note":"신건 100% — 816호(138만)와 비교","mapQuery":"평창군 봉평면 무이리 762-1","url":"https://www.onbid.co.kr/"},{"id":"k-28","source":"온비드","category":"콘도","region":"강원","title":"동강시스타 102동 2206호 (영월)","caseNo":"2026-11430-001 · 044회차","appraisalPrice":14000000,"minPrice":14000000,"deposit":1400000,"failCount":0,"bidDate":"2026-12-09","note":"신건 100% — 1,400만 원대","mapQuery":"영월군 영월읍 삼옥리 108","url":"https://www.onbid.co.kr/"},{"id":"k-29","source":"온비드","category":"콘도","region":"강원","title":"횡성 오원리 539-1 제1동 913호","caseNo":"2026-05991-001 · 044회차","appraisalPrice":20000000,"minPrice":20000000,"deposit":2000000,"failCount":0,"bidDate":"2026-12-09","note":"신건 100% — 감정가 2,000만 원","mapQuery":"횡성군 우천면 오원리 539-1","url":"https://www.onbid.co.kr/"},{"id":"k-30","source":"온비드","category":"콘도","region":"강원","title":"아이파크콘도 531호 (고성 토성면)","caseNo":"2026-01947-001 · 046회차","appraisalPrice":4000000,"minPrice":2000000,"deposit":200000,"failCount":5,"bidDate":"2026-12-23","note":"2025년 기준 휴장 — 레스토랑·온천 미운영, 관리비만 나감","mapQuery":"고성군 토성면 원암리 362-1","url":"https://www.onbid.co.kr/"},{"id":"k-31","source":"온비드","category":"콘도","region":"충청·대전","title":"단양대명콘도 1103호","caseNo":"2026-01701-001 · 046회차","appraisalPrice":51000000,"minPrice":20400000,"deposit":2040000,"failCount":6,"bidDate":"2026-12-23","note":"6회 유찰. 2,040만 원 — 보증금 204만 원","mapQuery":"단양군 단양읍 상진리 4-1","url":"https://www.onbid.co.kr/"},{"id":"k-32","source":"온비드","category":"콘도","region":"서울","title":"일성레저산업 콘도회원권 (회원번호 2211-7258)","caseNo":"2026-02862-001 · 046회차","appraisalPrice":2000000,"minPrice":2000000,"deposit":200000,"failCount":7,"bidDate":"2026-12-23","note":"7회 유찰. 부동산 아닌 회원권 — 명의이전 비용 낙찰자 부담","mapQuery":"서울 광진구 구의동 546-4","url":"https://www.onbid.co.kr/"},{"id":"k-33","source":"온비드","category":"콘도","region":"제주","title":"한국콘도 317호 (서귀포 색달동)","caseNo":"2025-06326-001 · 046회차","appraisalPrice":5000000,"minPrice":5000000,"deposit":500000,"failCount":0,"bidDate":"2026-12-23","note":"신건 100% — 525호와 같은 리조트","mapQuery":"서귀포시 색달동 2822-5","url":"https://www.onbid.co.kr/"},{"id":"k-34","source":"온비드","category":"콘도","region":"강원","title":"그레이스(포유리조트 설악) 124호 (고성)","caseNo":"2026-06412-001 · 046회차","appraisalPrice":5260000,"minPrice":5260000,"deposit":526000,"failCount":0,"bidDate":"2026-12-23","note":"포유리조트로 상호 변경·객실 운영 중. 시설보수분담금 승계 주의","mapQuery":"고성군 토성면 신평리 465-72","url":"https://www.onbid.co.kr/"},{"id":"k-35","source":"온비드","category":"콘도","region":"부산·경남","title":"금호통영마리나콘도 714호","caseNo":"2026-13664-001 · 046회차","appraisalPrice":7000000,"minPrice":7000000,"deposit":700000,"failCount":0,"bidDate":"2026-12-23","note":"신건 100% — 통영 도남동","mapQuery":"통영시 도남동 645","url":"https://www.onbid.co.kr/"},{"id":"k-36","source":"온비드","category":"콘도","region":"대구·경북","title":"사조리조트 228호 (경주 진현동)","caseNo":"2024-04312-001 · 046회차","appraisalPrice":28000000,"minPrice":8400000,"deposit":840000,"failCount":7,"bidDate":"2026-12-23","note":"7회 유찰. 사조온천리조트 영업 중 — 법원 226호(12/15)와 비교","mapQuery":"경주시 진현동 850-1","url":"https://www.onbid.co.kr/"},{"id":"k-37","source":"온비드","category":"콘도","region":"강원","title":"삼포리조트 102호 (고성 죽왕면)","caseNo":"2025-18197-001 · 046회차","appraisalPrice":990000,"minPrice":990000,"deposit":99000,"failCount":0,"bidDate":"2026-12-23","note":"99만 원 — 지분 구조(30분의 1 수준). 오션투유리조트로 운영 중","mapQuery":"고성군 죽왕면 삼포리 243-13","url":"https://www.onbid.co.kr/"},{"id":"k-38","source":"온비드","category":"콘도","region":"부산·경남","title":"빌라쥬드아난티1 D1102호 (부산 기장)","caseNo":"2026-18924-004 · 046회차","appraisalPrice":130000000,"minPrice":130000000,"deposit":13000000,"failCount":0,"bidDate":"2026-12-23","note":"1억 3,000만 원 신건 — 보증금 1,300만 원","mapQuery":"기장군 시랑리 733","url":"https://www.onbid.co.kr/"},{"id":"k-39","source":"온비드","category":"콘도","region":"인천","title":"동양콘도미니엄 214호 (옹진) 공유지분 1/10","caseNo":"2026-10545-001 · 046회차","appraisalPrice":4900000,"minPrice":4900000,"deposit":490000,"failCount":0,"bidDate":"2026-12-23","note":"공유지분 1/10 — 사용·처분 제한","mapQuery":"옹진군 자월면 승봉리 784","url":"https://www.onbid.co.kr/"},{"id":"k-40","source":"온비드","category":"콘도","region":"제주","title":"제주토비스 2004호 (애월)","caseNo":"2026-01280-003 · 046회차","appraisalPrice":2550000,"minPrice":2550000,"deposit":255000,"failCount":0,"bidDate":"2026-12-23","note":"신건 100%. 2103~2105호와 동시 접수 — 한 건만 선택","mapQuery":"제주시 애월읍 애월리 2504-1","url":"https://www.onbid.co.kr/"},{"id":"k-41","source":"온비드","category":"콘도","region":"제주","title":"제주토비스 2103호 (애월)","caseNo":"2026-01280-004 · 046회차","appraisalPrice":2550000,"minPrice":2550000,"deposit":255000,"failCount":0,"bidDate":"2026-12-23","note":"신건 100%. 같은 건물 4개 호실 동시 접수","mapQuery":"제주시 애월읍 애월리 2504-1","url":"https://www.onbid.co.kr/"},{"id":"k-42","source":"온비드","category":"콘도","region":"제주","title":"제주토비스 2104호 (애월)","caseNo":"2026-01280-002 · 046회차","appraisalPrice":2550000,"minPrice":2550000,"deposit":255000,"failCount":0,"bidDate":"2026-12-23","note":"신건 100%. 2027-01 별건(20514)과 중복 주의","mapQuery":"제주시 애월읍 애월리 2504-1","url":"https://www.onbid.co.kr/"},{"id":"k-43","source":"온비드","category":"콘도","region":"제주","title":"제주토비스 2105호 (애월)","caseNo":"2026-01280-001 · 046회차","appraisalPrice":2550000,"minPrice":2550000,"deposit":255000,"failCount":0,"bidDate":"2026-12-23","note":"신건 100%. 보증금 25.5만 원","mapQuery":"제주시 애월읍 애월리 2504-1","url":"https://www.onbid.co.kr/"},{"id":"k-44","source":"온비드","category":"콘도","region":"강원","title":"제베른2동 2202호 (고성 토성면)","caseNo":"2026-04341-001 · 046회차","appraisalPrice":11000000,"minPrice":11000000,"deposit":1100000,"failCount":0,"bidDate":"2026-12-23","note":"신건 100% — 1,100만 원","mapQuery":"고성군 토성면 신평리 773","url":"https://www.onbid.co.kr/"},{"id":"k-45","source":"온비드","category":"콘도","region":"강원","title":"횡성 오원리 539-1 제1동 307호","caseNo":"2026-03345-001 · 046회차","appraisalPrice":1500000,"minPrice":1500000,"deposit":150000,"failCount":0,"bidDate":"2026-12-23","note":"신건 100%. 보증금 15만 원","mapQuery":"횡성군 우천면 오원리 539-1","url":"https://www.onbid.co.kr/"},{"id":"k-46","source":"온비드","category":"콘도","region":"강원","title":"프레야낙산리조텔 1동 347호 (양양)","caseNo":"2025-17064-001 · 046회차","appraisalPrice":76000000,"minPrice":76000000,"deposit":7600000,"failCount":0,"bidDate":"2026-12-23","note":"7,600만 원 신건 — 보증금 760만 원","mapQuery":"양양군 양양읍 조산리 433-1","url":"https://www.onbid.co.kr/"},{"id":"k-47","source":"온비드","category":"콘도","region":"제주","title":"제주토비스 2104호 별건 (애월)","caseNo":"2026-20514-001 · 001회차","appraisalPrice":null,"minPrice":2530000,"deposit":253000,"failCount":0,"bidDate":"2027-01-06","note":"1월 입찰 — 12월 2104호(01280-002)와 다른 사건, 중복 접수 주의","mapQuery":"제주시 애월읍 애월리 2504-1","url":"https://www.onbid.co.kr/"},{"id":"k-48","source":"온비드","category":"콘도","region":"부산·경남","title":"부곡 거문리 412호 (창녕)","caseNo":"2026-12910-001 · 001회차","appraisalPrice":null,"minPrice":2000000,"deposit":200000,"failCount":0,"bidDate":"2027-01-06","note":"1월 입찰. 부곡온천권","mapQuery":"창녕군 부곡면 거문리 203-10","url":"https://www.onbid.co.kr/"},{"id":"k-49","source":"온비드","category":"콘도","region":"강원","title":"현대훼미리타운 A동 8104호 (속초)","caseNo":"2025-03048-001 · 001회차","appraisalPrice":null,"minPrice":3000000,"deposit":300000,"failCount":0,"bidDate":"2027-01-06","note":"1월 입찰. 보증금 30만 원","mapQuery":"속초시 노학동 729-3","url":"https://www.onbid.co.kr/"},{"id":"k-50","source":"온비드","category":"콘도","region":"강원","title":"대명홍천1차 콘도미니엄 309호","caseNo":"2026-09193-001 · 001회차","appraisalPrice":null,"minPrice":4000000,"deposit":400000,"failCount":0,"bidDate":"2027-01-06","note":"1월 입찰. 대명 계열 정상 운영","mapQuery":"홍천군 서면 팔봉리 1290-2","url":"https://www.onbid.co.kr/"},{"id":"k-51","source":"온비드","category":"콘도","region":"강원","title":"횡성 오원리 539-1 제1동 506호","caseNo":"2026-17228-001 · 001회차","appraisalPrice":null,"minPrice":2000000,"deposit":200000,"failCount":0,"bidDate":"2027-01-06","note":"1월 입찰. 보증금 20만 원","mapQuery":"횡성군 우천면 오원리 539-1","url":"https://www.onbid.co.kr/"},{"id":"k-52","source":"온비드","category":"콘도","region":"제주","title":"금호제주리조트 신관 580호 (서귀포 남원)","caseNo":"2024-17978-001 · 001회차","appraisalPrice":null,"minPrice":30000000,"deposit":3000000,"failCount":0,"bidDate":"2027-01-06","note":"1월 입찰. 3,000만 원대 — 보증금 300만 원","mapQuery":"서귀포시 남원읍 남원리 2384-3","url":"https://www.onbid.co.kr/"},{"id":"m-1","source":"온비드","category":"콘도","region":"제주","title":"비엔월드 제주토비스 회원권 공유지분 1/30 (파산자산)","caseNo":"2026-1100-062285","appraisalPrice":null,"minPrice":1000000,"deposit":100000,"failCount":0,"bidDate":"2026-11-25","note":"1회 600만→4회 100만. 법원 허가 조건 매매·명의변경 비용 전부 낙찰자 부담","mapQuery":"제주시 애월읍 애월리 2505","url":"https://www.onbid.co.kr/"},{"id":"m-2","source":"온비드","category":"콘도","region":"강원","title":"코레스코치악산 콘도회원권","caseNo":"2018-0900-034019","appraisalPrice":null,"minPrice":1000000,"deposit":100000,"failCount":90,"bidDate":"2026-11-27","note":"90회 유찰 — 8년간 한 건도 안 팔림. 시장가격 사실상 0","mapQuery":"횡성군 코레스코치악산","url":"https://www.onbid.co.kr/"},{"id":"m-3","source":"온비드","category":"콘도","region":"강원","title":"코레스코치악산 26평형 등기 제712호 1/10 지분","caseNo":"2018-0900-034036","appraisalPrice":null,"minPrice":1000000,"deposit":100000,"failCount":89,"bidDate":"2026-11-27","note":"89회 유찰. 1/10 공유지분 — 같은 물건 8건 동시 매각","mapQuery":"횡성군 코레스코치악산","url":"https://www.onbid.co.kr/"},{"id":"m-4","source":"온비드","category":"콘도","region":"충청·대전","title":"도고글로리 콘도회원권 1","caseNo":"2016-0331-001007","appraisalPrice":null,"minPrice":850000,"deposit":85000,"failCount":12,"bidDate":"2026-11-27","note":"12회 유찰. 보증금 8.5만 원 — 매수자 없음 전제","mapQuery":"아산시 도고면","url":"https://www.onbid.co.kr/"},{"id":"c-20","source":"법원경매","category":"콘도","region":"강원","title":"삼포리조트 휴양콘도미니엄 2층 221호 (42.36㎡)","caseNo":"속초지원 2026타경29","appraisalPrice":3000000,"minPrice":3000000,"deposit":300000,"failCount":1,"bidDate":"2026-12-02","note":"공유자 우선매수권 1회 — 지분 매각으로 보임. 오션투유리조트 운영 중","mapQuery":"고성군 죽왕면 삼포리 243-13","url":"https://www.courtauction.go.kr/"},{"id":"c-21","source":"법원경매","category":"콘도","region":"제주","title":"한국콘도 4층 553호 (서귀포 색달동)","caseNo":"제주 2025타경8747","appraisalPrice":7000000,"minPrice":3430000,"deposit":343000,"failCount":2,"bidDate":"2026-12-01","note":"감정가 49%. 전유 전체인지 지분인지·명의개서 조건 확인","mapQuery":"서귀포시 색달동 2822-5","url":"https://www.courtauction.go.kr/"},{"id":"c-22","source":"법원경매","category":"콘도","region":"제주","title":"제주헬스케어타운콘도미니엄 103동 102호","caseNo":"제주 2025타경1651","appraisalPrice":580000000,"minPrice":198940000,"deposit":19894000,"failCount":3,"bidDate":"2026-12-01","note":"3회 유찰. 1억 9,894만 원 — 보증금 1,989만 원","mapQuery":"서귀포시 동홍동 2045","url":"https://www.courtauction.go.kr/"},{"id":"c-23","source":"법원경매","category":"콘도","region":"대구·경북","title":"사조리조트휴양콘도미니엄 2층 226호 (39.0㎡)","caseNo":"경주지원 2026타경10178","appraisalPrice":21000000,"minPrice":14700000,"deposit":1470000,"failCount":1,"bidDate":"2026-12-15","note":"운영사 영업 중. 총투입 약 1,538만(취득세 4.6% 포함) — 6장 추천 후보","mapQuery":"경주시 진현동 850-1","url":"https://www.courtauction.go.kr/"},{"id":"c-24","source":"법원경매","category":"주거","region":"경기","title":"남양주 별내역아이파크스위트 102동 3004호","caseNo":"남양주지원 2025타경423","appraisalPrice":578000000,"minPrice":404600000,"deposit":40460000,"failCount":3,"bidDate":"2026-12-22","note":"3회 유찰. 4억 원대 — 보증금 4,046만 원","mapQuery":"남양주시 별내동 1005","url":"https://www.courtauction.go.kr/"},{"id":"d-1","source":"법원경매","category":"주거","region":"서울","title":"금천 독산 명성팰리스 303호","caseNo":"서울남부 2026타경5212","appraisalPrice":null,"minPrice":168320000,"deposit":16832000,"failCount":0,"bidDate":"2026-12-03","note":"HUG 특별매각조건 — 인수 0원·전입세대 없음. 예상 마진 +7,613만, 3건 중 1순위","mapQuery":"서울 금천구 독산동 명성팰리스","url":"https://www.courtauction.go.kr/"},{"id":"d-2","source":"법원경매","category":"주거","region":"서울","title":"금천 독산 자이에코빌 503호","caseNo":"서울남부 2026타경5212","appraisalPrice":null,"minPrice":127360000,"deposit":12736000,"failCount":0,"bidDate":"2026-12-03","note":"HUG 인수 0원. 5층 무승강기·보증보험 한도 약 1.5억 — 전세 세팅 시 확인","mapQuery":"서울 금천구 독산동 자이에코빌","url":"https://www.courtauction.go.kr/"},{"id":"d-3","source":"법원경매","category":"주거","region":"서울","title":"금천 독산 지오빌 602호","caseNo":"서울남부 2026타경5212","appraisalPrice":null,"minPrice":196480000,"deposit":19648000,"failCount":0,"bidDate":"2026-12-03","note":"HUG 인수 0원. 1억 9,648만 — 3건 중 최고가, 4차 대기 관망","mapQuery":"서울 금천구 독산동 지오빌","url":"https://www.courtauction.go.kr/"},{"id":"d-4","source":"온비드","category":"주거","region":"서울","title":"금천 독산 모던하우스 302호","caseNo":"온비드 043회차","appraisalPrice":null,"minPrice":113500000,"deposit":11350000,"failCount":0,"bidDate":"2026-12-02","note":"인수 0원 확정. 공매 명도 6~12개월·현금 일시납 부담, 낙찰가율 52.3%","mapQuery":"서울 금천구 독산동 모던하우스","url":"https://www.onbid.co.kr/"},{"id":"d-5","source":"온비드","category":"주거","region":"서울","title":"금천 독산 아크로빌 404호","caseNo":"2026-05258-001 · 043회차","appraisalPrice":null,"minPrice":28400000,"deposit":2840000,"failCount":0,"bidDate":"2026-12-02","note":"임차인 보증금 2억 2,200만 전액 인수 — 042 불참, 043회차만 숫자가 섬","mapQuery":"서울 금천구 독산동 아크로빌","url":"https://www.onbid.co.kr/"},{"id":"d-6","source":"법원경매","category":"주거","region":"서울","title":"금천 독산 호암빌 404호","caseNo":"서울남부 2026타경3141","appraisalPrice":null,"minPrice":192640000,"deposit":19264000,"failCount":2,"bidDate":"2026-12-08","note":"3차 1억 9,264만 원 — 보증금 1,926만 원","mapQuery":"서울 금천구 독산동 호암빌","url":"https://www.courtauction.go.kr/"},{"id":"d-7","source":"법원경매","category":"주거","region":"서울","title":"금천 독산 골드클래스 202호","caseNo":"서울남부 2026타경3739","appraisalPrice":null,"minPrice":201600000,"deposit":20160000,"failCount":2,"bidDate":"2026-12-15","note":"2회 유찰 2억 160만 원 — 보증금 2,016만 원","mapQuery":"서울 금천구 독산동 골드클래스","url":"https://www.courtauction.go.kr/"},{"id":"d-8","source":"법원경매","category":"주거","region":"서울","title":"금천 독산 더시크릿독산 203호","caseNo":"서울남부 2025타경8988","appraisalPrice":null,"minPrice":127480000,"deposit":12748000,"failCount":3,"bidDate":"2026-12-08","note":"4차 1억 2,748만 원 — 권리분석·시세 재점검 제안 상태","mapQuery":"서울 금천구 독산동 더시크릿독산","url":"https://www.courtauction.go.kr/"},{"id":"d-9","source":"법원경매","category":"주거","region":"서울","title":"금천 미림에이클래스 702호","caseNo":"서울남부 2025타경14131","appraisalPrice":null,"minPrice":131070000,"deposit":13107000,"failCount":0,"bidDate":"2026-12-04","note":"1억 3,107만 원 — 보증금 1,310만 원","mapQuery":"서울 금천구 미림에이클래스","url":"https://www.courtauction.go.kr/"},{"id":"d-10","source":"법원경매","category":"토지","region":"경기","title":"동두천 생연동 148 (도로 접한 토지)","caseNo":"의정부 2025타경72973[1]","appraisalPrice":null,"minPrice":66200000,"deposit":6620000,"failCount":0,"bidDate":"2026-12-30","note":"농취증 반려 시 보증금 662만 원 몰취 — 입찰 전 동두천시 농정 사전 문의 필수","mapQuery":"동두천시 생연동 148","url":"https://www.courtauction.go.kr/"},{"id":"d-11","source":"온비드","category":"토지","region":"경기","title":"동두천 생연동 246-43 (전)","caseNo":"2026-05910-001 · 044회차","appraisalPrice":null,"minPrice":10000000,"deposit":1000000,"failCount":0,"bidDate":"2026-12-09","note":"100% 맹지지만 농취증 불필요·이미 경작 중. 1년 이상 휴경 시 연 1,192만 원 이행강제금","mapQuery":"동두천시 생연동 246-43","url":"https://www.onbid.co.kr/"},{"id":"d-12","source":"온비드","category":"토지","region":"경기","title":"동두천 상패동 산 32-1 (공유재산 임야)","caseNo":"동두천시 공유재산 매각","appraisalPrice":null,"minPrice":9106000,"deposit":910600,"failCount":0,"bidDate":"2026-12-07","note":"맹지·옹벽·조성비로 텃밭 부적합 — 참고용","mapQuery":"동두천시 상패동 산 32-1","url":"https://www.onbid.co.kr/"}]</script>
+<script>
+(function () {
+  'use strict';
+  var DATA = JSON.parse(document.getElementById('auction-data').textContent);
+
+  var FAV_KEY = 'huni-auction-favs';
+  var PAGE = 30;
+
+  var state = {
+    source: '전체', cat: '전체', money: '전체', region: '전체',
+    q: '', sort: 'price_asc', favOnly: false, shown: PAGE
+  };
+
+  var SOURCES = ['전체', '법원경매', '온비드'];
+  var CATS = ['전체', '주거', '토지', '상가', '차량', '콘도', '기타'];
+  var MONEY = [
+    { key: '전체' },
+    { key: '보증금 100만 이하', test: function (d) { return d.deposit <= 1000000; } },
+    { key: '보증금 500만 이하', test: function (d) { return d.deposit <= 5000000; } },
+    { key: '최저가 3,000만 이하', test: function (d) { return d.minPrice <= 30000000; } },
+    { key: '최저가 1억 이하', test: function (d) { return d.minPrice <= 100000000; } },
+    { key: '1억 초과', test: function (d) { return d.minPrice > 100000000; } }
+  ];
+  var REGIONS = ['전체', '서울', '경기', '인천', '강원', '충청·대전', '전라·광주', '부산·경남', '대구·경북', '제주'];
+
+  var favs = loadFavs();
+
+  function loadFavs() {
+    try {
+      var raw = localStorage.getItem(FAV_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function saveFavs() {
+    try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch (e) {}
+  }
+  function isFav(id) { return favs.indexOf(id) !== -1; }
+
+  /* ---------- formatting ---------- */
+  function man(n) {
+    var v = n / 10000;
+    if (v < 10) return String(Math.round(v * 100) / 100);
+    if (v < 1000) return String(Math.round(v * 10) / 10);
+    return Math.round(v).toLocaleString('ko-KR');
+  }
+  function won(n) {
+    if (n >= 100000000) {
+      var eok = Math.floor(n / 100000000);
+      var rest = Math.round((n % 100000000) / 10000);
+      return rest > 0 ? eok + '억 ' + rest.toLocaleString('ko-KR') + '만' : eok + '억';
+    }
+    return man(n) + '만';
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function todayNum() {
+    var d = new Date();
+    return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+  function dayDiff(iso) {
+    var p = iso.split('-');
+    return Math.round((Date.UTC(+p[0], +p[1] - 1, +p[2]) - todayNum()) / 86400000);
+  }
+  function dday(iso) {
+    var d = dayDiff(iso);
+    if (d < 0) return { text: '기일 지남', cls: ' past' };
+    if (d === 0) return { text: '오늘 마감', cls: ' soon' };
+    if (d === 1) return { text: '내일', cls: ' soon' };
+    if (d <= 7) return { text: 'D-' + d, cls: ' soon' };
+    return { text: 'D-' + d, cls: '' };
+  }
+  function dateText(iso) {
+    var p = iso.split('-');
+    return p[0] + '.' + p[1] + '.' + p[2];
+  }
+  function riskify(text) {
+    var t = esc(text);
+    return t.replace(/(인수|지분|몰취|위반|체납|맹지|명도|우선매수|휴장|파산|제한경쟁|유치권|미등기|이행강제금|비추천|사용 불가|보증금 2배)/g,
+      '<span class="risk">$1</span>');
+  }
+  function mapUrl(d) {
+    return 'https://map.naver.com/p/search/' + encodeURIComponent(d.mapQuery || d.title);
+  }
+  function ratio(d) {
+    if (!d.appraisalPrice || d.appraisalPrice <= 0) return null;
+    return Math.round((d.minPrice / d.appraisalPrice) * 1000) / 10;
+  }
+
+  /* ---------- filtering ---------- */
+  var moneyTest = MONEY.reduce(function (m, x) { m[x.key] = x.test; return m; }, {});
+
+  function matches(d) {
+    if (state.source !== '전체' && d.source !== state.source) return false;
+    if (state.cat !== '전체' && d.category !== state.cat) return false;
+    if (state.region !== '전체' && d.region !== state.region) return false;
+    var t = moneyTest[state.money];
+    if (t && !t(d)) return false;
+    if (state.favOnly && !isFav(d.id)) return false;
+    if (state.q) {
+      var hay = (d.title + ' ' + d.caseNo + ' ' + d.region + ' ' + d.category + ' ' + d.source + ' ' + d.note + ' ' + d.mapQuery).toLowerCase();
+      var words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+      for (var i = 0; i < words.length; i++) {
+        if (hay.indexOf(words[i]) === -1) return false;
+      }
+    }
+    return true;
+  }
+
+  function sortList(arr) {
+    var s = state.sort;
+    return arr.slice().sort(function (a, b) {
+      if (s === 'price_asc') return a.minPrice - b.minPrice;
+      if (s === 'price_desc') return b.minPrice - a.minPrice;
+      if (s === 'date_asc') {
+        if (a.bidDate !== b.bidDate) return a.bidDate < b.bidDate ? -1 : 1;
+        return a.minPrice - b.minPrice;
+      }
+      if (s === 'fail_desc') {
+        if (b.failCount !== a.failCount) return b.failCount - a.failCount;
+        return a.minPrice - b.minPrice;
+      }
+      return 0;
+    });
+  }
+
+  /* ---------- render ---------- */
+  function cardHtml(d) {
+    var dd = dday(d.bidDate);
+    var r = ratio(d);
+    var fav = isFav(d.id);
+    var srcCls = d.source === '법원경매' ? 'court' : 'onbid';
+    var nums = [];
+    nums.push('<span>감정 ' + (d.appraisalPrice ? won(d.appraisalPrice) : '미공개') +
+      (r === null ? '' : ' · <span class="rv">' + r.toFixed(1) + '%</span>') + '</span>');
+    nums.push('<span>유찰 <b>' + (d.failCount === 0 ? '신건' : d.failCount + '회') + '</b></span>');
+
+    return '<article class="card" data-id="' + esc(d.id) + '" tabindex="0">' +
+      '<div class="badges">' +
+        '<span class="b cat">' + esc(d.category) + '</span>' +
+        '<span class="b ' + srcCls + '">' + esc(d.source) + '</span>' +
+        '<span class="b dday' + dd.cls + '">' + dd.text + '</span>' +
+        '<button class="star" data-fav="' + esc(d.id) + '" aria-pressed="' + (fav ? 'true' : 'false') +
+          '" aria-label="관심 물건 ' + (fav ? '해제' : '등록') + '">★</button>' +
+      '</div>' +
+      '<h3 class="ctitle">' + esc(d.title) + '</h3>' +
+      '<p class="ccase">' + esc(d.caseNo) + ' · ' + esc(d.region) + '</p>' +
+      '<div class="price"><span class="v">' + won(d.minPrice) + '</span><span class="u">원 최저가</span>' +
+        '<span class="dp">보증금 ' + won(d.deposit) + '</span></div>' +
+      '<div class="nums">' + nums.join('') + '</div>' +
+      '<p class="note">' + riskify(d.note) + '</p>' +
+      '<div class="links">' +
+        '<a class="map" href="' + mapUrl(d) + '" target="_blank" rel="noopener">🗺️ 네이버 지도</a>' +
+        '<a href="' + esc(d.url) + '" target="_blank" rel="noopener">🔗 상세/검색</a>' +
+      '</div>' +
+      '<div class="openhint">자세히 보기 <span class="ar" aria-hidden="true">›</span></div>' +
+    '</article>';
+  }
+
+  /* ---------- detail sheet ---------- */
+  function sheetHtml(d) {
+    var dd = dday(d.bidDate);
+    var r = ratio(d);
+    var fav = isFav(d.id);
+    var rows = [
+      ['구분', esc(d.source)],
+      ['종류', esc(d.category)],
+      ['지역', esc(d.region)],
+      ['소재지', esc(d.mapQuery || '-')],
+      ['감정가', d.appraisalPrice ? won(d.appraisalPrice) + ' 원' : '미공개'],
+      ['최저가', '<span class="em">' + won(d.minPrice) + ' 원</span>' +
+        (r === null ? '' : ' <span class="rv">감정가 대비 ' + r.toFixed(1) + '%</span>')],
+      ['보증금', '<span class="em">' + won(d.deposit) + ' 원</span>'],
+      ['유찰', d.failCount === 0 ? '신건' : d.failCount + '회'],
+      ['입찰기일', esc(dateText(d.bidDate)) + ' <span class="' + (dd.cls ? 'rv' : '') + '">' + dd.text + '</span>']
+    ];
+    return '<div class="badges">' +
+        '<span class="b cat">' + esc(d.category) + '</span>' +
+        '<span class="b ' + (d.source === '법원경매' ? 'court' : 'onbid') + '">' + esc(d.source) + '</span>' +
+        '<span class="b dday' + dd.cls + '">' + dd.text + '</span>' +
+      '</div>' +
+      '<h2 id="sTitle">' + esc(d.title) + '</h2>' +
+      '<p class="ccase">' + esc(d.caseNo) + '</p>' +
+      '<div class="kv">' + rows.map(function (x) {
+        return '<div class="row"><span class="k">' + x[0] + '</span><span class="v">' + x[1] + '</span></div>';
+      }).join('') + '</div>' +
+      '<p class="snote"><b>주의</b> ' + riskify(d.note) + '</p>' +
+      '<div class="sbtns">' +
+        '<button class="sfav" data-sfav="' + esc(d.id) + '" aria-pressed="' + (fav ? 'true' : 'false') + '">' +
+          (fav ? '★' : '☆') + ' 관심</button>' +
+        '<a class="map" href="' + mapUrl(d) + '" target="_blank" rel="noopener">🗺️ 네이버 지도</a>' +
+        '<a href="' + esc(d.url) + '" target="_blank" rel="noopener">🔗 상세/검색</a>' +
+      '</div>';
+  }
+
+  var sheetWrap = document.getElementById('sheetwrap');
+  var sheetOpenId = null;
+
+  function openSheet(id) {
+    var d = null;
+    for (var i = 0; i < DATA.length; i++) { if (DATA[i].id === id) { d = DATA[i]; break; } }
+    if (!d) return;
+    sheetOpenId = id;
+    document.getElementById('sbody').innerHTML = sheetHtml(d);
+    sheetWrap.hidden = false;
+    document.body.style.overflow = 'hidden';
+    var box = sheetWrap.querySelector('.sheetbox');
+    if (box) box.scrollTop = 0;
+  }
+
+  function closeSheet() {
+    sheetOpenId = null;
+    sheetWrap.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  function render() {
+    var all = DATA.filter(matches);
+    var sorted = sortList(all);
+    var listEl = document.getElementById('list');
+    var slice = sorted.slice(0, state.shown);
+
+    document.getElementById('cnt').textContent = all.length.toLocaleString('ko-KR');
+    document.getElementById('cntAll').textContent = DATA.length.toLocaleString('ko-KR');
+
+    if (!all.length) {
+      listEl.innerHTML = '<div class="empty"><span class="big">🔍</span>' +
+        (state.favOnly && !favs.length
+          ? '아직 ★ 관심 물건이 없습니다.<br>카드 오른쪽 별을 눌러 담아 두세요.'
+          : '조건에 맞는 물건이 없습니다.<br>필터를 줄이거나 검색어를 바꿔 보세요.') +
+        '<br><button id="emptyrst">필터 초기화</button></div>';
+      document.getElementById('morewrap').hidden = true;
+    } else {
+      listEl.innerHTML = slice.map(cardHtml).join('');
+      var mw = document.getElementById('morewrap');
+      mw.hidden = slice.length >= all.length;
+      if (!mw.hidden) {
+        document.getElementById('more').textContent = '더 보기 (' + (all.length - slice.length) + '건 남음)';
+      }
+    }
+
+    // summary line
+    var parts = [];
+    if (state.source !== '전체') parts.push(state.source);
+    if (state.cat !== '전체') parts.push(state.cat);
+    if (state.money !== '전체') parts.push(state.money);
+    if (state.region !== '전체') parts.push(state.region);
+    if (state.q) parts.push('"' + state.q + '"');
+    if (state.favOnly) parts.push('★ 관심');
+    document.getElementById('fsum').textContent = parts.length ? '적용: ' + parts.join(' · ') : '전체 물건을 보는 중';
+  }
+
+  /* ---------- chips ---------- */
+  function buildChips(el, items, field, cls) {
+    el.innerHTML = items.map(function (x) {
+      var key = typeof x === 'string' ? x : x.key;
+      var on = state[field] === key;
+      return '<button class="chip' + (on ? ' on' : '') + (cls ? ' ' + cls : '') + '" data-field="' + field +
+        '" data-val="' + esc(key) + '" aria-pressed="' + (on ? 'true' : 'false') + '">' + esc(key) + '</button>';
+    }).join('');
+  }
+  function buildAllChips() {
+    buildChips(document.getElementById('f-source'), SOURCES, 'source');
+    buildChips(document.getElementById('f-cat'), CATS, 'cat');
+    buildChips(document.getElementById('f-money'), MONEY.map(function (m) { return m.key; }), 'money', 'money');
+    buildChips(document.getElementById('f-region'), REGIONS, 'region');
+  }
+
+  document.querySelector('.filters').addEventListener('click', function (e) {
+    var btn = e.target.closest('.chip');
+    if (!btn) return;
+    state[btn.dataset.field] = btn.dataset.val;
+    state.shown = PAGE;
+    buildAllChips();
+    render();
+  });
+
+  /* ---------- search ---------- */
+  var qEl = document.getElementById('q');
+  var qClr = document.getElementById('qclr');
+  qEl.addEventListener('input', function () {
+    state.q = qEl.value.trim();
+    qClr.hidden = !qEl.value;
+    state.shown = PAGE;
+    render();
+  });
+  qClr.addEventListener('click', function () {
+    qEl.value = ''; state.q = ''; qClr.hidden = true; state.shown = PAGE; render(); qEl.focus();
+  });
+
+  /* ---------- sort / fav ---------- */
+  document.getElementById('sort').addEventListener('change', function (e) {
+    state.sort = e.target.value;
+    state.shown = PAGE;
+    render();
+  });
+  var favBtn = document.getElementById('favonly');
+  favBtn.addEventListener('click', function () {
+    state.favOnly = !state.favOnly;
+    favBtn.setAttribute('aria-pressed', state.favOnly ? 'true' : 'false');
+    state.shown = PAGE;
+    render();
+  });
+
+  /* ---------- 관심(★) ---------- */
+  function toggleFav(id) {
+    var i = favs.indexOf(id);
+    if (i === -1) { favs.push(id); toast('★ 관심 물건에 담았습니다'); }
+    else { favs.splice(i, 1); toast('관심에서 뺐습니다'); }
+    saveFavs();
+    return i === -1;
+  }
+  function syncFavUI(id) {
+    var on = isFav(id);
+    var cs = document.querySelector('.star[data-fav="' + id + '"]');
+    if (cs) cs.setAttribute('aria-pressed', on ? 'true' : 'false');
+    var sb = document.querySelector('.sfav[data-sfav="' + id + '"]');
+    if (sb) {
+      sb.setAttribute('aria-pressed', on ? 'true' : 'false');
+      sb.innerHTML = (on ? '★' : '☆') + ' 관심';
+    }
+    if (state.favOnly) render();
+    else document.getElementById('cnt').textContent = DATA.filter(matches).length.toLocaleString('ko-KR');
+  }
+
+  /* ---------- 목록 클릭 / 키보드 ---------- */
+  var listRoot = document.getElementById('list');
+  listRoot.addEventListener('click', function (e) {
+    if (e.target.closest('#emptyrst')) { resetFilters(); return; }
+    var st = e.target.closest('.star');
+    if (st) { toggleFav(st.dataset.fav); syncFavUI(st.dataset.fav); return; }
+    if (e.target.closest('a')) return; /* 지도·상세 링크는 그대로 열기 */
+    var card = e.target.closest('.card');
+    if (card) openSheet(card.dataset.id);
+  });
+  listRoot.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var card = e.target.closest('.card');
+    if (!card) return;
+    e.preventDefault();
+    openSheet(card.dataset.id);
+  });
+
+  /* ---------- 상세 시트 닫기·관심 ---------- */
+  sheetWrap.addEventListener('click', function (e) {
+    if (e.target.closest('[data-close]')) { closeSheet(); return; }
+    var sf = e.target.closest('[data-sfav]');
+    if (sf) { toggleFav(sf.dataset.sfav); syncFavUI(sf.dataset.sfav); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sheetOpenId) closeSheet();
+  });
+
+  document.getElementById('more').addEventListener('click', function () {
+    state.shown += PAGE;
+    render();
+  });
+
+  function resetFilters() {
+    state.source = '전체'; state.cat = '전체'; state.money = '전체'; state.region = '전체';
+    state.q = ''; qEl.value = ''; qClr.hidden = true; state.shown = PAGE;
+    buildAllChips();
+    render();
+  }
+  document.getElementById('freset').addEventListener('click', resetFilters);
+
+  /* ---------- toast ---------- */
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('on'); }, 1600);
+  }
+
+  /* ---------- boot ---------- */
+  buildAllChips();
+  render();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/sw.js').catch(function () {});
+    });
+  }
+})();
+</script>
+</body>
+</html>

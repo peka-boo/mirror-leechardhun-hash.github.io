@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FFF9F0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="한글색칠">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<title>🎨 후니의 한글·색칠 놀이터</title>
+<style>
+:root{
+  --ink:#4A4038;
+  --ink2:#8B7C6E;
+  --cream:#FFF9F0;
+  --line:#F1E4D5;
+  --card-shadow:0 5px 14px rgba(168,146,124,.15);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;overflow:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  background:var(--cream);color:var(--ink);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  touch-action:manipulation;overscroll-behavior:none;line-height:1.35;
+}
+#bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 8% 4%, #E6F4FD 0%, rgba(230,244,253,0) 46%),
+    radial-gradient(circle at 94% 10%, #FFEDF3 0%, rgba(255,237,243,0) 44%),
+    radial-gradient(circle at 50% 104%, #E7F8EC 0%, rgba(231,248,236,0) 56%),
+    #FFF9F0;
+}
+#app{
+  position:relative;z-index:1;
+  height:100vh;height:100dvh;max-width:640px;margin:0 auto;
+  display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+  overflow:hidden;
+}
+
+/* ── top bar ── */
+#topbar{flex:0 0 auto;display:flex;align-items:center;gap:8px;height:54px;padding:0 12px}
+#topTitle{
+  flex:1 1 auto;min-width:0;
+  font-size:15.5px;font-weight:900;letter-spacing:-.02em;color:#5B4B3E;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.applist-pill{
+  flex:0 0 auto;height:34px;padding:0 10px;border-radius:13px;
+  border:1.5px solid #EFE0CF;background:rgba(255,255,255,.86);
+  font-size:12px;font-weight:900;color:#6B5747;text-decoration:none;
+  display:flex;align-items:center;gap:3px;white-space:nowrap;font-family:inherit;
+}
+.applist-pill:active{background:#FFF3E2}
+
+/* ── tabs / pills / chips ── */
+.pills{flex:0 0 auto;display:flex;gap:7px;padding:0 14px 8px}
+.pill{
+  flex:1 1 0;min-width:0;height:42px;border-radius:14px;border:1.5px solid #EDDFCE;
+  background:rgba(255,255,255,.8);font-family:inherit;
+  font-size:13px;font-weight:900;color:#9C8977;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  cursor:pointer;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:background .13s,color .13s,border-color .13s;
+}
+.pill:active{filter:brightness(.97)}
+.pill.on{background:#FFF0DC;border-color:#F4CDA3;color:#C97A44;box-shadow:0 2px 6px rgba(201,122,68,.12)}
+#groups{padding:0 14px 7px}
+#groups .pill{height:36px;font-size:12.5px}
+.chips{flex:0 0 auto;display:flex;gap:6px;padding:0 14px 8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;height:34px;padding:0 12px;border-radius:12px;
+  border:1.5px solid #EEE0CF;background:rgba(255,255,255,.7);
+  font-family:inherit;font-size:13px;font-weight:900;color:#A2907E;cursor:pointer;
+}
+.chip:active{filter:brightness(.97)}
+.chip.on{background:#E7F8EC;border-color:#BFE6CC;color:#4E8F65}
+#designs{
+  flex:0 0 auto;
+  display:grid;grid-template-columns:repeat(6,1fr);gap:6px;
+  padding:0 12px 8px;overflow:visible;
+}
+.dchip{
+  height:50px;padding:0;border-radius:14px;
+  border:1.5px solid #EEE0CF;background:rgba(255,255,255,.7);
+  font-family:inherit;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+}
+.dchip:active{filter:brightness(.97)}
+.dchip .de{font-size:17px;line-height:1}
+.dchip .dn{font-size:9.5px;font-weight:900;color:#A2907E;letter-spacing:-.03em}
+.dchip.on{background:#FFF0DC;border-color:#F4CDA3}
+.dchip.on .dn{color:#C97A44}
+
+/* ── screens ── */
+#stage{position:relative;flex:1 1 auto;min-height:0;display:flex;overflow:hidden}
+.screen{display:none;flex:1 1 auto;min-width:0;min-height:0;flex-direction:column}
+.screen.active{display:flex}
+
+/* ── canvas ── */
+.canvas-wrap{
+  position:relative;flex:1 1 auto;min-height:0;margin:0 12px;
+  border-radius:24px;background:#fff;box-shadow:var(--card-shadow);
+  overflow:hidden;
+}
+.canvas-wrap canvas{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+  touch-action:none;
+}
+#lineLayer{pointer-events:none}
+
+/* ── buttons ── */
+.toolbar{flex:0 0 auto;display:grid;gap:7px;padding:9px 12px 0}
+.toolbar.t3{grid-template-columns:repeat(3,1fr);padding-bottom:2px}
+.toolbar.t4{grid-template-columns:repeat(4,1fr);padding-bottom:12px}
+.btn2{
+  height:46px;border-radius:16px;border:1.5px solid #EDDFCE;
+  background:rgba(255,255,255,.9);font-family:inherit;
+  font-size:13px;font-weight:900;color:#8A7663;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:3px;
+  white-space:nowrap;overflow:hidden;
+}
+.btn2:active{background:#FFF6EA;transform:scale(.985)}
+.btn2.on{background:#FFF1DF;border-color:#F6CFA8;color:#C97A44}
+.btn2.mint{background:linear-gradient(165deg,#EBFAF0,#D8F2E1);border-color:#CBEBD6;color:#4E8F65}
+.btn2.peach{background:linear-gradient(165deg,#FFF3E9,#FFE3CE);border-color:#F7D9BE;color:#C97A44}
+.btn2.lilac{background:linear-gradient(165deg,#F4EEFC,#E8DCFA);border-color:#DED0F6;color:#8460C8}
+
+.hint{
+  flex:0 0 auto;text-align:center;font-size:11.5px;font-weight:800;color:#B3A493;
+  padding:7px 14px 12px;margin:0;
+}
+
+/* ── palette ── */
+.palette{
+  flex:0 0 auto;display:grid;grid-template-columns:repeat(6,1fr);
+  gap:7px 6px;padding:9px 20px 3px;justify-items:center;
+}
+.sw{
+  width:35px;height:35px;border-radius:50%;padding:0;cursor:pointer;
+  border:2px solid rgba(0,0,0,.10);
+  box-shadow:inset 0 -3px 6px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.06);
+  transition:transform .12s;
+}
+.sw:active{transform:scale(.93)}
+.sw.on{outline:3px solid #C97A44;outline-offset:2px}
+
+/* ── sizes ── */
+.sizes{flex:0 0 auto;display:flex;gap:7px;padding:8px 14px 0;justify-content:center}
+.size-btn{
+  flex:0 0 auto;height:36px;padding:0 14px;border-radius:13px;
+  border:1.5px solid #EDDFCE;background:rgba(255,255,255,.8);
+  font-family:inherit;font-size:12px;font-weight:900;color:#9C8977;
+  display:flex;align-items:center;gap:5px;cursor:pointer;
+}
+.size-btn:active{filter:brightness(.97)}
+.size-btn.on{background:#FFF0DC;border-color:#F4CDA3;color:#C97A44}
+.size-btn .dot{display:block;border-radius:50%;background:#B7A695}
+.size-btn.on .dot{background:#C97A44}
+
+/* ── overlay ── */
+#confetti{position:fixed;inset:0;z-index:60;pointer-events:none;display:none}
+#praise{
+  position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.7);
+  z-index:70;pointer-events:none;opacity:0;
+  background:linear-gradient(165deg,#FFF9EA,#FFEDC7);
+  border:2.5px solid #FBD9A0;border-radius:26px;
+  padding:16px 24px;box-shadow:0 12px 30px rgba(180,140,80,.28);
+  font-size:20px;font-weight:900;color:#C0793A;white-space:nowrap;
+  transition:opacity .25s, transform .25s;
+}
+#praise.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#toast{
+  position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));
+  transform:translate(-50%,16px);z-index:80;pointer-events:none;
+  background:rgba(74,64,56,.93);color:#FFF9F0;
+  font-size:13px;font-weight:900;padding:11px 18px;border-radius:16px;
+  opacity:0;transition:opacity .22s, transform .22s;white-space:nowrap;
+}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<div id="app">
+  <div id="topbar">
+    <div id="topTitle">🎨 후니의 한글·색칠 놀이터</div>
+    <a href="/" class="applist-pill">🏠 앱 목록</a>
+  </div>
+
+  <div class="pills" id="tabs">
+    <button class="pill on" type="button" data-tab="hangul">🔤 한글 놀이</button>
+    <button class="pill" type="button" data-tab="color">🎨 색칠 놀이</button>
+  </div>
+
+  <div id="stage">
+    <!-- ══════ 한글 ══════ -->
+    <section class="screen active" id="scr-hangul">
+      <div class="pills" id="groups">
+        <button class="pill on" type="button" data-group="c">자음 ㄱ~ㅎ</button>
+        <button class="pill" type="button" data-group="v">모음 ㅏ~ㅣ</button>
+        <button class="pill" type="button" data-group="w">낱말</button>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="canvas-wrap" id="wrapH">
+        <canvas id="guideLayer"></canvas>
+        <canvas id="drawLayer"></canvas>
+      </div>
+      <div class="toolbar t3">
+        <button class="btn2 peach" id="btnSpeak" type="button">🔊 소리</button>
+        <button class="btn2" id="btnEraser" type="button">🧽 지우개</button>
+        <button class="btn2" id="btnClear" type="button">🔄 다시 쓰기</button>
+      </div>
+      <p class="hint">✏️ 점선 글자를 손가락으로 따라 써 보세요</p>
+    </section>
+
+    <!-- ══════ 색칠 ══════ -->
+    <section class="screen" id="scr-color">
+      <div id="designs"></div>
+      <div class="canvas-wrap" id="wrapC">
+        <canvas id="paintLayer"></canvas>
+        <canvas id="lineLayer"></canvas>
+      </div>
+      <div class="palette" id="palette"></div>
+      <div class="sizes" id="sizes"></div>
+      <div class="toolbar t4">
+        <button class="btn2" id="btnEraserC" type="button">🧽 지우개</button>
+        <button class="btn2" id="btnClearC" type="button">🗑 지우기</button>
+        <button class="btn2 peach" id="btnDone" type="button">✨ 완성!</button>
+        <button class="btn2 mint" id="btnSave" type="button">📷 저장</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<canvas id="confetti"></canvas>
+<div id="praise"></div>
+<div id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var FONT = '"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif';
+
+  /* ══════════ 공통 유틸 ══════════ */
+
+  function sizeCanvas(cv, wrap, keep) {
+    var r = wrap.getBoundingClientRect();
+    var w = Math.round(r.width), h = Math.round(r.height);
+    if (w < 20 || h < 20) return null;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (cv._c && cv._c.w === w && cv._c.h === h && cv._c.dpr === dpr) return cv._c;
+
+    var backup = null;
+    if (keep && cv._c) {
+      backup = document.createElement('canvas');
+      backup.width = cv.width;
+      backup.height = cv.height;
+      backup.getContext('2d').drawImage(cv, 0, 0);
+    }
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cv._c = { canvas: cv, ctx: ctx, w: w, h: h, dpr: dpr };
+    if (backup) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(backup, 0, 0, cv.width, cv.height);
+      ctx.restore();
+    }
+    return cv._c;
+  }
+
+  function koVoice() {
+    try {
+      var vs = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+      for (var i = 0; i < vs.length; i++) {
+        if (/^ko/i.test(vs[i].lang)) return vs[i];
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function speak(text, rate) {
+    try {
+      if (!window.speechSynthesis || !text) return;
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ko-KR';
+      u.rate = rate || 0.85;
+      u.pitch = 1.08;
+      var v = koVoice();
+      if (v) u.voice = v;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  var toastTimer = null;
+  function toast(msg) {
+    var t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('on'); }, 2200);
+  }
+
+  if (window.speechSynthesis) {
+    try { window.speechSynthesis.getVoices(); } catch (e) {}
+  }
+
+  /* ══════════ 탭 ══════════ */
+  $$('#tabs .pill').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var tab = b.getAttribute('data-tab');
+      $$('#tabs .pill').forEach(function (x) { x.classList.toggle('on', x === b); });
+      $$('.screen').forEach(function (s) { s.classList.toggle('active', s.id === 'scr-' + tab); });
+      requestAnimationFrame(function () {
+        if (tab === 'hangul') layoutHangul();
+        else layoutColor();
+      });
+    });
+  });
+
+  /* ══════════════════════════════════════════
+     🔤 한글 놀이
+     ══════════════════════════════════════════ */
+  var GROUPS = {
+    c: [
+      ['ㄱ', '기역'], ['ㄴ', '니은'], ['ㄷ', '디귿'], ['ㄹ', '리을'], ['ㅁ', '미음'],
+      ['ㅂ', '비읍'], ['ㅅ', '시옷'], ['ㅇ', '이응'], ['ㅈ', '지읒'], ['ㅊ', '치읓'],
+      ['ㅋ', '키읔'], ['ㅌ', '티읕'], ['ㅍ', '피읖'], ['ㅎ', '히읗']
+    ],
+    v: [
+      ['ㅏ', '아'], ['ㅑ', '야'], ['ㅓ', '어'], ['ㅕ', '여'], ['ㅗ', '오'], ['ㅛ', '요'],
+      ['ㅜ', '우'], ['ㅠ', '유'], ['ㅡ', '으'], ['ㅣ', '이'], ['ㅐ', '애'], ['ㅔ', '에']
+    ],
+    w: [
+      ['엄마', '엄마', '👩'], ['아빠', '아빠', '👨'], ['사과', '사과', '🍎'], ['바나나', '바나나', '🍌'],
+      ['강아지', '강아지', '🐶'], ['고양이', '고양이', '🐱'], ['자동차', '자동차', '🚗'],
+      ['별', '별', '⭐'], ['하트', '하트', '❤️'], ['꽃', '꽃', '🌸']
+    ]
+  };
+
+  var gkey = 'c';
+  var hItem = null;
+  var hStrokes = [];
+  var hEraser = false;
+  var H = null, HD = null;
+  var INK = '#5B8DEF';
+  var curStroke = null;
+
+  var wrapH = $('#wrapH');
+  var guideCv = $('#guideLayer');
+  var drawCv = $('#drawLayer');
+
+  function renderChips() {
+    var box = $('#chips');
+    box.innerHTML = '';
+    GROUPS[gkey].forEach(function (it, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.textContent = it[2] ? (it[2] + ' ' + it[0]) : it[0];
+      b.addEventListener('click', function () {
+        pickHangul({ t: it[0], say: it[1] || it[0] }, b);
+      });
+      box.appendChild(b);
+      if (i === 0) pickHangul({ t: it[0], say: it[1] || it[0] }, b, true);
+    });
+  }
+
+  function pickHangul(it, btn, silent) {
+    hItem = it;
+    hStrokes = [];
+    $$('#chips .chip').forEach(function (c) { c.classList.toggle('on', c === btn); });
+    drawGuide();
+    redrawHangul();
+    if (!silent) speak(it.say, it.t.length > 1 ? 0.8 : 0.85);
+  }
+
+  function drawGuide() {
+    if (!H) return;
+    var ctx = H.ctx, w = H.w, h = H.h;
+    ctx.setTransform(H.dpr, 0, 0, H.dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    /* 연한 십자 안내선 */
+    ctx.save();
+    ctx.strokeStyle = '#F4EADD';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, 12);
+    ctx.lineTo(w * 0.5, h - 12);
+    ctx.moveTo(12, h * 0.5);
+    ctx.lineTo(w - 12, h * 0.5);
+    ctx.stroke();
+    ctx.restore();
+
+    if (!hItem) return;
+
+    var maxW = w * 0.84;
+    var size = Math.min(w, h) * 0.72;
+    var setFont = function (s) { ctx.font = '900 ' + s.toFixed(1) + 'px ' + FONT; };
+    setFont(size);
+    var mw = ctx.measureText(hItem.t).width;
+    if (mw > maxW) {
+      size = size * (maxW / mw);
+      setFont(size);
+      mw = ctx.measureText(hItem.t).width;
+    }
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    var cx = w / 2, cy = h / 2;
+
+    ctx.fillStyle = 'rgba(150,120,95,0.10)';
+    ctx.fillText(hItem.t, cx, cy);
+
+    ctx.strokeStyle = '#DCC9B2';
+    ctx.lineWidth = Math.max(2, size * 0.026);
+    ctx.setLineDash([Math.max(6, size * 0.075), Math.max(5, size * 0.058)]);
+    ctx.strokeText(hItem.t, cx, cy);
+    ctx.setLineDash([]);
+  }
+
+  function strokePath(ctx, s, pts) {
+    ctx.save();
+    ctx.globalCompositeOperation = s.erase ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = INK;
+    ctx.fillStyle = INK;
+    ctx.lineWidth = s.w;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (pts.length === 1) {
+      ctx.beginPath();
+      ctx.arc(pts[0].x, pts[0].y, s.w / 2, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function redrawHangul() {
+    if (!HD) return;
+    var ctx = HD.ctx;
+    ctx.setTransform(HD.dpr, 0, 0, HD.dpr, 0, 0);
+    ctx.clearRect(0, 0, HD.w, HD.h);
+    for (var i = 0; i < hStrokes.length; i++) strokePath(ctx, hStrokes[i], hStrokes[i].pts);
+  }
+
+  function layoutHangul() {
+    var d = sizeCanvas(drawCv, wrapH, false);
+    if (!d) return;
+    HD = d;
+    var g = sizeCanvas(guideCv, wrapH, false);
+    if (!g) return;
+    H = g;
+    drawGuide();
+    redrawHangul();
+  }
+
+  function localPt(cv, e) {
+    var r = cv.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  drawCv.addEventListener('pointerdown', function (e) {
+    if (!HD) return;
+    e.preventDefault();
+    try { drawCv.setPointerCapture(e.pointerId); } catch (err) {}
+    var s = { erase: hEraser, w: hEraser ? 26 : 9, pts: [localPt(drawCv, e)] };
+    hStrokes.push(s);
+    curStroke = s;
+    strokePath(HD.ctx, s, s.pts);
+  });
+
+  drawCv.addEventListener('pointermove', function (e) {
+    if (!curStroke || !HD) return;
+    e.preventDefault();
+    var p = localPt(drawCv, e);
+    var pts = curStroke.pts;
+    var last = pts[pts.length - 1];
+    var dx = p.x - last.x, dy = p.y - last.y;
+    if (dx * dx + dy * dy < 2.2) return;
+    pts.push(p);
+    strokePath(HD.ctx, curStroke, [last, p]);
+  });
+
+  function endStroke() { curStroke = null; }
+  drawCv.addEventListener('pointerup', endStroke);
+  drawCv.addEventListener('pointercancel', endStroke);
+  drawCv.addEventListener('pointerleave', function (e) { if (e.buttons === 0) endStroke(); });
+  drawCv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  $('#btnSpeak').addEventListener('click', function () {
+    if (hItem) speak(hItem.say, hItem.t.length > 1 ? 0.8 : 0.85);
+  });
+
+  $('#btnEraser').addEventListener('click', function () {
+    hEraser = !hEraser;
+    this.classList.toggle('on', hEraser);
+    toast(hEraser ? '지우개 — 문지르면 지워져요' : '연필로 돌아왔어요');
+  });
+
+  $('#btnClear').addEventListener('click', function () {
+    hStrokes = [];
+    redrawHangul();
+  });
+
+  $$('#groups .pill').forEach(function (b) {
+    b.addEventListener('click', function () {
+      gkey = b.getAttribute('data-group');
+      $$('#groups .pill').forEach(function (x) { x.classList.toggle('on', x === b); });
+      renderChips();
+    });
+  });
+
+  /* ══════════════════════════════════════════
+     🎨 색칠 놀이
+     ══════════════════════════════════════════ */
+  var wrapC = $('#wrapC');
+  var paintCv = $('#paintLayer');
+  var lineCv = $('#lineLayer');
+  var P = null, L = null;
+  var paintInit = false;
+  var penColor = '#FF5A5A';
+  var brushSize = 14;
+  var cEraser = false;
+  var painting = false;
+  var lastPt = null;
+
+  function rr(ctx, x, y, w, h, r) {
+    var rad = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rad, y);
+    ctx.lineTo(x + w - rad, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + rad);
+    ctx.lineTo(x + w, y + h - rad);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - rad, y + h);
+    ctx.lineTo(x + rad, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - rad);
+    ctx.lineTo(x, y + rad);
+    ctx.quadraticCurveTo(x, y, x + rad, y);
+    ctx.closePath();
+  }
+
+  function scallop(ctx, x, y, w, n, d) {
+    var step = w / n;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    for (var i = 0; i < n; i++) {
+      var x0 = x + step * i;
+      ctx.quadraticCurveTo(x0 + step / 2, y + d * 2, x0 + step, y);
+    }
+    ctx.stroke();
+  }
+
+  function dCar(ctx) {
+    ctx.beginPath();
+    ctx.moveTo(10, 78);
+    ctx.lineTo(10, 62);
+    ctx.quadraticCurveTo(10, 55, 18, 55);
+    ctx.lineTo(25, 55);
+    ctx.lineTo(36, 31);
+    ctx.quadraticCurveTo(38, 27, 43, 27);
+    ctx.lineTo(64, 27);
+    ctx.quadraticCurveTo(69, 27, 71, 31);
+    ctx.lineTo(81, 55);
+    ctx.lineTo(86, 55);
+    ctx.quadraticCurveTo(90, 55, 90, 62);
+    ctx.lineTo(90, 78);
+    ctx.quadraticCurveTo(90, 84, 84, 84);
+    ctx.lineTo(16, 84);
+    ctx.quadraticCurveTo(10, 84, 10, 78);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    /* 창문 */
+    ctx.beginPath();
+    ctx.moveTo(31, 51); ctx.lineTo(39, 34); ctx.lineTo(49, 34); ctx.lineTo(49, 51);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(53, 51); ctx.lineTo(53, 34); ctx.lineTo(62, 34); ctx.lineTo(71, 51);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    /* 문 손잡이 */
+    ctx.beginPath();
+    ctx.moveTo(55, 63); ctx.lineTo(62, 63);
+    ctx.stroke();
+
+    /* 바퀴 */
+    [[29, 84], [71, 84]].forEach(function (p) {
+      ctx.beginPath(); ctx.arc(p[0], p[1], 11, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.arc(p[0], p[1], 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    });
+
+    /* 전조등 */
+    ctx.beginPath();
+    ctx.ellipse(85, 66, 2.6, 3.2, 0, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+  }
+
+  function dHouse(ctx) {
+    /* 굴뚝 */
+    rr(ctx, 64, 20, 9, 16, 2); ctx.fill(); ctx.stroke();
+    /* 지붕 */
+    ctx.beginPath();
+    ctx.moveTo(50, 16); ctx.lineTo(92, 47); ctx.lineTo(8, 47);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    /* 벽 */
+    ctx.beginPath(); ctx.rect(18, 47, 64, 40); ctx.fill(); ctx.stroke();
+    /* 문 */
+    ctx.beginPath();
+    ctx.moveTo(42, 87); ctx.lineTo(42, 68);
+    ctx.quadraticCurveTo(42, 64, 46, 64);
+    ctx.lineTo(54, 64);
+    ctx.quadraticCurveTo(58, 64, 58, 68);
+    ctx.lineTo(58, 87);
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(53.5, 77, 1.6, 0, Math.PI * 2); ctx.fill();
+    /* 창문 */
+    ctx.beginPath(); ctx.rect(24, 56, 17, 15); ctx.fill(); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(32.5, 56); ctx.lineTo(32.5, 71);
+    ctx.moveTo(24, 63.5); ctx.lineTo(41, 63.5);
+    ctx.stroke();
+  }
+
+  function dFlower(ctx) {
+    /* 줄기 */
+    ctx.beginPath();
+    ctx.moveTo(50, 47);
+    ctx.bezierCurveTo(55, 62, 45, 76, 50, 90);
+    ctx.stroke();
+    /* 잎 */
+    ctx.beginPath();
+    ctx.moveTo(50, 74);
+    ctx.bezierCurveTo(36, 66, 26, 72, 30, 80);
+    ctx.bezierCurveTo(38, 82, 47, 80, 50, 74);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(50, 63);
+    ctx.bezierCurveTo(62, 55, 74, 59, 70, 67);
+    ctx.bezierCurveTo(62, 70, 54, 68, 50, 63);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    /* 꽃잎 */
+    var cx = 50, cy = 36;
+    for (var i = 0; i < 6; i++) {
+      var a = -Math.PI / 2 + i * Math.PI / 3;
+      var px = cx + Math.cos(a) * 14, py = cy + Math.sin(a) * 14;
+      ctx.beginPath();
+      ctx.ellipse(px, py, 11.5, 8.5, a, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+    }
+    /* 꽃가운데 */
+    ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  }
+
+  function dButterfly(ctx) {
+    /* 더듬이 */
+    ctx.beginPath(); ctx.moveTo(48, 26); ctx.quadraticCurveTo(42, 16, 36, 12); ctx.stroke();
+    ctx.beginPath(); ctx.arc(35, 11, 2.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(52, 26); ctx.quadraticCurveTo(58, 16, 64, 12); ctx.stroke();
+    ctx.beginPath(); ctx.arc(65, 11, 2.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    /* 위 날개 */
+    ctx.beginPath(); ctx.ellipse(30, 40, 19, 14.5, -0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(70, 40, 19, 14.5, 0.35, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    /* 아래 날개 */
+    ctx.beginPath(); ctx.ellipse(33, 64, 14.5, 12.5, 0.32, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(67, 64, 14.5, 12.5, -0.32, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    /* 몸통 */
+    ctx.beginPath(); ctx.ellipse(50, 52, 5, 20, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    /* 머리 */
+    ctx.beginPath(); ctx.arc(50, 29, 5.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    /* 날개 무늬 */
+    [[24, 35], [76, 35], [32, 63], [68, 63]].forEach(function (p) {
+      ctx.beginPath(); ctx.arc(p[0], p[1], 3.2, 0, Math.PI * 2); ctx.stroke();
+    });
+  }
+
+  function dDino(ctx) {
+    /* 꼬리 */
+    ctx.beginPath();
+    ctx.moveTo(28, 60);
+    ctx.bezierCurveTo(16, 60, 7, 52, 6, 40);
+    ctx.bezierCurveTo(14, 44, 22, 50, 32, 52);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    /* 몸통 */
+    ctx.beginPath(); ctx.ellipse(50, 62, 24, 17, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    /* 목 */
+    ctx.beginPath();
+    ctx.moveTo(60, 52);
+    ctx.bezierCurveTo(64, 40, 68, 32, 74, 26);
+    ctx.lineTo(82, 30);
+    ctx.bezierCurveTo(76, 38, 72, 46, 70, 58);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    /* 머리 */
+    ctx.beginPath(); ctx.ellipse(80, 22, 13, 9, 0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    /* 다리 */
+    rr(ctx, 32, 70, 13, 22, 6); ctx.fill(); ctx.stroke();
+    rr(ctx, 55, 70, 13, 22, 6); ctx.fill(); ctx.stroke();
+    /* 무늬 */
+    [[43, 57], [54, 65], [45, 70]].forEach(function (p) {
+      ctx.beginPath(); ctx.arc(p[0], p[1], 3.4, 0, Math.PI * 2); ctx.stroke();
+    });
+    /* 눈 */
+    ctx.beginPath(); ctx.arc(82, 18, 1.8, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function dCake(ctx) {
+    /* 접시 */
+    ctx.beginPath(); ctx.ellipse(50, 91, 36, 4, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    /* 케이크 단 */
+    rr(ctx, 16, 64, 68, 24, 5); ctx.fill(); ctx.stroke();
+    rr(ctx, 22, 46, 56, 18, 5); ctx.fill(); ctx.stroke();
+    rr(ctx, 30, 30, 40, 16, 5); ctx.fill(); ctx.stroke();
+    /* 생크림 */
+    scallop(ctx, 16, 64, 68, 7, 5);
+    scallop(ctx, 22, 46, 56, 6, 4.5);
+    scallop(ctx, 30, 30, 40, 5, 4);
+    /* 초 */
+    rr(ctx, 47, 10, 6, 20, 2); ctx.fill(); ctx.stroke();
+    /* 불꽃 */
+    ctx.beginPath();
+    ctx.moveTo(50, 1);
+    ctx.bezierCurveTo(56, 6, 55, 13, 50, 13);
+    ctx.bezierCurveTo(45, 13, 44, 6, 50, 1);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    /* 장식 */
+    [[40, 38], [60, 38]].forEach(function (p) {
+      ctx.beginPath(); ctx.arc(p[0], p[1], 3.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    });
+  }
+
+  var DESIGNS = [
+    { key: 'car', name: '자동차', emoji: '🚗', draw: dCar },
+    { key: 'house', name: '집', emoji: '🏠', draw: dHouse },
+    { key: 'flower', name: '꽃', emoji: '🌸', draw: dFlower },
+    { key: 'butterfly', name: '나비', emoji: '🦋', draw: dButterfly },
+    { key: 'dino', name: '공룡', emoji: '🦕', draw: dDino },
+    { key: 'cake', name: '케이크', emoji: '🎂', draw: dCake }
+  ];
+  var designIdx = 0;
+
+  var PENS = [
+    '#FF5A5A', '#FF9E45', '#FFD23F', '#A8E063', '#3EC98B', '#5BC8E8',
+    '#3B82F6', '#9B6BF2', '#FF7AC6', '#B97840', '#4A4038', '#FFFFFF'
+  ];
+  var SIZES = [{ v: 6, n: '작게' }, { v: 14, n: '보통' }, { v: 26, n: '크게' }];
+
+  function renderDesigns() {
+    var box = $('#designs');
+    box.innerHTML = '';
+    DESIGNS.forEach(function (d, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'dchip' + (i === designIdx ? ' on' : '');
+      var e1 = document.createElement('span');
+      e1.className = 'de';
+      e1.textContent = d.emoji;
+      var e2 = document.createElement('span');
+      e2.className = 'dn';
+      e2.textContent = d.name;
+      b.appendChild(e1);
+      b.appendChild(e2);
+      b.setAttribute('aria-label', d.name);
+      b.addEventListener('click', function () {
+        designIdx = i;
+        $$('#designs .dchip').forEach(function (x, j) { x.classList.toggle('on', j === i); });
+        clearPaint();
+        drawLineArt();
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function renderPen() {
+    var box = $('#palette');
+    box.innerHTML = '';
+    PENS.forEach(function (c) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'sw' + (c === penColor ? ' on' : '');
+      b.style.background = c;
+      b.setAttribute('aria-label', '색 ' + c);
+      b.addEventListener('click', function () {
+        penColor = c;
+        cEraser = false;
+        $('#btnEraserC').classList.remove('on');
+        $$('#palette .sw').forEach(function (x) { x.classList.toggle('on', x === b); });
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function renderSizes() {
+    var box = $('#sizes');
+    box.innerHTML = '';
+    SIZES.forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'size-btn' + (s.v === brushSize ? ' on' : '');
+      var d = document.createElement('span');
+      d.className = 'dot';
+      d.style.width = (4 + s.v * 0.42) + 'px';
+      d.style.height = (4 + s.v * 0.42) + 'px';
+      b.appendChild(d);
+      b.appendChild(document.createTextNode(s.n));
+      b.addEventListener('click', function () {
+        brushSize = s.v;
+        $$('#sizes .size-btn').forEach(function (x) { x.classList.toggle('on', x === b); });
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function drawLineArt() {
+    var c = sizeCanvas(lineCv, wrapC, false);
+    if (!c) return;
+    L = c;
+    var ctx = L.ctx;
+    ctx.setTransform(L.dpr, 0, 0, L.dpr, 0, 0);
+    ctx.clearRect(0, 0, L.w, L.h);
+    var S = Math.min(L.w, L.h) * 0.92;
+    ctx.save();
+    ctx.translate((L.w - S) / 2, (L.h - S) / 2);
+    ctx.scale(S / 100, S / 100);
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#241E19';
+    ctx.fillStyle = '#FFFFFF';
+    DESIGNS[designIdx].draw(ctx);
+    ctx.restore();
+  }
+
+  function clearPaint() {
+    if (!P) return;
+    P.ctx.setTransform(P.dpr, 0, 0, P.dpr, 0, 0);
+    P.ctx.fillStyle = '#FFFFFF';
+    P.ctx.fillRect(0, 0, P.w, P.h);
+  }
+
+  function layoutColor() {
+    var p = sizeCanvas(paintCv, wrapC, true);
+    if (!p) return;
+    P = p;
+    if (!paintInit) {
+      clearPaint();
+      paintInit = true;
+    }
+    drawLineArt();
+  }
+
+  function paintAt(x, y, w, color) {
+    var ctx = P.ctx;
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, w / 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function paintSeg(a, b, w, color) {
+    var ctx = P.ctx;
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = w;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  paintCv.addEventListener('pointerdown', function (e) {
+    if (!P) return;
+    e.preventDefault();
+    try { paintCv.setPointerCapture(e.pointerId); } catch (err) {}
+    painting = true;
+    var p = localPt(paintCv, e);
+    var col = cEraser ? '#FFFFFF' : penColor;
+    var w = cEraser ? Math.max(brushSize * 1.8, 22) : brushSize;
+    lastPt = p;
+    paintAt(p.x, p.y, w, col);
+  });
+
+  paintCv.addEventListener('pointermove', function (e) {
+    if (!painting || !P) return;
+    e.preventDefault();
+    var p = localPt(paintCv, e);
+    var dx = p.x - lastPt.x, dy = p.y - lastPt.y;
+    if (dx * dx + dy * dy < 2) return;
+    var col = cEraser ? '#FFFFFF' : penColor;
+    var w = cEraser ? Math.max(brushSize * 1.8, 22) : brushSize;
+    paintSeg(lastPt, p, w, col);
+    lastPt = p;
+  });
+
+  function stopPaint() { painting = false; lastPt = null; }
+  paintCv.addEventListener('pointerup', stopPaint);
+  paintCv.addEventListener('pointercancel', stopPaint);
+  paintCv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  $('#btnEraserC').addEventListener('click', function () {
+    cEraser = !cEraser;
+    this.classList.toggle('on', cEraser);
+    toast(cEraser ? '지우개 — 문지르면 지워져요' : penColor === '#FFFFFF' ? '하양 크레파스' : '크레파스로 돌아왔어요');
+  });
+
+  $('#btnClearC').addEventListener('click', function () {
+    clearPaint();
+    toast('새 종이로 바꿨어요 🗒️');
+  });
+
+  /* ══════════ 완성! ══════════ */
+  var confettiCv = $('#confetti');
+  var confettiCtx = confettiCv.getContext('2d');
+  var confParts = [];
+  var confRAF = 0;
+  var confEnd = 0;
+
+  function confetti() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = window.innerWidth, h = window.innerHeight;
+    confettiCv.width = Math.round(w * dpr);
+    confettiCv.height = Math.round(h * dpr);
+    confettiCv.style.display = 'block';
+    confettiCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    confettiCtx.clearRect(0, 0, w, h);
+
+    var colors = ['#FF5A5A', '#FF9E45', '#FFD23F', '#A8E063', '#3EC98B', '#5BC8E8', '#3B82F6', '#9B6BF2', '#FF7AC6'];
+    confParts = [];
+    for (var i = 0; i < 110; i++) {
+      confParts.push({
+        x: w * 0.5 + (Math.random() - 0.5) * w * 0.7,
+        y: h * 0.36 + Math.random() * 40,
+        vx: (Math.random() - 0.5) * 8,
+        vy: -Math.random() * 12 - 3,
+        g: 0.28 + Math.random() * 0.12,
+        s: 5 + Math.random() * 7,
+        r: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.32,
+        c: colors[(Math.random() * colors.length) | 0]
+      });
+    }
+    confEnd = performance.now() + 3400;
+    if (!confRAF) confRAF = requestAnimationFrame(confTick);
+  }
+
+  function confTick(t) {
+    var w = window.innerWidth, h = window.innerHeight;
+    confettiCtx.clearRect(0, 0, w, h);
+    var alive = 0;
+    for (var i = 0; i < confParts.length; i++) {
+      var p = confParts[i];
+      p.vy += p.g;
+      p.vx *= 0.995;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.r += p.vr;
+      if (p.y > h + 30) { p.y = h + 30; p.vy = 0; p.vx = 0; }
+      else alive++;
+      confettiCtx.save();
+      confettiCtx.translate(p.x, p.y);
+      confettiCtx.rotate(p.r);
+      confettiCtx.fillStyle = p.c;
+      confettiCtx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
+      confettiCtx.restore();
+    }
+    if (t < confEnd || alive > 0) {
+      confRAF = requestAnimationFrame(confTick);
+    } else {
+      confRAF = 0;
+      confettiCtx.clearRect(0, 0, w, h);
+      confettiCv.style.display = 'none';
+    }
+  }
+
+  var praiseTimer = null;
+  function praise(msg) {
+    var el = $('#praise');
+    el.textContent = msg;
+    el.classList.add('on');
+    clearTimeout(praiseTimer);
+    praiseTimer = setTimeout(function () { el.classList.remove('on'); }, 2500);
+  }
+
+  $('#btnDone').addEventListener('click', function () {
+    var PRAISE = [
+      '정말 잘했어요! 🎉',
+      '우와~ 멋진 작품! 🌟',
+      '색이 참 예뻐요 🌈',
+      '후니 최고! 👏',
+      '또 그리고 싶다! 🖍️'
+    ];
+    var msg = PRAISE[(Math.random() * PRAISE.length) | 0];
+    praise(msg);
+    confetti();
+    speak('정말 잘했어요!', 0.95);
+  });
+
+  $('#btnSave').addEventListener('click', function () {
+    if (!P || !L) return;
+    var out = document.createElement('canvas');
+    out.width = P.canvas.width;
+    out.height = P.canvas.height;
+    var c = out.getContext('2d');
+    c.fillStyle = '#FFFFFF';
+    c.fillRect(0, 0, out.width, out.height);
+    c.drawImage(P.canvas, 0, 0);
+    c.drawImage(L.canvas, 0, 0);
+    var url;
+    try { url = out.toDataURL('image/png'); } catch (e) { toast('저장할 수 없어요'); return; }
+    var a = document.createElement('a');
+    if ('download' in a) {
+      a.href = url;
+      a.download = 'huni-coloring.png';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 1500);
+      toast('그림을 저장했어요 📷');
+    } else {
+      var win = window.open(url, '_blank');
+      if (!win) toast('길게 눌러 사진을 저장해 주세요');
+      else toast('새 창에서 길게 눌러 저장해 주세요');
+    }
+  });
+
+  /* ══════════ 리사이즈 ══════════ */
+  var rafPending = false;
+  function relayoutAll() {
+    layoutHangul();
+    if ($('#scr-color').classList.contains('active')) layoutColor();
+  }
+  function scheduleLayout() {
+    if (rafPending) return;
+    rafPending = true;
+    requestAnimationFrame(function () {
+      rafPending = false;
+      relayoutAll();
+    });
+  }
+
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(function () { scheduleLayout(); });
+    ro.observe(wrapH);
+    ro.observe(wrapC);
+  }
+  window.addEventListener('resize', scheduleLayout);
+  window.addEventListener('orientationchange', function () { setTimeout(scheduleLayout, 260); });
+
+  /* ══════════ 시작 ══════════ */
+  renderDesigns();
+  renderPen();
+  renderSizes();
+  renderChips();
+  requestAnimationFrame(function () {
+    layoutHangul();
+    layoutColor();
+  });
+  setTimeout(scheduleLayout, 320);
+
+  /* PWA */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/sw.js').catch(function () {});
+    });
+  }
+})();
+</script>
+</body>
+</html>
